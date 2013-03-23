@@ -1,0 +1,46 @@
+﻿<Window x:Name="FolderBrowser" x:Class="MoonGate.FolderBrowseWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Entity="clr-namespace:MoonGate.Component.Entity"
+        Title="Select Folders" Height="498" Width="329" Icon="pic/Moongate.ico" FontFamily="Tahoma" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" DataContext="{DynamicResource Tree}">
+    <Grid>
+        <TreeView x:Name="FolderTreeView" Margin="0,0,0,155" FontSize="14" Background="WhiteSmoke" SelectedItemChanged="FolderTreeView_SelectedItemChanged" 
+                  ItemsSource="{Binding Path=Nodes}" VirtualizingStackPanel.VirtualizationMode="Recycling" VirtualizingStackPanel.IsVirtualizing="True" ContextMenu="{DynamicResource DlgContextMenu}">
+            <TreeView.ItemTemplate>
+                <!-- ノードのテンプレート -->
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=ListTreeNodes}">
+                    <StackPanel Orientation="Horizontal" Height="20">
+                        <Image Height="12" Width="15" Source="pic/glyphicons/glyphicons_145_folder_plus.png" />
+                        <TextBlock Text="{Binding Path=FolderInfo.FileName}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <Control x:Name="SelectedNode" Visibility="Hidden" DataContext="{Binding Path=SelectedNode,Mode=OneWayToSource}" />
+        <Button x:Name="BtnOK" Content="OK" Margin="0,0,2,4" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="80" Command="ApplicationCommands.Close"/>
+        <Button x:Name="BtnAdd" Content="Add" HorizontalAlignment="Right" Margin="0,0,87,4" VerticalAlignment="Bottom" Width="80" Height="25" Command="{Binding Path=AddNodesCommand}" IsDefault="True"/>
+        <ListBox x:Name="ListSelected" HorizontalAlignment="Left" Height="116" Margin="0,323,0,0" VerticalAlignment="Top" Width="321" 
+                 Background="WhiteSmoke" FontSize="14" ItemsSource="{Binding Path=SelectedNodes}" IsTextSearchEnabled="False" />
+    </Grid>
+    
+    <Window.Resources>
+        <!-- VM定義 -->
+        <ObjectDataProvider x:Key="Tree" x:Name="Tree" ObjectType="{x:Type Entity:TreeEntity}" />
+        <!-- コンテキストメニュー定義 -->
+        <ContextMenu x:Key="DlgContextMenu" FontFamily="Tahoma">
+            <MenuItem Name="MenuItemRemove" Header="Add" Command="{Binding Path=AddNodesCommand}"/>
+        </ContextMenu>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close"
+                        Executed="CloseCommandHandler"/>
+    </Window.CommandBindings>
+
+    <Window.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#FFD4D0C8"/>
+            <GradientStop Color="#FFF5F5F4" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+</Window>
