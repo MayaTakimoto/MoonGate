@@ -10,8 +10,8 @@
                 <GradientStop Color="#FFF5F5F4" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <Button x:Name="btnOK" Content="OK" Margin="0,0,102,10" RenderTransformOrigin="0.32,-0.238" FontSize="14" Click="btnOK_Click" HorizontalAlignment="Right" Width="94" Height="28" VerticalAlignment="Bottom"/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,0,10" Width="97" RenderTransformOrigin="0.32,-0.238" FontSize="14" Click="btnCancel_Click" IsCancel="True" Height="28" VerticalAlignment="Bottom"/>
+        <Button x:Name="btnOK" Content="OK" Margin="0,0,102,10" RenderTransformOrigin="0.32,-0.238" FontSize="14" HorizontalAlignment="Right" Width="94" Height="28" VerticalAlignment="Bottom"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,0,10" Width="97" RenderTransformOrigin="0.32,-0.238" FontSize="14" IsCancel="True" Height="28" VerticalAlignment="Bottom"/>
         <Label x:Name="lblInfo" Content="" HorizontalAlignment="Left" Margin="0,259,0,0" VerticalAlignment="Top" Width="197" FontSize="14" Background="Transparent"/>
         <TabControl HorizontalAlignment="Left" Width="408" Margin="0,0,0,55" FontSize="14" Background="{x:Null}">
             <TabItem Header="Password">

@@ -19,28 +19,44 @@ namespace mgcloud
     public abstract class BaseCloudOperator : IDisposable
     {
         /// <summary>
-        /// 初回認証フラグ
-        /// </summary>
-        public bool FirstAuthFlg { get; set; }
-
-
-        /// <summary>
         /// ダウンロード対象ファイルの名前とダウンロードURLの一覧
         /// </summary>
         public HybridDictionary DownloadFileList { get; set; }
 
+        /// <summary>
+        /// 初回認証フラグ
+        /// </summary>
+        internal bool FirstAuthFlg { get; set; }
 
+        /// <summary>
+        /// クラウド接続済みフラグ
+        /// </summary>
+        internal bool ReadyConFlg { get; set; }
+                
         /// <summary>
         /// 認証情報保持エンティティ
         /// </summary>
         internal AuthInfoEntity EntAuth { get; set; }
 
+        /// <summary>
+        /// コンシューマキー
+        /// </summary>
+        internal string ConsumerKey { get; set; }
+
+        /// <summary>
+        /// コンシューマシークレット
+        /// </summary>
+        internal string ConsumerSecret { get; set; }
+
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public BaseCloudOperator()
+        public BaseCloudOperator(string cKey, string cSec)
         {
+            ConsumerKey = cKey;
+            ConsumerSecret = cSec;
+
             FirstAuthFlg = false;
         }
 

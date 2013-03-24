@@ -12,7 +12,7 @@ namespace MoonGate
          *************************************************/
 
         // 秘密鍵生成に使う情報
-        private string sPassInf;
+        //private string sPassInf;
 
 
         /*************************************************

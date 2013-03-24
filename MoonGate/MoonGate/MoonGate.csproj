@@ -30,7 +30,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\Moongate\</OutputPath>
+    <OutputPath>..\..\..\..\MoonGate\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -113,6 +113,8 @@
     <Compile Include="Component\Action\SelectFileAction.cs" />
     <Compile Include="Component\Action\SelectFolderAction.cs" />
     <Compile Include="Component\BaseAction.cs" />
+    <Compile Include="Component\Entity\CloudInfoEntity.cs" />
+    <Compile Include="Component\Entity\CloudInfoListEntity.cs" />
     <Compile Include="Component\Entity\FileInfoEntity.cs" />
     <Compile Include="Component\Entity\TreeEntity.cs" />
     <Compile Include="Component\Entity\TreeNodeEntity.cs" />

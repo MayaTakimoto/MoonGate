@@ -27,6 +27,7 @@ namespace MoonGate
         public MainWindow()
         {
             Thread.Sleep(1500);
+
             InitializeComponent();
         }
 

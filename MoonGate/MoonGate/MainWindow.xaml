@@ -56,12 +56,16 @@
                     <Image Source="pic/glyphicons/glyphicons_207_remove_2.png" />
                 </Button>
                 <Separator x:Name="sep_1" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
+                <!--
                 <Button x:Name="BtnEncrypt" Uid="BtnEncrypt" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Start to Encrypt">
                     <Image Source="pic/glyphicons/glyphicons_203_lock.png" />
                 </Button>
                 <Button x:Name="BtnDecrypt" Uid="BtnDecrypt" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Start to Decrypt">
                     <Image Source="pic/glyphicons/glyphicons_204_unlock.png" />
                 </Button>
+                -->
+                <Rectangle Width="5"/>
+                <ComboBox Width="120" DataContext="{DynamicResource EntCloud}" ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="StorageName" SelectedValuePath="StorageKey" />
                 <Button x:Name="BtnUpload" Uid="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Encrypt and Upload">
                     <Image Source="pic/glyphicons/glyphicons_213_up_arrow.png" />
                 </Button>
@@ -96,6 +100,8 @@
     <Window.Resources>
         <!-- VM定義 -->
         <Entity:ListEntity x:Key="EntList"/>
+        <!-- コンボボックスデータソース定義 -->
+        <Entity:CloudInfoListEntity x:Key="EntCloud" />
         <!-- コンテキストメニュー定義 -->
         <ContextMenu x:Key="ContextMenuMain" FontFamily="Tahoma">
             <MenuItem Name="MenuItemRemove" Header="Remove from List" 

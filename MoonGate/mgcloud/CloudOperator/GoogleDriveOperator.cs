@@ -35,26 +35,33 @@ namespace mgcloud.CloudOperator
         private const string MIME_GETFILES = @"application/octet-stream";
         private const string QUERY_GETFILES = @"fullText contains 'zip'";
         private const string FILE_DESCRIPTION = @"MoonGate Encrypted File";
-        private const string CLIENT_ID = @"815568550348.apps.googleusercontent.com";
-        private const string CLIENT_SECRET = @"yRDhSlYssPrYYjTNuVRpsiEh";
-        private const string REDIRECT_URI = @"urn:ietf:wg:oauth:2.0:oob";
+        //private const string CLIENT_ID = @"815568550348.apps.googleusercontent.com";
+        //private const string CLIENT_SECRET = @"yRDhSlYssPrYYjTNuVRpsiEh";
+        //private const string REDIRECT_URI = @"urn:ietf:wg:oauth:2.0:oob";
         private const string OAUTH_SCOPE = @"https://www.googleapis.com/auth/drive.file";
         private const string AUTH_PATH = @"GoogleDriveAuthInfo.xml";
         private const string KEY_CONTAINER_NAME = @"GDR_AUTH";
-
-
+        
         /// <summary>
         /// 
         /// </summary>
         private IAuthorizationState state;
-
-
+        
         /// <summary>
         /// 
         /// </summary>
         private DriveService dServ;
 
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="cKey"></param>
+        /// <param name="cSec"></param>
+        public GoogleDriveOperator(string cKey, string cSec)
+            : base(cKey, cSec) { }
+
+        
         /// <summary>
         /// 
         /// </summary>
@@ -243,7 +250,7 @@ namespace mgcloud.CloudOperator
         private DriveService InitConnection()
         {
             // GoogleDriveとコネクトするためのお決まり
-            var provider = new NativeApplicationClient(GoogleAuthenticationServer.Description, CLIENT_ID, CLIENT_SECRET);
+            var provider = new NativeApplicationClient(GoogleAuthenticationServer.Description, ConsumerKey, ConsumerSecret);
             var auth = new OAuth2Authenticator<NativeApplicationClient>(provider, GetAuthorization);
             dServ = new DriveService(auth);
 
@@ -269,16 +276,21 @@ namespace mgcloud.CloudOperator
             }
             else
             {
-                state.AccessToken = AuthInfoCipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);     // アクセストークンをセット
-                state.RefreshToken = AuthInfoCipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);   // リフレッシュトークンをセット
-                state.AccessTokenExpirationUtc = EntAuth.TokenLimit;                                        // アクセストークンの有効期限をセット
+                if (!ReadyConFlg)
+                {
+                    state.AccessToken = AuthInfoCipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);     // アクセストークンをセット
+                    state.RefreshToken = AuthInfoCipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);   // リフレッシュトークンをセット
+                    state.AccessTokenExpirationUtc = EntAuth.TokenLimit;                                        // アクセストークンの有効期限をセット
+
+                    AuthInfoCipher.DeleteKeys(KEY_CONTAINER_NAME);
+                }
 
                 if (state.AccessTokenExpirationUtc < DateTime.Now)
                 {
                     arg.RefreshToken(state);
                 }
 
-                AuthInfoCipher.DeleteKeys(KEY_CONTAINER_NAME);
+                ReadyConFlg = true;
                 return state;
             }
         }
@@ -298,6 +310,8 @@ namespace mgcloud.CloudOperator
             // アクセスコードを取得
             string authCode = Interaction.InputBox("Type Authrorization Code!", "Authorize");
 
+            FirstAuthFlg = false;
+            ReadyConFlg = true;
             return arg.ProcessUserAuthorization(authCode, state);
         }
 

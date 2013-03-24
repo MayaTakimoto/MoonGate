@@ -232,16 +232,16 @@ namespace MoonGate.Component.Entity
         }
 
 
-        ///// <summary>
-        ///// プロパティ変更イベントのコール
-        ///// </summary>
-        ///// <param name="strPropName">プロパティ名</param>
-        //private void OnPropertyChanged(string strPropName)
-        //{
-        //    if (PropertyChanged != null)
-        //    {
-        //        PropertyChanged(this, new PropertyChangedEventArgs(strPropName));
-        //    }
-        //}
+        /// <summary>
+        /// プロパティ変更イベントのコール
+        /// </summary>
+        /// <param name="strPropName">プロパティ名</param>
+        private void OnPropertyChanged(string strPropName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(strPropName));
+            }
+        }
     }
 }
