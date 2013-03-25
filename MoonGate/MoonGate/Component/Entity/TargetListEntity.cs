@@ -1,8 +1,8 @@
 ﻿//-----------------------------------------------------------------------
-// <summary>処理対象ファイルリストのビューモデル</summary>
+// <summary>処理対象ファイルリスト保持クラス</summary>
 // <author>MayaTakimoto</author> 
 // <date>$Date: 2013-02-13 14:00:00  +9:00 $</date>
-// <copyright file="$Name: ListEntity.cs $" > 
+// <copyright file="$Name: TargetListEntity.cs $" > 
 //     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
 // </copyright>
 //-----------------------------------------------------------------------
@@ -20,14 +20,14 @@ using System.Windows.Media.Imaging;
 namespace MoonGate.Component.Entity
 {
     /// <summary>
-    /// ターゲットリストのVMクラス
+    /// ターゲットリストクラス
     /// </summary>
-    class ListEntity : INotifyPropertyChanged
+    class TargetListEntity : INotifyPropertyChanged
     {
         /// <summary>
         /// ファイルリストのプロパティ
         /// </summary>
-        public ObservableCollection<ListItemEntity> ObsFileList { get; set; }
+        public ObservableCollection<TargetEntity> ObsFileList { get; set; }
 
         /// <summary>
         /// トグルボタン状態プロパティ
@@ -93,9 +93,9 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ListEntity()
+        public TargetListEntity()
         {
-            ObsFileList = new ObservableCollection<ListItemEntity>();
+            ObsFileList = new ObservableCollection<TargetEntity>();
             
             SetCommands();
         }
@@ -130,7 +130,7 @@ namespace MoonGate.Component.Entity
         /// <returns></returns>
         private bool IsSelected()
         {
-            foreach (ListItemEntity item in ObsFileList)
+            foreach (TargetEntity item in ObsFileList)
             {
                 if (item.IsSelected)
                 {
@@ -165,7 +165,7 @@ namespace MoonGate.Component.Entity
             {
                 foreach (string filePath in selectFileMessage.FileNames)
                 {
-                    ListItemEntity listItem = new ListItemEntity();
+                    TargetEntity listItem = new TargetEntity();
 
                     // 新規項目に情報をセットする
                     listItem.FileName = Path.GetFileName(filePath);
@@ -198,7 +198,7 @@ namespace MoonGate.Component.Entity
             {
                 foreach (string folderPath in selectFolderMessage.FolderNames)
                 {
-                    ListItemEntity listItem = new ListItemEntity();
+                    TargetEntity listItem = new TargetEntity();
 
                     listItem.FileName = Path.GetFileName(folderPath);
                     listItem.FilePath = folderPath;

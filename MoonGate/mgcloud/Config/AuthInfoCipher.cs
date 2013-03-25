@@ -15,7 +15,7 @@ namespace mgcloud.Config
         /// <param name="str"></param>
         /// <param name="containerName"></param>
         /// <returns></returns>
-        public static string EncryptRsa(string str, string containerName)
+        public string EncryptRsa(string str, string containerName)
         {
             string PublicKey = GetPublicKey(containerName);
 
@@ -36,7 +36,7 @@ namespace mgcloud.Config
         /// <param name="str"></param>
         /// <param name="containerName"></param>
         /// <returns></returns>
-        public static string DecryptRsa(string str, string containerName)
+        public string DecryptRsa(string str, string containerName)
         {
             var rsaProv = InitRsa(containerName);
 
@@ -52,7 +52,7 @@ namespace mgcloud.Config
         /// </summary>
         /// <param name="containerName"></param>
         /// <remarks>復号完了後に呼ぶ</remarks>
-        public static void DeleteKeys(string containerName)
+        public void DeleteKeys(string containerName)
         {
             var rsaProv = InitRsa(containerName);
             rsaProv.PersistKeyInCsp = false;
@@ -65,7 +65,7 @@ namespace mgcloud.Config
         /// </summary>
         /// <param name="containerName"></param>
         /// <returns></returns>
-        private static RSACryptoServiceProvider InitRsa(string containerName)
+        private RSACryptoServiceProvider InitRsa(string containerName)
         {
             CspParameters cspParam = new CspParameters();
             cspParam.KeyContainerName = containerName;
@@ -79,7 +79,7 @@ namespace mgcloud.Config
         /// </summary>
         /// <param name="containerName"></param>
         /// <returns></returns>
-        private static string GetPublicKey(string containerName)
+        private string GetPublicKey(string containerName)
         {
             var rsaProv = InitRsa(containerName);
 

@@ -25,7 +25,7 @@ namespace mgcloud.Config
 
 
         /// <summary>
-        /// 
+        /// コンストラクタ
         /// </summary>
         /// <param name="authInfoPath"></param>
         public AuthInfoSerializer(string authInfoPath)

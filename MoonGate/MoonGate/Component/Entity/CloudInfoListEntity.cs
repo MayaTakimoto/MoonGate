@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -14,20 +13,25 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 
         /// </summary>
-        public ObservableCollection<CloudInfoEntity> ListCloudInfo { get; set; }
+        public List<CloudInfoEntity> ListCloudInfo { get; private set; }
 
 
         /// <summary>
-        /// コンストラクタ
+        /// 
         /// </summary>
         public CloudInfoListEntity()
         {
-            ListCloudInfo = new ObservableCollection<CloudInfoEntity>();
+            ListCloudInfo = new List<CloudInfoEntity>();
+        }
 
-            CloudInfoEntity c = new CloudInfoEntity();
-            c.StorageName = "Google Drive";
-            c.StorageKey = "CS01";
-            ListCloudInfo.Add(c);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cldInf"></param>
+        public void UpdateList(CloudInfoEntity cldInf)
+        {
+            ListCloudInfo.Add(cldInf);
         }
     }
 }

@@ -62,36 +62,36 @@ namespace mgcloud.CloudOperator
             : base(cKey, cSec) { }
 
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileList"></param>
-        /// <returns>アップロードしたファイル数</returns>
-        public override int UploadFiles(string[] fileList)
-        {
-            int OKCount = 0;
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="fileList"></param>
+        ///// <returns>アップロードしたファイル数</returns>
+        //public override int UploadFiles(string[] fileList)
+        //{
+        //    int OKCount = 0;
 
-            LoadAuthInfo(AUTH_PATH);
+        //    LoadAuthInfo(AUTH_PATH);
 
-            dServ = InitConnection();
+        //    dServ = InitConnection();
 
-            foreach (string file in fileList)
-            {
-                int iRet = UploadFile(file);
-                if (iRet == 0)
-                {
-                    OKCount++;
-                }
-            }
+        //    foreach (string file in fileList)
+        //    {
+        //        //int iRet = UploadFile(file);
+        //        //if (iRet == 0)
+        //        //{
+        //        //    OKCount++;
+        //        //}
+        //    }
 
-            // 認証情報の保存。失敗した場合は既存の認証情報を削除する
-            if (!SaveAuthInfo(AUTH_PATH) && System.IO.File.Exists(AUTH_PATH))
-            {
-                System.IO.File.Delete(AUTH_PATH);
-            }
+        //    // 認証情報の保存。失敗した場合は既存の認証情報を削除する
+        //    if (!SaveAuthInfo(AUTH_PATH) && System.IO.File.Exists(AUTH_PATH))
+        //    {
+        //        System.IO.File.Delete(AUTH_PATH);
+        //    }
 
-            return OKCount;
-        }
+        //    return OKCount;
+        //}
 
 
 
@@ -134,65 +134,65 @@ namespace mgcloud.CloudOperator
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileList"></param>
-        /// <returns></returns>
-        public override int DownloadFiles(string[] fileList)
-        {
-            int OKCount = 0;
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="fileList"></param>
+        ///// <returns></returns>
+        //public override int DownloadFiles(string[] fileList)
+        //{
+        //    int OKCount = 0;
 
-            LoadAuthInfo(AUTH_PATH);
+        //    LoadAuthInfo(AUTH_PATH);
 
-            dServ = InitConnection();
+        //    dServ = InitConnection();
 
-            foreach (string file in fileList)
-            {
-                int iRet = DownloadFile(file);
-                if (iRet == 0)
-                {
-                    OKCount++;
-                }
-            }
+        //    foreach (string file in fileList)
+        //    {
+        //        //int iRet = DownloadFile(file);
+        //        //if (iRet == 0)
+        //        //{
+        //        //    OKCount++;
+        //        //}
+        //    }
 
-            // 認証情報の保存。失敗した場合は既存の認証情報を削除する
-            if (!SaveAuthInfo(AUTH_PATH) && System.IO.File.Exists(AUTH_PATH))
-            {
-                System.IO.File.Delete(AUTH_PATH);
-            }
+        //    // 認証情報の保存。失敗した場合は既存の認証情報を削除する
+        //    if (!SaveAuthInfo(AUTH_PATH) && System.IO.File.Exists(AUTH_PATH))
+        //    {
+        //        System.IO.File.Delete(AUTH_PATH);
+        //    }
 
-            return OKCount;
-        }
+        //    return OKCount;
+        //}
 
 
         /// <summary>
         /// アップロード（メイン）
         /// </summary>
-        /// <param name="filePath">アップロードするファイル</param>
+        /// <param name="fileName">アップロードするファイル</param>
         /// <returns></returns>
-        protected override int UploadFile(string filePath)
+        public override int UploadFile(string fileName, byte[] data)
         {
             // 引数が空の場合はエラー
-            if (string.IsNullOrEmpty(filePath) || string.IsNullOrWhiteSpace(filePath))
+            if (string.IsNullOrEmpty(fileName) || string.IsNullOrWhiteSpace(fileName))
             {
                 return -1;
             }
 
             // ファイルが存在しない場合はエラー
-            if (!System.IO.File.Exists(filePath))
+            if (!System.IO.File.Exists(fileName))
             {
                 return -2;
             }
 
             // アップロードファイルのひな形を作る
             var uploadFile = new Google.Apis.Drive.v2.Data.File();
-            uploadFile.Title = filePath;
+            uploadFile.Title = fileName;
             uploadFile.Description = FILE_DESCRIPTION;
             uploadFile.MimeType = MIME_GETFILES;
 
-            byte[] ulData = System.IO.File.ReadAllBytes(filePath);
-            MemoryStream ms = new MemoryStream(ulData);
+            //byte[] ulData = System.IO.File.ReadAllBytes(fileName);
+            MemoryStream ms = new MemoryStream(data);
 
             FilesResource.InsertMediaUpload uploadRequest = dServ.Files.Insert(uploadFile, ms, MIME_GETFILES);
             
@@ -208,7 +208,7 @@ namespace mgcloud.CloudOperator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        protected override int DownloadFile(string fileName)
+        public override int DownloadFile(string fileName, out byte[] data)
         {
             string downloadUrl = DownloadFileList[fileName].ToString();
 
@@ -220,7 +220,8 @@ namespace mgcloud.CloudOperator
 
             using (Stream fsSave = res.GetResponseStream())
             {
-                using (FileStream dlFile = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                using(MemoryStream msDl = new MemoryStream())
+                //using (FileStream dlFile = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
                     try
                     {
@@ -228,19 +229,35 @@ namespace mgcloud.CloudOperator
                         int iReadLength = 0;
                         while ((iReadLength = fsSave.Read(bytes, 0, bytes.Length)) > 0)
                         {
-                            dlFile.Write(bytes, 0, iReadLength);
+                            msDl.Write(bytes, 0, iReadLength);
+                            //dlFile.Write(bytes, 0, iReadLength);
                         }
                     }
                     catch
                     {
+                        data = null;
                         return -1;
                     }
+
+                    data = msDl.ToArray();
                 }
             }
-
+            
             return 0;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected override void SetAuthInfo()
+        {
+            AuthInfoCipher cipher = new AuthInfoCipher();
+
+            EntAuth.AccessToken = cipher.EncryptRsa(state.AccessToken, KEY_CONTAINER_NAME);
+            EntAuth.RefreshToken = cipher.EncryptRsa(state.RefreshToken, KEY_CONTAINER_NAME);
+            EntAuth.TokenLimit = (DateTime)state.AccessTokenExpirationUtc;
+        }
 
 
         /// <summary>
@@ -278,18 +295,20 @@ namespace mgcloud.CloudOperator
             {
                 if (!ReadyConFlg)
                 {
-                    state.AccessToken = AuthInfoCipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);     // アクセストークンをセット
-                    state.RefreshToken = AuthInfoCipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);   // リフレッシュトークンをセット
+                    AuthInfoCipher cipher = new AuthInfoCipher();
+
+                    state.AccessToken = cipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);     // アクセストークンをセット
+                    state.RefreshToken = cipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);   // リフレッシュトークンをセット
                     state.AccessTokenExpirationUtc = EntAuth.TokenLimit;                                        // アクセストークンの有効期限をセット
 
-                    AuthInfoCipher.DeleteKeys(KEY_CONTAINER_NAME);
+                    cipher.DeleteKeys(KEY_CONTAINER_NAME);
                 }
 
                 if (state.AccessTokenExpirationUtc < DateTime.Now)
                 {
                     arg.RefreshToken(state);
                 }
-
+                
                 ReadyConFlg = true;
                 return state;
             }

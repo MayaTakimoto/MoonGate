@@ -106,6 +106,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CloudSetupWindow.xaml.cs">
+      <DependentUpon>CloudSetupWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Component\ActionList.cs" />
     <Compile Include="Component\ActionRegistHelper.cs">
       <SubType>Code</SubType>
@@ -115,13 +118,19 @@
     <Compile Include="Component\BaseAction.cs" />
     <Compile Include="Component\Entity\CloudInfoEntity.cs" />
     <Compile Include="Component\Entity\CloudInfoListEntity.cs" />
+    <Compile Include="Component\Entity\ComboItemEntity.cs" />
+    <Compile Include="Component\Entity\ComboItemListEntity.cs" />
     <Compile Include="Component\Entity\FileInfoEntity.cs" />
     <Compile Include="Component\Entity\TreeEntity.cs" />
     <Compile Include="Component\Entity\TreeNodeEntity.cs" />
     <Compile Include="Component\Message\SelectFileMessage.cs" />
     <Compile Include="Component\BaseMessage.cs" />
     <Compile Include="Component\Indicator.cs" />
-    <Compile Include="Component\Entity\ListEntity.cs" />
+    <Compile Include="Component\Entity\TargetListEntity.cs" />
+    <Page Include="CloudSetupWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FolderBrowseWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -141,7 +150,7 @@
     <Compile Include="Component\CommandSetter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Component\Entity\ListItemEntity.cs" />
+    <Compile Include="Component\Entity\TargetEntity.cs" />
     <Compile Include="Component\Message\SelectFolderMessage.cs" />
     <Compile Include="FolderBrowseWindow.xaml.cs">
       <DependentUpon>FolderBrowseWindow.xaml</DependentUpon>
@@ -214,7 +223,9 @@
   <ItemGroup>
     <Resource Include="pic\glyphicons\glyphicons_134_inbox_in.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="pic\glyphicons\glyphicons_342_hdd.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

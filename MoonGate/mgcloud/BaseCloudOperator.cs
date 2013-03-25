@@ -61,12 +61,12 @@ namespace mgcloud
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileList"></param>
-        /// <returns></returns>
-        public abstract int UploadFiles(string[] fileList);
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="fileList"></param>
+        ///// <returns></returns>
+        //public abstract int UploadFiles(string[] fileList);
 
 
         /// <summary>
@@ -76,33 +76,39 @@ namespace mgcloud
         public abstract int GetFileList();
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileList"></param>
-        /// <returns></returns>
-        public abstract int DownloadFiles(string[] fileList);
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="fileList"></param>
+        ///// <returns></returns>
+        //public abstract int DownloadFiles(string[] fileList);
 
 
         /// <summary>
         /// クラウドストレージにアップロード
         /// </summary>
         /// <returns></returns>
-        protected abstract int UploadFile(string filePath);
+        public abstract int UploadFile(string filePath, byte[] data);
 
 
         /// <summary>
         /// クラウドストレージからダウンロード
         /// </summary>
         /// <returns></returns>
-        protected abstract int DownloadFile(string downloadUrl);
+        public abstract int DownloadFile(string downloadUrl, out byte[] data);
+
+
+        /// <summary>
+        /// 認証情報をエンティティに格納
+        /// </summary>
+        protected abstract void SetAuthInfo();
 
 
         /// <summary>
         /// 認証情報の読み込み
         /// </summary>
         /// <param name="authPath"></param>
-        protected virtual void LoadAuthInfo(string authPath)
+        public void LoadAuthInfo(string authPath)
         {
             AuthInfoEntity entAuth = new AuthInfoEntity();
 
@@ -122,9 +128,11 @@ namespace mgcloud
         /// <param name="authPath"></param>
         /// <param name="entAuthInfo"></param>
         /// <returns></returns>
-        protected virtual bool SaveAuthInfo(string authPath)
+        public bool SaveAuthInfo(string authPath)
         {
             bool bSerialize = true;
+
+            SetAuthInfo();
 
             AuthInfoSerializer aiSerializer = new AuthInfoSerializer(authPath);
             if (!aiSerializer.TrySerialize(EntAuth))

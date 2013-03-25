@@ -65,7 +65,7 @@
                 </Button>
                 -->
                 <Rectangle Width="5"/>
-                <ComboBox Width="120" DataContext="{DynamicResource EntCloud}" ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="StorageName" SelectedValuePath="StorageKey" />
+                <ComboBox Width="120" DataContext="{DynamicResource EntCloud}" ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="Value" SelectedValuePath="Key" />
                 <Button x:Name="BtnUpload" Uid="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Encrypt and Upload">
                     <Image Source="pic/glyphicons/glyphicons_213_up_arrow.png" />
                 </Button>
@@ -76,7 +76,10 @@
                     <Image Source="pic/glyphicons/glyphicons_134_inbox_in.png" />
                 </ToggleButton>
                 <Separator x:Name="sep_2" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
-                <Button x:Name="BtnSetting" Uid="BtnSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Setting">
+                <Button x:Name="BtnCldSetting" Uid="BtnCldSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="CloudStorage Setting">
+                    <Image Source="pic/glyphicons/glyphicons_342_hdd.png" />
+                </Button>
+                <Button x:Name="BtnSetting" Uid="BtnSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="App Setting">
                     <Image Source="pic/glyphicons/glyphicons_280_settings.png" />
                 </Button>
             </ToolBar>
@@ -99,9 +102,9 @@
 
     <Window.Resources>
         <!-- VM定義 -->
-        <Entity:ListEntity x:Key="EntList"/>
+        <Entity:TargetListEntity x:Key="EntList"/>
         <!-- コンボボックスデータソース定義 -->
-        <Entity:CloudInfoListEntity x:Key="EntCloud" />
+        <Entity:ComboItemListEntity x:Key="EntCloud" />
         <!-- コンテキストメニュー定義 -->
         <ContextMenu x:Key="ContextMenuMain" FontFamily="Tahoma">
             <MenuItem Name="MenuItemRemove" Header="Remove from List" 
