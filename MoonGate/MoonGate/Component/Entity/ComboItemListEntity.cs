@@ -1,8 +1,5 @@
-﻿using System;
+﻿using MoonGate.utility;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace MoonGate.Component.Entity
 {
@@ -14,7 +11,12 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 
         /// </summary>
-        public ObservableCollection<ComboItemEntity> ListCloudInfo { get; set; }
+        private string CSLIST_PATH = "mst/CSList.xml";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<ComboItemEntity> ListCloudInfo { get; set; }
 
 
         /// <summary>
@@ -22,21 +24,24 @@ namespace MoonGate.Component.Entity
         /// </summary>
         public ComboItemListEntity()
         {
-            ListCloudInfo = new ObservableCollection<ComboItemEntity>();
-
-            SetList();
+            object list = new List<ComboItemEntity>();
+            
+            if (DataSerializer.TryDeserialize(CSLIST_PATH, ref list))
+            {
+                ListCloudInfo = list as List<ComboItemEntity>;
+            }
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public void SetList()
-        {
-            ComboItemEntity c = new ComboItemEntity();
-            c.Value = "Google Drive";
-            c.Key = "CS01";
-            ListCloudInfo.Add(c);
-        }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public void SetList()
+        //{
+        //    ComboItemEntity c = new ComboItemEntity();
+        //    c.Value = "Google Drive";
+        //    c.Key = "CS01";
+        //    ListCloudInfo.Add(c);
+        //}
     }
 }

@@ -76,7 +76,7 @@ namespace mgcloud.Config
                 {
                     try
                     {
-                        entAuthInfo = (AuthInfoEntity)aiDeserializer.ReadObject(xDicRead);
+                        entAuthInfo = aiDeserializer.ReadObject(xDicRead) as AuthInfoEntity;
                     }
                     catch
                     {

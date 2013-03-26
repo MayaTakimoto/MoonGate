@@ -88,6 +88,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -127,6 +128,8 @@
     <Compile Include="Component\BaseMessage.cs" />
     <Compile Include="Component\Indicator.cs" />
     <Compile Include="Component\Entity\TargetListEntity.cs" />
+    <Compile Include="utility\Compressor.cs" />
+    <Compile Include="utility\DataSerializer.cs" />
     <Page Include="CloudSetupWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -225,6 +228,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="pic\glyphicons\glyphicons_342_hdd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="pic\glyphicons\glyphicons_149_folder_new.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

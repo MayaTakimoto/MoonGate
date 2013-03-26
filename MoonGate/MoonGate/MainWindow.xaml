@@ -37,6 +37,9 @@
         </Menu>
         <ToolBarTray Height="25" Margin="0,22,0,0" VerticalAlignment="Top" Width="Auto">
             <ToolBar x:Name="ToolBarMain" VerticalAlignment="Top" Width="Auto" Height="25">
+                <ComboBox Width="120" DataContext="{DynamicResource EntCloud}" ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="Value" SelectedValuePath="Key" />
+                <Rectangle Width="5"/>
+                <Separator x:Name="sep_0" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
                 <Button x:Name="BtnFileOpen" Uid="BtnFileOpen" Height="20" Width="23" 
                         VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Add Files to List" 
                         Command="{Binding Path=AddFilesCommand}" >
@@ -64,8 +67,6 @@
                     <Image Source="pic/glyphicons/glyphicons_204_unlock.png" />
                 </Button>
                 -->
-                <Rectangle Width="5"/>
-                <ComboBox Width="120" DataContext="{DynamicResource EntCloud}" ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="Value" SelectedValuePath="Key" />
                 <Button x:Name="BtnUpload" Uid="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Encrypt and Upload">
                     <Image Source="pic/glyphicons/glyphicons_213_up_arrow.png" />
                 </Button>
