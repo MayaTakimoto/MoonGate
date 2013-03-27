@@ -83,7 +83,12 @@ namespace MoonGate.Component.Entity
         /// 設定画面表示コマンドプロパティ
         /// </summary>
         public ICommand SettingCommand { get; private set; }
-        
+
+        /// <summary>
+        /// 終了コマンドプロパティ
+        /// </summary>
+        public ICommand ExitCommand { get; private set; }
+
         /// <summary>
         /// プロパティ変更検知用イベントハンドラ
         /// </summary>
@@ -96,7 +101,7 @@ namespace MoonGate.Component.Entity
         public TargetListEntity()
         {
             ObsFileList = new ObservableCollection<TargetEntity>();
-            
+
             SetCommands();
         }
 
@@ -121,9 +126,14 @@ namespace MoonGate.Component.Entity
                     return IsSelected();
                 }
             );
+
+
+            ExitCommand = new CommandSetter(
+                param => this.Shutdown()
+            );
         }
 
-        
+
         /// <summary>
         /// 選択項目の存在有無判定
         /// </summary>
@@ -229,6 +239,16 @@ namespace MoonGate.Component.Entity
                     index--;
                 }
             }
+        }
+
+
+        /// <summary>
+        /// アプリケーションの終了
+        /// </summary>
+        /// <returns></returns>
+        private void Shutdown()
+        {
+            App.Current.Shutdown();
         }
 
 
