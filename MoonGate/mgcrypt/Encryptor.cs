@@ -75,7 +75,7 @@ namespace mgcrypt
         /// 暗号化を実際に行うメソッド
         /// </summary>
         /// <returns></returns>
-        protected abstract int encryptMain(byte[] decInfo);
+        protected abstract int encryptMain(byte[] decInfo, out byte[] encData);
 
 
         /// <summary>
@@ -85,21 +85,20 @@ namespace mgcrypt
         private byte[] getDecInfo()
         {
             // ファイル拡張子の情報
-            StringBuilder sbDecInfo = new StringBuilder(8);
+            StringBuilder sbDecInfo = new StringBuilder(16);
             sbDecInfo.Append(Path.GetExtension(Target));
 
             // 半角スペースで埋める
-            while (sbDecInfo.Length < 8)
+            while (sbDecInfo.Length < 16)
             {
                 sbDecInfo.Append(" ");
             }
 
-            byte[] decInfo = new byte[32];
+            //byte[] decInfo = new byte[32];
 
-            Encoding.Unicode.GetBytes(sbDecInfo.ToString()).CopyTo(decInfo, 0);
-            KeyGen.Salt.CopyTo(decInfo, 16);
+            //.CopyTo(decInfo, 0);
 
-            return decInfo;
+            return Encoding.Unicode.GetBytes(sbDecInfo.ToString());
         }
 
 
@@ -109,37 +108,33 @@ namespace mgcrypt
         /// <param name="sPassInf">秘密鍵の生成に使う情報</param>
         /// <param name="iMode">暗号化モード</param>
         /// <returns></returns>
-        public int encrypt(string sPassInf, int iMode, int iKeyLength, int iBlockSize)
+        public int encrypt(string sPassInf, int iMode, int iKeyLength, int iBlockSize, out byte[] encData)
         {
-            // メソッドの戻り値
             int iRet = -99;
+            encData = null;
 
             // モードで場合分け
             switch (iMode)
             {
-                case 0: // パスワードによる暗号化の場合
+                case 0: 
                     char[] cPassword = sPassInf.ToCharArray();
 
-                    // 秘密鍵生成メソッド（パスワード用）を呼び出す
                     iRet = KeyGen.generateKey(cPassword);
                     break;
 
-                case 1: // 鍵ファイルによる暗号化の場合
+                case 1: 
                     FileInfo fiPass = new FileInfo(sPassInf);
 
-                    // 秘密鍵生成メソッド（鍵ファイル用）を呼び出す
                     iRet = KeyGen.generateKey(fiPass);
                     break;
 
-                case 2: // 鍵ドライブによる暗号化の場合
-                    // 秘密鍵生成メソッド（鍵ドライブ用）を呼び出す
+                case 2: 
                     iRet = KeyGen.generateKey(sPassInf);
                     break;
             }
             
             if (iRet < 0)
             {
-                // 戻り値が負の場合はエラーコードを返す
                 return iRet;
             }
 
@@ -155,14 +150,12 @@ namespace mgcrypt
             byte[] btDecInfo = getDecInfo();
 
             // 暗号化開始
-            iRet = encryptMain(btDecInfo);
+            iRet = encryptMain(btDecInfo, out encData);
             if (iRet < 0)
             {
-                // 戻り値が負の場合はエラーコードを返す
                 return iRet;
             }
 
-            // 正常に終了
             return 0;
         }
 

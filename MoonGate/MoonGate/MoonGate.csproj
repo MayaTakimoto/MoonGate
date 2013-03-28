@@ -78,11 +78,13 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mgcloud">
-      <HintPath>..\..\..\..\Documents\Moongate\bin\mgcloud.dll</HintPath>
+    <Reference Include="mgcloud, Version=1.0.4835.41714, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\MoonGate\bin\mgcloud.dll</HintPath>
     </Reference>
-    <Reference Include="mgcrypt">
-      <HintPath>..\..\..\..\Documents\Moongate\bin\mgcrypt.dll</HintPath>
+    <Reference Include="mgcrypt, Version=1.0.4835.41711, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\MoonGate\bin\mgcrypt.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

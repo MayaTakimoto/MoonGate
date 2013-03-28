@@ -30,18 +30,20 @@ namespace MoonGate.Component.Entity
             {
                 ListCloudInfo = list as List<ComboItemEntity>;
             }
+
+            SetList();
         }
 
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        //public void SetList()
-        //{
-        //    ComboItemEntity c = new ComboItemEntity();
-        //    c.Value = "Google Drive";
-        //    c.Key = "CS01";
-        //    ListCloudInfo.Add(c);
-        //}
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SetList()
+        {
+            ComboItemEntity c = new ComboItemEntity();
+            c.Value = "SkyDrive";
+            c.Key = "CS02";
+            ListCloudInfo.Add(c);
+        }
     }
 }

@@ -71,33 +71,37 @@ namespace mgcrypt.Rijndael
         /// Rijndaelアルゴリズムによる暗号化
         /// </summary>
         /// <returns></returns>
-        protected override int encryptMain(byte[] decInfo)
+        protected override int encryptMain(byte[] decInfo, out byte[] encData)
         {
             using (ICryptoTransform iEncryptor = rijnProvider.CreateEncryptor())
             {
-                using (FileStream outFs = new FileStream(Path.ChangeExtension(Target, sType), FileMode.Create, FileAccess.Write))
+                using (MemoryStream outMs = new MemoryStream())
                 {
                     using (FileStream inFs = new FileStream(Target, FileMode.Open, FileAccess.Read))
                     {
-                        using (CryptoStream cryptStrm = new CryptoStream(outFs, iEncryptor, CryptoStreamMode.Write))
+                        using (CryptoStream cryptStrm = new CryptoStream(outMs, iEncryptor, CryptoStreamMode.Write))
                         {
                             byte[] btTmp = new byte[1024];  // 一時バッファ
                             int iReadLength = 0;            // 読込データサイズ
-                            int iWriteOffset = 0;           // 書込開始位置
+                            //int iPosition = 0;           
 
                             try
                             {
-                                outFs.Write(decInfo, iWriteOffset, decInfo.Length);
-                                iWriteOffset = decInfo.Length;
+                                outMs.Write(KeyGen.Salt, 0, KeyGen.Salt.Length);
+                                cryptStrm.Position = KeyGen.Salt.Length;
 
+                                cryptStrm.Write(decInfo, 0, decInfo.Length);
                                 while ((iReadLength = inFs.Read(btTmp, 0, btTmp.Length)) > 0)
                                 {
-                                    cryptStrm.Write(btTmp, iWriteOffset, iReadLength);
+                                    cryptStrm.Write(btTmp, 0, iReadLength);
                                 }
+                                
+                                encData = outMs.ToArray();
                             }
                             catch
                             {
                                 // 例外発生時は偽を返す
+                                encData = null;
                                 return -90;
                             }
                         }
@@ -105,8 +109,8 @@ namespace mgcrypt.Rijndael
                 }
             }
 
-            // 進捗の更新
-            Interlocked.Exchange(ref iProgress, Interlocked.Add(ref iProgress, 1));
+            //// 進捗の更新
+            //Interlocked.Exchange(ref iProgress, Interlocked.Add(ref iProgress, 1));
 
             // 正常終了
             return 0;

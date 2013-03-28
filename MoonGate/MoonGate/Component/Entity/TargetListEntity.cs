@@ -89,6 +89,8 @@ namespace MoonGate.Component.Entity
         /// </summary>
         public ICommand ExitCommand { get; private set; }
 
+        public ICommand Test { get; set; }
+
         /// <summary>
         /// プロパティ変更検知用イベントハンドラ
         /// </summary>
@@ -127,10 +129,19 @@ namespace MoonGate.Component.Entity
                 }
             );
 
-
+            Test = new CommandSetter(
+                param => this.TestMes(param)
+            );
+           
             ExitCommand = new CommandSetter(
                 param => this.Shutdown()
             );
+        }
+
+        private void TestMes(object param)
+        {
+            ComboItemEntity c = param as ComboItemEntity;
+            MessageBox.Show(c.Key);
         }
 
 

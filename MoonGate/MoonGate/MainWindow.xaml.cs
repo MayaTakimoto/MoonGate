@@ -29,29 +29,20 @@ namespace MoonGate
             Thread.Sleep(1500);
 
             InitializeComponent();
-        }
 
-
-        /// <summary>
-        /// "Menu" → "Settling" クリック時イベント
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MenuSetting_Click(object sender, RoutedEventArgs e)
-        {
 
         }
 
-
-        /// <summary>
-        /// "Menu" → "Exit" クリック時イベント
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MenuExit_Click(object sender, RoutedEventArgs e)
+        private void BtnSetting_Click_1(object sender, RoutedEventArgs e)
         {
-            // MoonGateを終了する
-            this.Close();
+            ComboItemEntity c = this.MenuItemUpload.Items.CurrentItem as ComboItemEntity;
+            //ComboItemEntity i = this.MenuItemUpload.Items[0] as ComboItemEntity;
+            MessageBox.Show(c.Key);
+        }
+
+        private void CommandBinding_Executed_1(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+
         }
     }
 }

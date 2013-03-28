@@ -63,28 +63,33 @@ namespace mgcrypt.Rijndael
         /// 復号メインメソッド
         /// </summary>
         /// <returns></returns>
-        protected override int decryptMain(string strExtention)
+        protected override int decryptMain(byte[] decTarget, out byte[] decResult)
         {
             using (ICryptoTransform iDecryptor = rijnProvider.CreateDecryptor())
             {
-                using (FileStream inFs = new FileStream(Target, FileMode.Open, FileAccess.Read))
+                using (MemoryStream inMs = new MemoryStream(decTarget))
                 {
-                    using (FileStream outFs = new FileStream(Path.ChangeExtension(Target, strExtention), FileMode.Create, FileAccess.Write))
+                    using (MemoryStream outMs = new MemoryStream())
                     {
-                        using (CryptoStream cryptStrm = new CryptoStream(inFs, iDecryptor, CryptoStreamMode.Read))
+                        using (CryptoStream cryptStrm = new CryptoStream(inMs, iDecryptor, CryptoStreamMode.Read))
                         {
                             byte[] bs = new byte[1024];
 
                             try
                             {
                                 int readLen;
+                                cryptStrm.Position = KeyGen.Salt.Length;
+
                                 while ((readLen = cryptStrm.Read(bs, 0, bs.Length)) > 0)
                                 {
-                                    outFs.Write(bs, 0, readLen);
+                                    outMs.Write(bs, 0, readLen);
                                 }
+
+                                decResult = outMs.ToArray();
                             }
                             catch
                             {
+                                decResult = null;
                                 return -99;
                             }
                         }

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace mgcrypt
 {
@@ -24,10 +22,14 @@ namespace mgcrypt
          *  プロパティ                                   *
          *************************************************/
 
-        // 復号の対象ファイルのリストのプロパティ
-        protected string Target { get; set; }
-
-        // キージェネレータのプロパティ
+        /// <summary>
+        /// 復号したファイルの保存先のプロパティ
+        /// </summary>
+        protected string OutPath { get; private set; }
+                
+        /// <summary>
+        /// キージェネレータのプロパティ
+        /// </summary>
         internal KeyGenerator KeyGen { get; set; }
 
         
@@ -35,10 +37,10 @@ namespace mgcrypt
          *  コンストラクタ                               *
          *************************************************/
 
-        public Decryptor(string strTarget)
+        public Decryptor(string strOutPath)
         {
-            Target = strTarget;
-
+            OutPath = strOutPath;
+           
             // キージェネレータの生成
             KeyGen = new KeyGenerator();
         }
@@ -63,34 +65,34 @@ namespace mgcrypt
         /// 復号を実際に行うメソッド
         /// </summary>
         /// <returns></returns>
-        protected abstract int decryptMain(string strExtention);
+        protected abstract int decryptMain(byte[] decTarget, out byte[] decResult);
 
 
-        /// <summary>
-        /// 復号ファイルから復号用情報を抜き出す
-        /// </summary>
-        /// <returns></returns>
-        private byte[] getDecInfo()
-        {
-            byte[] btDecInfo = new byte[40];
+        ///// <summary>
+        ///// 復号ファイルから復号用情報を抜き出す
+        ///// </summary>
+        ///// <returns></returns>
+        //private byte[] getDecInfo()
+        //{
+        //    byte[] btDecInfo = DecTarget.
 
-            using (FileStream fsSalt = new FileStream(Target, FileMode.Open, FileAccess.Read))
-            {
-                try
-                {
-                    if (fsSalt.Read(btDecInfo, 0, btDecInfo.Length) != btDecInfo.Length)
-                    {
-                        return null;
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
-            }
+        //    using (FileStream fsSalt = new FileStream(OutPath, FileMode.Open, FileAccess.Read))
+        //    {
+        //        try
+        //        {
+        //            if (fsSalt.Read(btDecInfo, 0, btDecInfo.Length) != btDecInfo.Length)
+        //            {
+        //                return null;
+        //            }
+        //        }
+        //        catch
+        //        {
+        //            return null;
+        //        }
+        //    }
 
-            return btDecInfo;
-        }
+        //    return btDecInfo;
+        //}
 
 
         /// <summary>
@@ -98,10 +100,10 @@ namespace mgcrypt
         /// </summary>
         /// <param name="btDecInfo"></param>
         /// <returns></returns>
-        private string getExtention(byte[] btDecInfo)
+        private string getExtention(byte[] decResult)
         {
-            byte[] btExt = new byte[16];
-            Buffer.BlockCopy(btDecInfo, 0, btExt, 0, 16);
+            byte[] btExt = new byte[32];
+            Buffer.BlockCopy(decResult, 0, btExt, 0, 32);
 
             string strExtention = Encoding.Unicode.GetString(btExt);
 
@@ -114,10 +116,10 @@ namespace mgcrypt
         /// </summary>
         /// <param name="btDecInfo"></param>
         /// <returns></returns>
-        private byte[] getSalt(byte[] btDecInfo)
+        private byte[] getSalt(byte[] decTarget)
         {
             byte[] btSalt = new byte[16];
-            Buffer.BlockCopy(btDecInfo, 16, btSalt, 0, 16);
+            Buffer.BlockCopy(decTarget, 16, btSalt, 0, 16);
 
             return btSalt;
         }
@@ -129,22 +131,14 @@ namespace mgcrypt
         /// <param name="sPassInf">秘密鍵の生成に使う情報</param>
         /// <param name="iMode">復号モード</param>
         /// <returns></returns>
-        public int decrypt(string sPassInf, int iMode, int iKeyLength, int iBlockSize)
+        public int decrypt(string sPassInf, int iMode, int iKeyLength, int iBlockSize, byte[] decTarget)
         {
             // メソッドの戻り値
             int iRet = -99;
 
             // Saltを取得する
-            byte[] btDecInfo = getDecInfo();
-            if (btDecInfo == null || btDecInfo.Length == 0)
-            {
-                return iRet;
-            }
-            else
-            {
-                KeyGen.Salt = getSalt(btDecInfo);
-            }
-
+            KeyGen.Salt = getSalt(decTarget);
+            
             // モードで場合分け
             switch (iMode)
             {
@@ -180,16 +174,20 @@ namespace mgcrypt
                 return iRet;
             }
 
-            // ファイル拡張子を取得する
-            string strExtention = getExtention(btDecInfo);
-
+            
             // 復号開始
-            iRet = decryptMain(strExtention);
+            byte[] decResult = null;
+            iRet = decryptMain(decTarget, out decResult);
             if (iRet < 0)
             {
                 // 戻り値が負の場合はエラーコードを返す
                 return iRet;
             }
+
+            string strExtention = getExtention(decResult);
+            byte[] writeData = decResult.Skip(32).Take(decResult.Length - 32).ToArray();
+
+            File.WriteAllBytes(Path.ChangeExtension(OutPath, strExtention), writeData);
 
             // 正常に終了
             return 0;
