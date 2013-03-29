@@ -32,27 +32,31 @@
                 </LinearGradientBrush>
             </Menu.Background>
             <MenuItem x:Name="MenuMain" Header="File(_F)" Margin="0" FontFamily="Tahoma">
-                <MenuItem Name="MenuItemOpenFiles" Header="Add Files" HorizontalAlignment="Stretch" Command="{Binding Path=AddFilesCommand}" />
-                <MenuItem Name="MenuItemOpenDir" Header="Add Folders" HorizontalAlignment="Stretch" Command="{Binding Path=AddFoldersCommand}" />
-                <MenuItem Name="MenuItemOpenCloud" Header="Add Files from Cloud" HorizontalAlignment="Stretch" />
+                <MenuItem Name="MenuItemOpenFiles" Header="Add Files(_F)" HorizontalAlignment="Stretch" Command="{Binding Path=AddFilesCommand}" />
+                <MenuItem Name="MenuItemOpenDir" Header="Add Folders(_D)" HorizontalAlignment="Stretch" Command="{Binding Path=AddFoldersCommand}" />
+                <MenuItem Name="MenuItemOpenCloud" Header="Add Files from Cloud(_C)" HorizontalAlignment="Stretch" />
                 <Separator />
-                <MenuItem Name="MenuItemExit" Header="Exit" HorizontalAlignment="Stretch" Command="{Binding Path=ExitCommand}"/>
+                <MenuItem Name="MenuItemExit" Header="Exit(_Q)" HorizontalAlignment="Stretch" Command="{Binding Path=ExitCommand}"/>
             </MenuItem>
-            <MenuItem x:Name="MenuEnc" Header="Transmit(_T)" DataContext="{DynamicResource EntCloud}" >
-                <MenuItem Name="MenuItemUpload" Header="Upload(_U)" HorizontalAlignment="Stretch" ItemContainerStyle="{DynamicResource UploadMenuItemStyle}" ItemsSource="{Binding ListCloudInfo}" DisplayMemberPath="Value">
-                    
-                </MenuItem>
-                <MenuItem Name="MenuItemDownload" Header="Download(_D)" HorizontalAlignment="Stretch" />
+            <MenuItem x:Name="MenuTrans" Header="Transmit(_T)" >
+                <MenuItem x:Name="MenuItemUpload" Header="Upload(_U)" HorizontalAlignment="Stretch" 
+                          Command="{Binding Path=UploadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
+                <MenuItem x:Name="MenuItemUploadAll" Header="Upload All(_I)" HorizontalAlignment="Stretch" 
+                          Command="{Binding Path=UploadAllCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
+                <MenuItem Name="MenuItemDownload" Header="Download(_D)" HorizontalAlignment="Stretch" 
+                          Command="{Binding Path=DownloadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
+                <MenuItem Name="MenuItemDownloadAll" Header="Download All(_S)" HorizontalAlignment="Stretch" 
+                          Command="{Binding Path=DownloadAllCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
             </MenuItem>
            
             <MenuItem x:Name="MenuSetting" Header="Setting(_S)" >
 
             </MenuItem>
         </Menu>
-
         <ToolBarTray Height="25" Margin="0,22,0,0" VerticalAlignment="Top" Width="Auto">
             <ToolBar x:Name="ToolBarMain" VerticalAlignment="Top" Width="Auto" Height="25">
-                <ComboBox Width="120" DataContext="{DynamicResource EntCloud}" ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedIndex="0" />
+                <ComboBox x:Name="CmbCloudInfo" Width="120" SelectedIndex="0" 
+                          DataContext="{DynamicResource EntList}" ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="Value" SelectedValuePath="Key"/>
                 <Rectangle Width="5"/>
                 <Separator x:Name="sep_0" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
                 <Button x:Name="BtnFileOpen" Uid="BtnFileOpen" Height="20" Width="23" 
@@ -82,20 +86,20 @@
                     <Image Source="pic/glyphicons/glyphicons_204_unlock.png" />
                 </Button>
                 -->
-                <Button x:Name="BtnUpload" Uid="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Upload">
-                    <Image Source="pic/glyphicons/glyphicons_213_up_arrow.png" />
+                <Button x:Name="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Upload">
+                    <Image Source="pic/glyphicons/glyphicons_363_cloud_upload.png" />
                 </Button>
                 <Button x:Name="BtnDownload" Uid="BtnDownload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Download">
-                    <Image Source="pic/glyphicons/glyphicons_212_down_arrow.png" />
+                    <Image Source="pic/glyphicons/glyphicons_364_cloud_download.png" />
                 </Button>
-                <ToggleButton x:Name="tbtnUnifying" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsToggled,Mode=OneWayToSource}" >
+                <ToggleButton x:Name="tbtnUnifying" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsBundle,Mode=OneWayToSource}" >
                     <Image Source="pic/glyphicons/glyphicons_134_inbox_in.png" />
                 </ToggleButton>
                 <Separator x:Name="sep_2" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
                 <Button x:Name="BtnCldSetting" Uid="BtnCldSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Regist ConsumerInfo">
                     <Image Source="pic/glyphicons/glyphicons_193_circle_ok.png" />
                 </Button>
-                <Button x:Name="BtnSetting" Uid="BtnSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="App Setting" Click="BtnSetting_Click_1">
+                <Button x:Name="BtnSetting" Uid="BtnSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="App Setting" >
                     <Image Source="pic/glyphicons/glyphicons_136_cogwheel.png" />
                 </Button>
             </ToolBar>
@@ -118,9 +122,7 @@
 
     <Window.Resources>
         <!-- VM定義 -->
-        <Entity:TargetListEntity x:Key="EntList"/>
-        <!-- コンボボックスデータソース定義 -->
-        <Entity:ComboItemListEntity x:Key="EntCloud" />
+        <Entity:MainWindowInfoEntity x:Key="EntList"/>
         <!-- コンテキストメニュー定義 -->
         <ContextMenu x:Key="ContextMenuMain" FontFamily="Tahoma">
             <MenuItem Name="ConItemRemove" Header="Remove from List" Command="{Binding Path=RemoveItemsCommand}"/>
@@ -145,10 +147,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!-- 通信メニューアイテムスタイル -->
-        <Style x:Key="UploadMenuItemStyle" TargetType="{x:Type MenuItem}">
-            <Setter Property="Command" Value="{Binding EntList.Test}" />
-            
+        <Style x:Key="UploadMenuStyle" TargetType="{x:Type MenuItem}" >
+            <Setter Property="Command" Value="{Binding UploadCommand}" />
+            <Setter Property="CommandParameter" Value="{Binding Path=Items.CurrentItem}"/>
         </Style>
     </Window.Resources>
 

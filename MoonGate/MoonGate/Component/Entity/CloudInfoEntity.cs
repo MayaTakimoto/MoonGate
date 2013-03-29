@@ -1,24 +1,24 @@
 ﻿
+using System.Runtime.Serialization;
+
 namespace MoonGate.Component.Entity
 {
     /// <summary>
     /// 
     /// </summary>
+    [DataContract]
     class CloudInfoEntity
     {
         /// <summary>
         /// 
         /// </summary>
-        public string StorageKey { get; set; }
+        [DataMember]
+        public string Value { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public char[] ConsumerKey { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public char[] ConsumerSecret { get; set; }
+        [DataMember]
+        public string Key { get; set; }
     }
 }

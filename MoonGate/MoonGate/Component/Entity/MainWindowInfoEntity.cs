@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <summary>処理対象ファイルリスト保持クラス</summary>
+// <summary>メインウィンドウ各情報保持クラス</summary>
 // <author>MayaTakimoto</author> 
 // <date>$Date: 2013-02-13 14:00:00  +9:00 $</date>
 // <copyright file="$Name: TargetListEntity.cs $" > 
@@ -8,7 +8,9 @@
 //-----------------------------------------------------------------------
 
 using MoonGate.Component.Message;
+using MoonGate.utility;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -20,19 +22,29 @@ using System.Windows.Media.Imaging;
 namespace MoonGate.Component.Entity
 {
     /// <summary>
-    /// ターゲットリストクラス
+    /// MainWindow情報保持クラス
     /// </summary>
-    class TargetListEntity : INotifyPropertyChanged
+    class MainWindowInfoEntity : INotifyPropertyChanged
     {
         /// <summary>
-        /// ファイルリストのプロパティ
+        /// 
         /// </summary>
-        public ObservableCollection<TargetEntity> ObsFileList { get; set; }
+        private const string CSLIST_PATH = "mst/CSList.xml";
+
+        /// <summary>
+        /// リストのデータソースプロパティ
+        /// </summary>
+        public ObservableCollection<ListItemEntity> ObsFileList { get; set; }
+
+        /// <summary>
+        /// 使用可能クラウドストレージのリストプロパティ
+        /// </summary>
+        public List<CloudInfoEntity> ListCloudInfo { get; set; }
 
         /// <summary>
         /// トグルボタン状態プロパティ
         /// </summary>
-        public bool IsToggled { get; set; }
+        public bool IsBundle { get; set; }
 
         /// <summary>
         /// 処理進捗率プロパティ
@@ -60,24 +72,24 @@ namespace MoonGate.Component.Entity
         public ICommand RemoveItemsCommand { get; private set; }
 
         /// <summary>
-        /// 暗号化コマンドプロパティ
-        /// </summary>
-        public ICommand EncryptCommand { get; private set; }
-
-        /// <summary>
-        /// 復号コマンドプロパティ
-        /// </summary>
-        public ICommand DecryptCommand { get; private set; }
-
-        /// <summary>
-        /// アップデートコマンドプロパティ
+        /// 選択アップロードコマンドプロパティ
         /// </summary>
         public ICommand UploadCommand { get; private set; }
 
         /// <summary>
-        /// ダウンロードコマンドプロパティ
+        /// 全アップロードコマンドプロパティ
+        /// </summary>
+        public ICommand UploadAllCommand { get; private set; }
+
+        /// <summary>
+        /// 選択ダウンロードコマンドプロパティ
         /// </summary>
         public ICommand DownloadCommand { get; private set; }
+
+        /// <summary>
+        /// 全ダウンロードコマンドプロパティ
+        /// </summary>
+        public ICommand DownloadAllCommand { get; private set; }
 
         /// <summary>
         /// 設定画面表示コマンドプロパティ
@@ -89,8 +101,6 @@ namespace MoonGate.Component.Entity
         /// </summary>
         public ICommand ExitCommand { get; private set; }
 
-        public ICommand Test { get; set; }
-
         /// <summary>
         /// プロパティ変更検知用イベントハンドラ
         /// </summary>
@@ -100,9 +110,19 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public TargetListEntity()
+        public MainWindowInfoEntity()
         {
-            ObsFileList = new ObservableCollection<TargetEntity>();
+            ObsFileList = new ObservableCollection<ListItemEntity>();
+
+            object list = new List<CloudInfoEntity>();
+            if (DataSerializer.TryDeserialize(CSLIST_PATH, ref list))
+            {
+                ListCloudInfo = list as List<CloudInfoEntity>;
+            }
+            //CloudInfoEntity c = new CloudInfoEntity();
+            //c.Key = "CS02";
+            //c.Value = "SkyDrive";
+            //ListCloudInfo.Add(c);
 
             SetCommands();
         }
@@ -129,19 +149,17 @@ namespace MoonGate.Component.Entity
                 }
             );
 
-            Test = new CommandSetter(
-                param => this.TestMes(param)
+            UploadCommand = new CommandSetter(
+                param => this.Upload(param),
+                param =>
+                {
+                    return IsSelected();
+                }
             );
-           
+
             ExitCommand = new CommandSetter(
                 param => this.Shutdown()
             );
-        }
-
-        private void TestMes(object param)
-        {
-            ComboItemEntity c = param as ComboItemEntity;
-            MessageBox.Show(c.Key);
         }
 
 
@@ -151,7 +169,7 @@ namespace MoonGate.Component.Entity
         /// <returns></returns>
         private bool IsSelected()
         {
-            foreach (TargetEntity item in ObsFileList)
+            foreach (ListItemEntity item in ObsFileList)
             {
                 if (item.IsSelected)
                 {
@@ -186,7 +204,7 @@ namespace MoonGate.Component.Entity
             {
                 foreach (string filePath in selectFileMessage.FileNames)
                 {
-                    TargetEntity listItem = new TargetEntity();
+                    ListItemEntity listItem = new ListItemEntity();
 
                     // 新規項目に情報をセットする
                     listItem.FileName = Path.GetFileName(filePath);
@@ -219,7 +237,7 @@ namespace MoonGate.Component.Entity
             {
                 foreach (string folderPath in selectFolderMessage.FolderNames)
                 {
-                    TargetEntity listItem = new TargetEntity();
+                    ListItemEntity listItem = new ListItemEntity();
 
                     listItem.FileName = Path.GetFileName(folderPath);
                     listItem.FilePath = folderPath;
@@ -250,6 +268,17 @@ namespace MoonGate.Component.Entity
                     index--;
                 }
             }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        private void Upload(object param)
+        {
+            MessageBox.Show(param.ToString());
         }
 
 

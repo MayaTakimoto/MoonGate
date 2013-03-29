@@ -29,20 +29,6 @@ namespace MoonGate
             Thread.Sleep(1500);
 
             InitializeComponent();
-
-
-        }
-
-        private void BtnSetting_Click_1(object sender, RoutedEventArgs e)
-        {
-            ComboItemEntity c = this.MenuItemUpload.Items.CurrentItem as ComboItemEntity;
-            //ComboItemEntity i = this.MenuItemUpload.Items[0] as ComboItemEntity;
-            MessageBox.Show(c.Key);
-        }
-
-        private void CommandBinding_Executed_1(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
-        {
-
         }
     }
 }
