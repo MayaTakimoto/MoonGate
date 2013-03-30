@@ -9,7 +9,7 @@ namespace MoonGate.Component.Entity
     /// <summary>
     /// ツリーノードリストクラス
     /// </summary>
-    class TreeEntity
+    class FolderBrowserInfoEntity
     {
         /// <summary>
         /// 子ノードのリストのプロパティ
@@ -31,21 +31,21 @@ namespace MoonGate.Component.Entity
         /// </summary>
         public ICommand AddNodesCommand { get; private set; }
 
-        /// <summary>
-        /// OKボタン押下時コマンドプロパティ
-        /// </summary>
-        public ICommand ResultOKCommand { get; private set; }
+        ///// <summary>
+        ///// OKボタン押下時コマンドプロパティ
+        ///// </summary>
+        //public ICommand ResultOKCommand { get; private set; }
 
-        /// <summary>
-        /// キャンセルボタン押下時コマンドプロパティ
-        /// </summary>
-        public ICommand ResultCancelCommand { get; private set; }
+        ///// <summary>
+        ///// キャンセルボタン押下時コマンドプロパティ
+        ///// </summary>
+        //public ICommand ResultCancelCommand { get; private set; }
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public TreeEntity()
+        public FolderBrowserInfoEntity()
         {
             DriveInfo[] listDrv = DriveInfo.GetDrives();
             Nodes = listDrv.Select(param => new TreeNodeEntity(param.Name)).ToList<TreeNodeEntity>();
@@ -62,7 +62,7 @@ namespace MoonGate.Component.Entity
         private void SetCommand()
         {
             AddNodesCommand = new CommandSetter(
-                param => Add(),
+                param => this.Add(),
                 param =>
                 {
                     if (SelectedNode == null)
@@ -74,21 +74,25 @@ namespace MoonGate.Component.Entity
                 }
             );
 
-            ResultOKCommand = new CommandSetter(
-                param => Close(),
-                param =>
-                {
-                    if (SelectedNodes.Count == 0)
-                    {
-                        return false;
-                    }
+            //ResultOKCommand = new CommandSetter(
+            //    param => this.Close(),
+            //    param =>
+            //    {
+            //        if (SelectedNodes.Count == 0)
+            //        {
+            //            return false;
+            //        }
 
-                    return true;
-                }
-            );
+            //        return true;
+            //    }
+            //);
+
+            //ResultCancelCommand = new CommandSetter(
+            //    param => this.Cansel()
+            //);
         }
 
-
+        
         /// <summary>
         /// 選択されたノードをリストに追加
         /// </summary>
@@ -99,14 +103,27 @@ namespace MoonGate.Component.Entity
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private void Close()
-        {
-            AddNodesCommand = null;
-            ResultOKCommand = null;
-            ResultCancelCommand = null;
-        }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //private void Close()
+        //{
+        //    AddNodesCommand = null;
+        //    ResultOKCommand = null;
+        //    ResultCancelCommand = null;
+
+            
+        //}
+
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //private void Cansel()
+        //{
+        //    SelectedNodes.Clear();
+        //    this.Close();
+        //}
+
     }
 }

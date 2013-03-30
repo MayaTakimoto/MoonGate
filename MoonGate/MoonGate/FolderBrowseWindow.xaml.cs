@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using MoonGate.Component.Entity;
+using System.Windows;
 using System.Windows.Input;
 
 namespace MoonGate

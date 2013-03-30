@@ -25,7 +25,7 @@
     
     <Window.Resources>
         <!-- VM定義 -->
-        <ObjectDataProvider x:Key="Tree" x:Name="Tree" ObjectType="{x:Type Entity:TreeEntity}" />
+        <ObjectDataProvider x:Key="Tree" x:Name="Tree" ObjectType="{x:Type Entity:FolderBrowserInfoEntity}" />
         <!-- コンテキストメニュー定義 -->
         <ContextMenu x:Key="DlgContextMenu" FontFamily="Tahoma">
             <MenuItem Name="MenuItemRemove" Header="Add" Command="{Binding Path=AddNodesCommand}"/>

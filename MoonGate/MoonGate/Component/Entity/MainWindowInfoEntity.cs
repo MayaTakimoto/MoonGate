@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -29,7 +30,7 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 
         /// </summary>
-        private const string CSLIST_PATH = "mst/CSList.xml";
+        private const string CSLIST_PATH = "./mst/CSList.xml";
 
         /// <summary>
         /// リストのデータソースプロパティ
@@ -42,9 +43,14 @@ namespace MoonGate.Component.Entity
         public List<CloudInfoEntity> ListCloudInfo { get; set; }
 
         /// <summary>
-        /// トグルボタン状態プロパティ
+        /// 複数ファイルを一つに圧縮するかプロパティ
         /// </summary>
         public bool IsBundle { get; set; }
+
+        /// <summary>
+        /// ローカルに暗号化ファイルを残すかプロパティ
+        /// </summary>
+        public bool IsLocal { get; set; }
 
         /// <summary>
         /// 処理進捗率プロパティ
@@ -90,6 +96,11 @@ namespace MoonGate.Component.Entity
         /// 全ダウンロードコマンドプロパティ
         /// </summary>
         public ICommand DownloadAllCommand { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ICommand CloudSetupCommand { get; private set; }
 
         /// <summary>
         /// 設定画面表示コマンドプロパティ
@@ -157,12 +168,16 @@ namespace MoonGate.Component.Entity
                 }
             );
 
+            CloudSetupCommand = new CommandSetter(
+                param => this.CallCldSetup()
+            );
+
             ExitCommand = new CommandSetter(
                 param => this.Shutdown()
             );
         }
 
-
+        
         /// <summary>
         /// 選択項目の存在有無判定
         /// </summary>
@@ -281,6 +296,16 @@ namespace MoonGate.Component.Entity
             MessageBox.Show(param.ToString());
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private void CallCldSetup()
+        {
+            Process.Start("CldSetup.exe");
+        }
+        
 
         /// <summary>
         /// アプリケーションの終了

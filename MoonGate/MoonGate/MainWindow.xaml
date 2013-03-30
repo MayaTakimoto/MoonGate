@@ -7,7 +7,7 @@
     xmlns:Component="clr-namespace:MoonGate.Component"
     Title="MoonGate" Height="471.724" Width="604.415"
     Icon="pic/Moongate.ico" WindowStartupLocation="CenterScreen" 
-    FontFamily="Tahoma" DataContext="{DynamicResource EntList}" >
+    FontFamily="Tahoma" DataContext="{DynamicResource EntMain}" >
         
     <!-- メイン画面定義 -->
     <Grid>
@@ -56,7 +56,7 @@
         <ToolBarTray Height="25" Margin="0,22,0,0" VerticalAlignment="Top" Width="Auto">
             <ToolBar x:Name="ToolBarMain" VerticalAlignment="Top" Width="Auto" Height="25">
                 <ComboBox x:Name="CmbCloudInfo" Width="120" SelectedIndex="0" 
-                          DataContext="{DynamicResource EntList}" ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="Value" SelectedValuePath="Key"/>
+                          ItemsSource="{Binding Path=ListCloudInfo}" DisplayMemberPath="Value" SelectedValuePath="Key"/>
                 <Rectangle Width="5"/>
                 <Separator x:Name="sep_0" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
                 <Button x:Name="BtnFileOpen" Uid="BtnFileOpen" Height="20" Width="23" 
@@ -95,8 +95,12 @@
                 <ToggleButton x:Name="tbtnUnifying" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsBundle,Mode=OneWayToSource}" >
                     <Image Source="pic/glyphicons/glyphicons_134_inbox_in.png" />
                 </ToggleButton>
+                <ToggleButton x:Name="tbLocalCopy" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsLocal,Mode=OneWayToSource}" >
+                    <Image Source="pic/glyphicons/glyphicons_134_inbox_in.png" />
+                </ToggleButton>
                 <Separator x:Name="sep_2" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
-                <Button x:Name="BtnCldSetting" Uid="BtnCldSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Regist ConsumerInfo">
+                <Button x:Name="BtnCldSetting" Uid="BtnCldSetting" Height="20" VerticalAlignment="Center" Width="23" 
+                        HorizontalAlignment="Left" ToolTip="Regist ConsumerInfo" Command="{Binding Path=CloudSetupCommand}">
                     <Image Source="pic/glyphicons/glyphicons_193_circle_ok.png" />
                 </Button>
                 <Button x:Name="BtnSetting" Uid="BtnSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="App Setting" >
@@ -122,7 +126,7 @@
 
     <Window.Resources>
         <!-- VM定義 -->
-        <Entity:MainWindowInfoEntity x:Key="EntList"/>
+        <Entity:MainWindowInfoEntity x:Key="EntMain"/>
         <!-- コンテキストメニュー定義 -->
         <ContextMenu x:Key="ContextMenuMain" FontFamily="Tahoma">
             <MenuItem Name="ConItemRemove" Header="Remove from List" Command="{Binding Path=RemoveItemsCommand}"/>
