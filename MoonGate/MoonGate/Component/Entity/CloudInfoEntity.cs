@@ -7,7 +7,7 @@ namespace MoonGate.Component.Entity
     /// 
     /// </summary>
     [DataContract]
-    class CloudInfoEntity
+    public class CloudInfoEntity
     {
         /// <summary>
         /// 

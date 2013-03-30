@@ -109,9 +109,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CloudSetupWindow.xaml.cs">
-      <DependentUpon>CloudSetupWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Component\ActionList.cs" />
     <Compile Include="Component\ActionRegistHelper.cs">
       <SubType>Code</SubType>
@@ -120,7 +117,6 @@
     <Compile Include="Component\Action\SelectFileAction.cs" />
     <Compile Include="Component\Action\SelectFolderAction.cs" />
     <Compile Include="Component\BaseAction.cs" />
-    <Compile Include="Component\Entity\CloudSetupInfoEntity.cs" />
     <Compile Include="Component\Entity\ConsumerInfoEntity.cs" />
     <Compile Include="Component\Entity\ConsumerInfoListEntity.cs" />
     <Compile Include="Component\Entity\CloudInfoEntity.cs" />
@@ -133,11 +129,8 @@
     <Compile Include="Component\Indicator.cs" />
     <Compile Include="Component\Entity\MainWindowInfoEntity.cs" />
     <Compile Include="utility\Compressor.cs" />
+    <Compile Include="utility\DataCipher.cs" />
     <Compile Include="utility\DataSerializer.cs" />
-    <Page Include="CloudSetupWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="FolderBrowseWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -195,7 +188,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <SplashScreen Include="pic\Moongate_s.png" />
@@ -231,6 +226,10 @@
   <ItemGroup>
     <Resource Include="pic\glyphicons\glyphicons_363_cloud_upload.png" />
     <Resource Include="pic\glyphicons\glyphicons_364_cloud_download.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="pic\glyphicons\glyphicons_235_pen.png" />
+    <Resource Include="pic\glyphicons\glyphicons_358_file_import.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

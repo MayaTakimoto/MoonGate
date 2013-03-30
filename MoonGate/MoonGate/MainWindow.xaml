@@ -95,12 +95,15 @@
                 <ToggleButton x:Name="tbtnUnifying" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsBundle,Mode=OneWayToSource}" >
                     <Image Source="pic/glyphicons/glyphicons_134_inbox_in.png" />
                 </ToggleButton>
-                <ToggleButton x:Name="tbLocalCopy" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsLocal,Mode=OneWayToSource}" >
-                    <Image Source="pic/glyphicons/glyphicons_134_inbox_in.png" />
+                <ToggleButton x:Name="tbLocalCopy" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Local Copy" IsChecked="{Binding Path=IsLocal,Mode=OneWayToSource}" >
+                    <Image Source="pic/glyphicons/glyphicons_358_file_import.png" />
                 </ToggleButton>
                 <Separator x:Name="sep_2" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
                 <Button x:Name="BtnCldSetting" Uid="BtnCldSetting" Height="20" VerticalAlignment="Center" Width="23" 
                         HorizontalAlignment="Left" ToolTip="Regist ConsumerInfo" Command="{Binding Path=CloudSetupCommand}">
+                    <Image Source="pic/glyphicons/glyphicons_235_pen.png" />
+                </Button>
+                <Button x:Name="BtnAssociate" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Associate" >
                     <Image Source="pic/glyphicons/glyphicons_193_circle_ok.png" />
                 </Button>
                 <Button x:Name="BtnSetting" Uid="BtnSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="App Setting" >

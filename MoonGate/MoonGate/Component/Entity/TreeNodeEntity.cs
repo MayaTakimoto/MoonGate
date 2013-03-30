@@ -8,7 +8,7 @@ namespace MoonGate.Component.Entity
     /// <summary>
     /// ツリーノードクラス
     /// </summary>
-    class TreeNodeEntity
+    public class TreeNodeEntity
     {
         /// <summary>
         /// ディレクトリ情報

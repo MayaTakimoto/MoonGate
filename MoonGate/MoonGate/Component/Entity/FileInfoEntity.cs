@@ -1,11 +1,10 @@
-﻿using System.Windows.Media.Imaging;
-
+﻿
 namespace MoonGate.Component.Entity
 {
     /// <summary>
     /// ファイル情報保持クラス
     /// </summary>
-    class FileInfoEntity
+    public class FileInfoEntity
     {
         /// <summary>
         /// ファイル名

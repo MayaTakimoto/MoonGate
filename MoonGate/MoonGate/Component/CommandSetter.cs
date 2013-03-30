@@ -6,7 +6,7 @@ namespace MoonGate.Component
     /// <summary>
     /// 自作RelayCommandクラス
     /// </summary>
-    sealed class CommandSetter : ICommand
+    public sealed class CommandSetter : ICommand
     {
         /// <summary>
         /// 実行用メソッド

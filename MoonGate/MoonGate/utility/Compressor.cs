@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MoonGate.Component
 {
-    class Compressor
+    public class Compressor
     {
     }
 }

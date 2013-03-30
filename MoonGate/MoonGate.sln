@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mgcloud", "mgcloud\mgcloud.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mgcrypt", "mgcrypt\mgcrypt.csproj", "{FDABB69C-B05D-4196-9841-546A159EEA4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CldSetup", "CldSetup\CldSetup.csproj", "{DAECE863-9122-4E67-96BB-E1E77AB8C738}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsumerSignup", "ConsumerSignup\ConsumerSignup.csproj", "{E95B2F5B-DFCA-40FB-8521-79284313F47D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,14 +55,14 @@ Global
 		{FDABB69C-B05D-4196-9841-546A159EEA4D}.Release|x64.Build.0 = Release|x64
 		{FDABB69C-B05D-4196-9841-546A159EEA4D}.Release|x86.ActiveCfg = Release|x86
 		{FDABB69C-B05D-4196-9841-546A159EEA4D}.Release|x86.Build.0 = Release|x86
-		{DAECE863-9122-4E67-96BB-E1E77AB8C738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DAECE863-9122-4E67-96BB-E1E77AB8C738}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DAECE863-9122-4E67-96BB-E1E77AB8C738}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{DAECE863-9122-4E67-96BB-E1E77AB8C738}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DAECE863-9122-4E67-96BB-E1E77AB8C738}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DAECE863-9122-4E67-96BB-E1E77AB8C738}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DAECE863-9122-4E67-96BB-E1E77AB8C738}.Release|x64.ActiveCfg = Release|Any CPU
-		{DAECE863-9122-4E67-96BB-E1E77AB8C738}.Release|x86.ActiveCfg = Release|Any CPU
+		{E95B2F5B-DFCA-40FB-8521-79284313F47D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E95B2F5B-DFCA-40FB-8521-79284313F47D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E95B2F5B-DFCA-40FB-8521-79284313F47D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E95B2F5B-DFCA-40FB-8521-79284313F47D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E95B2F5B-DFCA-40FB-8521-79284313F47D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E95B2F5B-DFCA-40FB-8521-79284313F47D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E95B2F5B-DFCA-40FB-8521-79284313F47D}.Release|x64.ActiveCfg = Release|Any CPU
+		{E95B2F5B-DFCA-40FB-8521-79284313F47D}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

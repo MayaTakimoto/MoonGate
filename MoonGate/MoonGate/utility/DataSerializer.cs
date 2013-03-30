@@ -7,7 +7,7 @@ namespace MoonGate.utility
     /// <summary>
     /// シリアライズ・デシリアライズクラス
     /// </summary>
-    class DataSerializer
+    public class DataSerializer
     {
         /// <summary>
         /// シリアライズメソッド

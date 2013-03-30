@@ -9,7 +9,7 @@ namespace MoonGate.Component.Entity
     /// <summary>
     /// リスト項目クラス
     /// </summary>
-    class ListItemEntity : FileInfoEntity
+    public class ListItemEntity : FileInfoEntity
     {
         /// <summary>
         /// アイコンパス

@@ -4,7 +4,7 @@ namespace MoonGate.Component.Entity
     /// <summary>
     /// 
     /// </summary>
-    class ConsumerInfoEntity
+    public class ConsumerInfoEntity
     {
         /// <summary>
         /// 

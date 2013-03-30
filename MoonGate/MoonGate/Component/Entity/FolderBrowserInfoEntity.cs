@@ -9,7 +9,7 @@ namespace MoonGate.Component.Entity
     /// <summary>
     /// ツリーノードリストクラス
     /// </summary>
-    class FolderBrowserInfoEntity
+    public class FolderBrowserInfoEntity
     {
         /// <summary>
         /// 子ノードのリストのプロパティ

@@ -25,12 +25,12 @@ namespace MoonGate.Component.Entity
     /// <summary>
     /// MainWindow情報保持クラス
     /// </summary>
-    class MainWindowInfoEntity : INotifyPropertyChanged
+    public class MainWindowInfoEntity : INotifyPropertyChanged
     {
         /// <summary>
         /// 
         /// </summary>
-        private const string CSLIST_PATH = "./mst/CSList.xml";
+        private const string MASTERFILE_PATH = "./mst/CSFile.xml";
 
         /// <summary>
         /// リストのデータソースプロパティ
@@ -126,7 +126,7 @@ namespace MoonGate.Component.Entity
             ObsFileList = new ObservableCollection<ListItemEntity>();
 
             object list = new List<CloudInfoEntity>();
-            if (DataSerializer.TryDeserialize(CSLIST_PATH, ref list))
+            if (DataSerializer.TryDeserialize(MASTERFILE_PATH, ref list))
             {
                 ListCloudInfo = list as List<CloudInfoEntity>;
             }
@@ -168,6 +168,19 @@ namespace MoonGate.Component.Entity
                 }
             );
 
+            UploadAllCommand = new CommandSetter(
+                param => this.UproadAll(param),
+                param =>
+                {
+                    if (ObsFileList.Count == 0) 
+                    { 
+                        return false;
+                    }
+
+                    return true;
+                }
+            );
+
             CloudSetupCommand = new CommandSetter(
                 param => this.CallCldSetup()
             );
@@ -176,7 +189,7 @@ namespace MoonGate.Component.Entity
                 param => this.Shutdown()
             );
         }
-
+        
         
         /// <summary>
         /// 選択項目の存在有無判定
@@ -290,7 +303,6 @@ namespace MoonGate.Component.Entity
         /// 
         /// </summary>
         /// <param name="param"></param>
-        /// <returns></returns>
         private void Upload(object param)
         {
             MessageBox.Show(param.ToString());
@@ -300,10 +312,20 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="param"></param>
+        private void UproadAll(object param)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// CloudSetup起動
+        /// </summary>
         /// <returns></returns>
         private void CallCldSetup()
         {
-            Process.Start("CldSetup.exe");
+            Process.Start("ConsumerSignup.exe");
         }
         
 
@@ -314,6 +336,22 @@ namespace MoonGate.Component.Entity
         private void Shutdown()
         {
             App.Current.Shutdown();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private ConsumerInfoListEntity GetConsumerInfoList()
+        {
+            object objConsumerInfo = new ConsumerInfoListEntity();
+            if (!DataSerializer.TryDeserialize("./user/CSInfo.xml", ref objConsumerInfo))
+            {
+                return null;
+            }
+
+            return objConsumerInfo as ConsumerInfoListEntity;
         }
 
 
