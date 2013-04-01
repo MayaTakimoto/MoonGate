@@ -14,11 +14,11 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 
         /// </summary>
-        public char[] ConsumerKey { get; set; }
+        public string ConsumerKey { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public char[] ConsumerSecret { get; set; }
+        public string ConsumerSecret { get; set; }
     }
 }

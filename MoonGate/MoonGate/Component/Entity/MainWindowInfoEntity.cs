@@ -30,7 +30,7 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 
         /// </summary>
-        private const string MASTERFILE_PATH = "./mst/CSFile.xml";
+        private const string MASTERFILE_PATH = "./mst.xml";
 
         /// <summary>
         /// リストのデータソースプロパティ

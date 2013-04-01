@@ -299,7 +299,7 @@ namespace mgcloud.CloudOperator
 
                     state.AccessToken = cipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);     // アクセストークンをセット
                     state.RefreshToken = cipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);   // リフレッシュトークンをセット
-                    state.AccessTokenExpirationUtc = EntAuth.TokenLimit;                                        // アクセストークンの有効期限をセット
+                    state.AccessTokenExpirationUtc = EntAuth.TokenLimit;                                // アクセストークンの有効期限をセット
 
                     cipher.DeleteKeys(KEY_CONTAINER_NAME);
                 }

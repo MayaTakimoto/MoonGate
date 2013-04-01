@@ -19,6 +19,8 @@ namespace MoonGate.utility
         {
             DataContractSerializer dSerializer = new DataContractSerializer(data.GetType());
 
+            var serializeObj = data;
+
             using (FileStream fsWrite = new FileStream(filePath, FileMode.Create, FileAccess.Write))
             {
                 using (XmlDictionaryWriter dicWriter = XmlDictionaryWriter.CreateBinaryWriter(fsWrite))
@@ -46,6 +48,11 @@ namespace MoonGate.utility
         /// <returns></returns>
         public static bool TryDeserialize(string filePath, ref object data)
         {
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+
             DataContractSerializer dSerializer = new DataContractSerializer(data.GetType());
 
             using (FileStream fsRead = new FileStream(filePath, FileMode.Open, FileAccess.Read))
