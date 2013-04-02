@@ -29,18 +29,43 @@ namespace mgcloud.CloudOperator
     public class GoogleDriveOperator : BaseCloudOperator
     {
         /// <summary>
-        /// 定数フィールド
+        /// MimeType（フォルダ）
         /// </summary>
         private const string MIME_FDSEARCH = @"mimeType = 'application/vnd.google-apps.folder'";
+
+        /// <summary>
+        /// MimeType（ファイル）
+        /// </summary>
         private const string MIME_GETFILES = @"application/octet-stream";
+
+        /// <summary>
+        /// ファイルリスト取得時の条件
+        /// </summary>
         private const string QUERY_GETFILES = @"fullText contains 'zip'";
+
+        /// <summary>
+        /// ファイルに付加する説明
+        /// </summary>
         private const string FILE_DESCRIPTION = @"MoonGate Encrypted File";
+
+        /// <summary>
+        /// スコープ定義
+        /// </summary>
+        private const string OAUTH_SCOPE = @"https://www.googleapis.com/auth/drive.file";
+
+        /// <summary>
+        /// 認証情報保持ファイルのパス
+        /// </summary>
+        private const string AUTH_PATH = @"GoogleDriveAuthInfo.xml";
+
+        /// <summary>
+        /// RSAキーコンテナ名
+        /// </summary>
+        private const string KEY_CONTAINER_NAME = @"GDR_AUTH";
+
         //private const string CLIENT_ID = @"815568550348.apps.googleusercontent.com";
         //private const string CLIENT_SECRET = @"yRDhSlYssPrYYjTNuVRpsiEh";
         //private const string REDIRECT_URI = @"urn:ietf:wg:oauth:2.0:oob";
-        private const string OAUTH_SCOPE = @"https://www.googleapis.com/auth/drive.file";
-        private const string AUTH_PATH = @"GoogleDriveAuthInfo.xml";
-        private const string KEY_CONTAINER_NAME = @"GDR_AUTH";
         
         /// <summary>
         /// 

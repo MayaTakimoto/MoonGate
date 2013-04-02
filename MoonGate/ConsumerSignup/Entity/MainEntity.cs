@@ -11,7 +11,7 @@ namespace ConsumerSignup.Entity
     /// <summary>
     /// 
     /// </summary>
-    class MainEntity : INotifyPropertyChanged
+    class MainEntity
     {
         /// <summary>
         /// マスタファイルパス
@@ -22,16 +22,6 @@ namespace ConsumerSignup.Entity
         /// 
         /// </summary>
         private const string USERFILE_PATH = "./user/consumer.xml";
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private string consumerKey;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private string consumerSecret;
 
         /// <summary>
         /// 
@@ -58,11 +48,6 @@ namespace ConsumerSignup.Entity
         /// </summary>
         public ICommand ResCancelCommand { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
 
         /// <summary>
         /// コンストラクタ
@@ -88,7 +73,7 @@ namespace ConsumerSignup.Entity
                 param => this.OKProcess(param),
                 param =>
                 {
-                    if (param == null || string.IsNullOrEmpty(ConsumerKey) || string.IsNullOrEmpty(ConsumerSecret))
+                    if (string.IsNullOrEmpty(ConsumerSecret) || string.IsNullOrEmpty(ConsumerKey) || param == null)
                     {
                         return false;
                     }
@@ -161,19 +146,6 @@ namespace ConsumerSignup.Entity
         private void Close()
         {
             App.Current.Shutdown();
-        }
-
-
-        /// <summary>
-        /// プロパティ変更イベントのコール
-        /// </summary>
-        /// <param name="strPropName">プロパティ名</param>
-        private void OnPropertyChanged(string strPropName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(strPropName));
-            }
         }
     }
 }
