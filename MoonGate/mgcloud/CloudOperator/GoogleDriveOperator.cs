@@ -53,10 +53,10 @@ namespace mgcloud.CloudOperator
         /// </summary>
         private const string OAUTH_SCOPE = @"https://www.googleapis.com/auth/drive.file";
 
-        /// <summary>
-        /// 認証情報保持ファイルのパス
-        /// </summary>
-        private const string AUTH_PATH = @"GoogleDriveAuthInfo.xml";
+        ///// <summary>
+        ///// 認証情報保持ファイルのパス
+        ///// </summary>
+        //private const string AUTH_PATH = @"GoogleDriveAuthInfo.xml";
 
         /// <summary>
         /// RSAキーコンテナ名
@@ -84,7 +84,10 @@ namespace mgcloud.CloudOperator
         /// <param name="cKey"></param>
         /// <param name="cSec"></param>
         public GoogleDriveOperator(string cKey, string cSec)
-            : base(cKey, cSec) { }
+            : base(cKey, cSec) 
+        {
+            authPath = @"./user/GoogleDrive.xml"; 
+        }
 
         
         ///// <summary>
@@ -126,8 +129,6 @@ namespace mgcloud.CloudOperator
         /// <returns></returns>
         public override int GetFileList()
         {
-            LoadAuthInfo(AUTH_PATH);
-
             dServ = InitConnection();
 
             DownloadFileList = new HybridDictionary();

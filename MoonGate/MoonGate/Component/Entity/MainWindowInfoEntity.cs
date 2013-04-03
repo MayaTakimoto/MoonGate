@@ -7,6 +7,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using mgcloud;
+using mgcloud.CloudOperator;
+using mgcrypt;
+using mgcrypt.Rijndael;
 using MoonGate.Component.Message;
 using MoonGate.utility;
 using System;
@@ -32,6 +36,14 @@ namespace MoonGate.Component.Entity
         /// </summary>
         private const string MASTERFILE_PATH = "./mst.xml";
 
+
+        private const string USERFILE_PATH = "./user/consumer.xml";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private List<ConsumerInfoEntity> listConsumerInfo;
+
         /// <summary>
         /// リストのデータソースプロパティ
         /// </summary>
@@ -41,7 +53,7 @@ namespace MoonGate.Component.Entity
         /// 使用可能クラウドストレージのリストプロパティ
         /// </summary>
         public List<CloudInfoEntity> ListCloudInfo { get; set; }
-
+                
         /// <summary>
         /// 複数ファイルを一つに圧縮するかプロパティ
         /// </summary>
@@ -300,15 +312,63 @@ namespace MoonGate.Component.Entity
 
 
         /// <summary>
-        /// 
+        /// アップロード
         /// </summary>
         /// <param name="param"></param>
         private void Upload(object param)
         {
-            MessageBox.Show(param.ToString());
+            string strKey;
+            string strSec;
+
+            LoadConsumerInfo(param, out strKey, out strSec);
+            if (string.IsNullOrEmpty(strKey) || string.IsNullOrEmpty(strSec))
+            {
+
+            }
+
+            using (Encryptor encData = new RijndaelEncryptor())
+            {
+                using (BaseCloudOperator oprCld = new GoogleDriveOperator(strKey, strSec))
+                {
+                    // 認証情報のロード
+                    oprCld.LoadAuthInfo();
+
+                    foreach (var item in ObsFileList)
+                    {
+                        if (!item.IsSelected)
+                        {
+                            continue;
+                        }
+                        if (item.IsCloud)
+                        {
+                            continue;
+                        }
+
+                        // 暗号化対象をセット
+                        encData.InitEncrypt(item.FilePath);
+
+                        // 暗号化
+                        byte[] encryptedData = null;
+                        encData.encrypt("", 1, 256, 128, out encryptedData);
+
+                        // アップロード
+                        oprCld.UploadFile(item.FilePath, encryptedData);
+                    }
+
+                    // 認証情報のセーブ
+                    oprCld.SaveAuthInfo();
+                }
+            }
+
+            if (!SaveConsumerInfoList(param, strKey, strSec))
+            {
+
+            }
+
+            RemoveItems();
         }
 
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -337,21 +397,67 @@ namespace MoonGate.Component.Entity
         {
             App.Current.Shutdown();
         }
-
+        
 
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
-        private ConsumerInfoListEntity GetConsumerInfoList()
+        /// <param name="param"></param>
+        /// <param name="strKey"></param>
+        /// <param name="strSec"></param>
+        private void LoadConsumerInfo(object param, out string strKey, out string strSec)
         {
-            object objConsumerInfo = new ConsumerInfoListEntity();
-            if (!DataSerializer.TryDeserialize("./user/CSInfo.xml", ref objConsumerInfo))
+            strKey = null;
+            strSec = null;
+            DataCipher dcp = new DataCipher();
+
+            object objConsumerInfo = new List<ConsumerInfoEntity>();
+            if (!DataSerializer.TryDeserialize(USERFILE_PATH, ref objConsumerInfo))
             {
-                return null;
+                return;
             }
 
-            return objConsumerInfo as ConsumerInfoListEntity;
+            listConsumerInfo = objConsumerInfo as List<ConsumerInfoEntity>;
+            ConsumerInfoEntity conInfo = new ConsumerInfoEntity();
+            foreach (var item in listConsumerInfo)
+            {
+                if (param.ToString() == item.StorageKey)
+                {
+                    conInfo = item;
+                    listConsumerInfo.Remove(item);
+                    break;
+                }
+            }
+
+            strKey = dcp.DecryptRsa(conInfo.ConsumerKey, param.ToString());
+            strSec = dcp.DecryptRsa(conInfo.ConsumerSecret, param.ToString());
+
+            // 秘密鍵の削除
+            dcp.DeleteKeys(param.ToString());
+        }
+
+
+        /// <summary>
+        /// コンシューマ情報リスト保存
+        /// </summary>
+        /// <param name="conInfo"></param>
+        private bool SaveConsumerInfoList(object param, string strKey, string strSec)
+        {
+            DataCipher dcp = new DataCipher();
+
+            ConsumerInfoEntity conInfo = new ConsumerInfoEntity();
+            conInfo.StorageKey = param.ToString();
+            conInfo.ConsumerKey = dcp.EncryptRsa(strKey, param.ToString());
+            conInfo.ConsumerSecret = dcp.EncryptRsa(strSec, param.ToString());
+
+            listConsumerInfo.Add(conInfo);
+
+            if (!DataSerializer.TrySerialize(USERFILE_PATH, listConsumerInfo))
+            {
+                return false;
+            }
+
+            return true;
         }
 
 

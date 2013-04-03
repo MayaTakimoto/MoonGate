@@ -43,11 +43,11 @@ namespace mgcrypt
         internal KeyGenerator KeyGen { get; set; }
 
         
-        /*************************************************
-         *  コンストラクタ                               *
-         *************************************************/
-
-        public Encryptor(string strTarget)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strTarget"></param>
+        public void InitEncrypt(string strTarget)
         {
             Target = strTarget;
 
@@ -55,11 +55,7 @@ namespace mgcrypt
             KeyGen = new KeyGenerator();
         }
 
-
-        /*************************************************
-         *  メソッド                                     *
-         *************************************************/
-
+                
         /// <summary>
         /// 暗号化プロバイダの呼び出し
         /// </summary>

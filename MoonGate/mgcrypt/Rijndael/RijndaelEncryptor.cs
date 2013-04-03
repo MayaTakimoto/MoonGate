@@ -26,14 +26,6 @@ namespace mgcrypt.Rijndael
 
 
         /*************************************************
-         *  コンストラクタ                               *
-         *************************************************/
-
-        public RijndaelEncryptor(string strTarget)
-            : base(strTarget) { }
-
-
-        /*************************************************
          *  メソッド                                     *
          *************************************************/
 
@@ -95,7 +87,7 @@ namespace mgcrypt.Rijndael
                                 {
                                     cryptStrm.Write(btTmp, 0, iReadLength);
                                 }
-                                
+
                                 encData = outMs.ToArray();
                             }
                             catch

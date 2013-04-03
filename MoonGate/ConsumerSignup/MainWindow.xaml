@@ -24,12 +24,14 @@
             <StackPanel Height="65" Orientation="Horizontal">
                 <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Text="Key"/>
                 <Rectangle Width="25"/>
-                <TextBox x:Name="ConKey" Width="295" VerticalAlignment="Center" Margin="0,22,0,21" Text="{Binding Path=ConsumerKey,Mode=OneWayToSource}"/>
+                <TextBox x:Name="ConKey" Width="295" VerticalAlignment="Center" Margin="0,22,0,21" 
+                         Foreground="White" SelectionBrush="White" Text="{Binding Path=ConsumerKey,Mode=OneWayToSource}"/>
             </StackPanel>
             <StackPanel Height="65" Orientation="Horizontal">
                 <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Text="Secret"/>
                 <Rectangle Width="10"/>
-                <TextBox x:Name="ConSec" Width="294" VerticalAlignment="Center" Margin="0,22,0,21" Text="{Binding Path=ConsumerSecret,Mode=OneWayToSource}" />
+                <TextBox x:Name="ConSec" Width="294" VerticalAlignment="Center" Margin="0,22,0,21"
+                         Foreground="White" SelectionBrush="White" Text="{Binding Path=ConsumerSecret,Mode=OneWayToSource}" />
             </StackPanel>
         </StackPanel>
         <Button x:Name="BtnOK" Content="OK" Margin="200,243,0,0" Height="24" Width="75" 

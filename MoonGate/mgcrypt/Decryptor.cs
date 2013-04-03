@@ -32,23 +32,19 @@ namespace mgcrypt
         /// </summary>
         internal KeyGenerator KeyGen { get; set; }
 
-        
-        /*************************************************
-         *  コンストラクタ                               *
-         *************************************************/
-
-        public Decryptor(string strOutPath)
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strOutPath"></param>
+        public void InitDecrypt(string strOutPath)
         {
             OutPath = strOutPath;
-           
+
             // キージェネレータの生成
             KeyGen = new KeyGenerator();
         }
 
-
-        /*************************************************
-         *  メソッド                                     *
-         *************************************************/
 
         /// <summary>
         /// 復号プロバイダの呼び出し

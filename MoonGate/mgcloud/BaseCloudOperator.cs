@@ -24,6 +24,11 @@ namespace mgcloud
         public HybridDictionary DownloadFileList { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        protected string authPath;
+
+        /// <summary>
         /// 初回認証フラグ
         /// </summary>
         internal bool FirstAuthFlg { get; set; }
@@ -108,7 +113,7 @@ namespace mgcloud
         /// 認証情報の読み込み
         /// </summary>
         /// <param name="authPath"></param>
-        public void LoadAuthInfo(string authPath)
+        public void LoadAuthInfo()
         {
             AuthInfoEntity entAuth = new AuthInfoEntity();
 
@@ -128,7 +133,7 @@ namespace mgcloud
         /// <param name="authPath"></param>
         /// <param name="entAuthInfo"></param>
         /// <returns></returns>
-        public bool SaveAuthInfo(string authPath)
+        public bool SaveAuthInfo()
         {
             bool bSerialize = true;
 

@@ -118,7 +118,6 @@
     <Compile Include="Component\Action\SelectFolderAction.cs" />
     <Compile Include="Component\BaseAction.cs" />
     <Compile Include="Component\Entity\ConsumerInfoEntity.cs" />
-    <Compile Include="Component\Entity\ConsumerInfoListEntity.cs" />
     <Compile Include="Component\Entity\CloudInfoEntity.cs" />
     <Compile Include="Component\Entity\FileInfoEntity.cs" />
     <Compile Include="Component\Entity\FolderBrowserInfoEntity.cs" />
@@ -230,6 +229,9 @@
   <ItemGroup>
     <Resource Include="pic\glyphicons\glyphicons_235_pen.png" />
     <Resource Include="pic\glyphicons\glyphicons_358_file_import.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="pic\glyphicons\glyphicons_194_circle_question_mark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

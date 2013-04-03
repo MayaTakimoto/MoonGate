@@ -8,7 +8,7 @@
     Title="MoonGate" Height="471.724" Width="604.415"
     Icon="pic/Moongate.ico" WindowStartupLocation="CenterScreen" 
     FontFamily="Tahoma" DataContext="{DynamicResource EntMain}" >
-        
+
     <!-- メイン画面定義 -->
     <Grid>
         <ListBox x:Name="TargetList" Height="Auto" Width="Auto" FontFamily="Tahoma"  FontSize="14" Margin="0,47,0,22" Background="WhiteSmoke" 
@@ -48,9 +48,9 @@
                 <MenuItem Name="MenuItemDownloadAll" Header="Download All(_S)" HorizontalAlignment="Stretch" 
                           Command="{Binding Path=DownloadAllCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
             </MenuItem>
-           
-            <MenuItem x:Name="MenuSetting" Header="Setting(_S)" >
 
+            <MenuItem x:Name="MenuSetting" Header="Setting(_S)" >
+                <MenuItem x:Name="MenuItemCloudSetup" Header="Regist ConsumerInfo(_A)" HorizontalAlignment="Stretch" Command="{Binding Path=CloudSetupCommand}" />
             </MenuItem>
         </Menu>
         <ToolBarTray Height="25" Margin="0,22,0,0" VerticalAlignment="Top" Width="Auto">
@@ -86,7 +86,7 @@
                     <Image Source="pic/glyphicons/glyphicons_204_unlock.png" />
                 </Button>
                 -->
-                <Button x:Name="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Upload">
+                <Button x:Name="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Upload" Command="{Binding Path=UploadCommand}">
                     <Image Source="pic/glyphicons/glyphicons_363_cloud_upload.png" />
                 </Button>
                 <Button x:Name="BtnDownload" Uid="BtnDownload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Download">
@@ -110,6 +110,9 @@
                 -->
                 <Button x:Name="BtnSetting" Uid="BtnSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="App Setting" >
                     <Image Source="pic/glyphicons/glyphicons_136_cogwheel.png" />
+                </Button>
+                <Button x:Name="BtnHelp" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Help" >
+                    <Image Source="pic/glyphicons/glyphicons_194_circle_question_mark.png" />
                 </Button>
             </ToolBar>
         </ToolBarTray>
