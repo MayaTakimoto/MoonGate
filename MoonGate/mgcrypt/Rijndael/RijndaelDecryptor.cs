@@ -7,19 +7,16 @@ using System.Text;
 
 namespace mgcrypt.Rijndael
 {
+    /// <summary>
+    /// Rijndael復号処理クラス
+    /// </summary>
     public class RijndaelDecryptor : Decryptor
     {
-        /*************************************************
-         *  フィールド                                   *
-         *************************************************/
-
-        // Rijndaelプロバイダ
+        /// <summary>
+        /// Rijndaelプロバイダ
+        /// </summary>
         private RijndaelManaged rijnProvider;
 
-
-        /*************************************************
-         *  メソッド                                     *
-         *************************************************/
 
         /// <summary>
         /// Rijndaelプロバイダ取得
@@ -29,7 +26,7 @@ namespace mgcrypt.Rijndael
         /// <param name="btKey"></param>
         /// <param name="btIv"></param>
         /// <returns></returns>
-        protected override int getProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv)
+        protected override int GetProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv)
         {
             try
             {
@@ -55,7 +52,7 @@ namespace mgcrypt.Rijndael
         /// 復号メインメソッド
         /// </summary>
         /// <returns></returns>
-        protected override int decryptMain(byte[] decTarget, out byte[] decResult)
+        protected override int DecryptMain(byte[] decTarget, out byte[] decResult)
         {
             using (ICryptoTransform iDecryptor = rijnProvider.CreateDecryptor())
             {

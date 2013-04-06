@@ -37,7 +37,7 @@ namespace mgcrypt.Rijndael
         /// <param name="btKey"></param>
         /// <param name="btIv"></param>
         /// <returns></returns>
-        protected override int getProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv)
+        protected override int GetProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace mgcrypt.Rijndael
         /// Rijndaelアルゴリズムによる暗号化
         /// </summary>
         /// <returns></returns>
-        protected override int encryptMain(byte[] decInfo, out byte[] encData)
+        protected override int EncryptMain(byte[] decInfo, out byte[] encData)
         {
             using (ICryptoTransform iEncryptor = rijnProvider.CreateEncryptor())
             {

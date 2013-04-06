@@ -36,6 +36,8 @@ namespace MoonGate.Component.Action
 
             message.FileNames = dlgGetFiles.FileNames;
             message.Result = (bool)resDlg;
+
+            dlgGetFiles = null;
         }
     }
 }

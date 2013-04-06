@@ -53,7 +53,7 @@ namespace MoonGate.Component.Entity
         /// 使用可能クラウドストレージのリストプロパティ
         /// </summary>
         public List<CloudInfoEntity> ListCloudInfo { get; set; }
-                
+
         /// <summary>
         /// 複数ファイルを一つに圧縮するかプロパティ
         /// </summary>
@@ -184,8 +184,8 @@ namespace MoonGate.Component.Entity
                 param => this.UproadAll(param),
                 param =>
                 {
-                    if (ObsFileList.Count == 0) 
-                    { 
+                    if (ObsFileList.Count == 0)
+                    {
                         return false;
                     }
 
@@ -201,8 +201,8 @@ namespace MoonGate.Component.Entity
                 param => this.Shutdown()
             );
         }
-        
-        
+
+
         /// <summary>
         /// 選択項目の存在有無判定
         /// </summary>
@@ -319,7 +319,7 @@ namespace MoonGate.Component.Entity
         {
             string strKey;
             string strSec;
-
+            
             LoadConsumerInfo(param, out strKey, out strSec);
             if (string.IsNullOrEmpty(strKey) || string.IsNullOrEmpty(strSec))
             {
@@ -330,6 +330,8 @@ namespace MoonGate.Component.Entity
             {
                 using (BaseCloudOperator oprCld = new GoogleDriveOperator(strKey, strSec))
                 {
+                    int iRes = -1;
+
                     // 認証情報のロード
                     oprCld.LoadAuthInfo();
 
@@ -349,10 +351,18 @@ namespace MoonGate.Component.Entity
 
                         // 暗号化
                         byte[] encryptedData = null;
-                        encData.encrypt("", 1, 256, 128, out encryptedData);
+                        
+                        if (iRes < 0)
+                        {
+
+                        }
 
                         // アップロード
-                        oprCld.UploadFile(item.FilePath, encryptedData);
+                        iRes = oprCld.UploadFile(item.FilePath, encryptedData);
+                        if (iRes < 0)
+                        {
+
+                        }
                     }
 
                     // 認証情報のセーブ
@@ -360,15 +370,17 @@ namespace MoonGate.Component.Entity
                 }
             }
 
-            if (!SaveConsumerInfoList(param, strKey, strSec))
+            if (!SaveConsumerInfo(param, strKey, strSec))
             {
 
             }
 
+            strKey = null;
+            strSec = null;
             RemoveItems();
         }
 
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -387,7 +399,7 @@ namespace MoonGate.Component.Entity
         {
             Process.Start("ConsumerSignup.exe");
         }
-        
+
 
         /// <summary>
         /// アプリケーションの終了
@@ -397,10 +409,10 @@ namespace MoonGate.Component.Entity
         {
             App.Current.Shutdown();
         }
-        
+
 
         /// <summary>
-        /// 
+        /// コンシューマ情報の読み込み
         /// </summary>
         /// <param name="param"></param>
         /// <param name="strKey"></param>
@@ -441,7 +453,7 @@ namespace MoonGate.Component.Entity
         /// コンシューマ情報リスト保存
         /// </summary>
         /// <param name="conInfo"></param>
-        private bool SaveConsumerInfoList(object param, string strKey, string strSec)
+        private bool SaveConsumerInfo(object param, string strKey, string strSec)
         {
             DataCipher dcp = new DataCipher();
 

@@ -41,6 +41,8 @@ namespace MoonGate.Component.Action
                 message.FolderNames = DialogGetFolder.ListSelected.Items.Cast<string>().ToArray();
                 message.Result = true;
             }
+
+            DialogGetFolder = null;
         }
     }
 }

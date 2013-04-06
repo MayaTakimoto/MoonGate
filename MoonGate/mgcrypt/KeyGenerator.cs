@@ -55,7 +55,7 @@ namespace mgcrypt
         /// Saltを生成する
         /// </summary>
         /// <returns></returns>
-        private void generateSalt()
+        private void GenerateSalt()
         {
             Salt = new byte[16];
 
@@ -68,7 +68,7 @@ namespace mgcrypt
         /// 秘密鍵を生成する（パスワード）
         /// </summary>
         /// <returns></returns>
-        public int generateKey(char[] password)
+        public int GenerateKey(char[] password)
         {
             // 変数定義
             byte[] pass = null;
@@ -91,14 +91,14 @@ namespace mgcrypt
             }
 
             // 秘密鍵を生成
-            return generateKey(pass, KeyLength, BlockSize);
+            return GenerateKey(pass, KeyLength, BlockSize);
         }
 
         /// <summary>
         /// 秘密鍵を生成する（鍵ファイル）
         /// </summary>
         /// <returns></returns>
-        public int generateKey(FileInfo fiKey)
+        public int GenerateKey(FileInfo fiKey)
         {
             // 変数定義
             byte[] pass = null;
@@ -128,15 +128,15 @@ namespace mgcrypt
             }
 
             // 秘密鍵を生成
-            return generateKey(pass, KeyLength, BlockSize);
+            return GenerateKey(pass, KeyLength, BlockSize);
         }
 
         /// <summary>
-        /// 秘密鍵を生成する（鍵ドライブ）
+        /// 秘密鍵を生成する（ハードウェアキー）
         /// </summary>
         /// <param name="sKeyDrive"></param>
         /// <returns></returns>
-        public int generateKey(string sKeyDrive)
+        public int GenerateKey(string sKeyDrive)
         {
             // 変数定義
             byte[] pass = null;
@@ -179,7 +179,7 @@ namespace mgcrypt
             }
 
             // 秘密鍵を生成
-            return generateKey(pass, KeyLength, BlockSize);
+            return GenerateKey(pass, KeyLength, BlockSize);
         }
 
         /// <summary>
@@ -189,14 +189,14 @@ namespace mgcrypt
         /// <param name="keySize">鍵長</param>
         /// <param name="blockSize">ブロックサイズ</param>
         /// <returns></returns>
-        private int generateKey(byte[] btPass, int keySize, int blockSize)
+        private int GenerateKey(byte[] btPass, int keySize, int blockSize)
         {
             try
             {
                 // Salt生成
                 if (Salt == null || Salt.Length == 0)
                 {
-                    generateSalt();
+                    GenerateSalt();
                 }
 
                 Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(btPass, Salt, 1024);

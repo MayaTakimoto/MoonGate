@@ -2,6 +2,8 @@
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Security;
+using System.Runtime.InteropServices;
 
 namespace mgcrypt
 {
@@ -13,6 +15,8 @@ namespace mgcrypt
 
         /*定数*/
         protected const string sType = @".mgen";    // 復号ファイルの拡張子
+        protected const int KEY_LENGTH = 256;
+        protected const int BLOCK_SIZE = 128;
 
         // 進捗
         public int iProgress;
@@ -26,13 +30,13 @@ namespace mgcrypt
         /// 復号したファイルの保存先のプロパティ
         /// </summary>
         protected string OutPath { get; private set; }
-                
+
         /// <summary>
         /// キージェネレータのプロパティ
         /// </summary>
         internal KeyGenerator KeyGen { get; set; }
 
-       
+
         /// <summary>
         /// 
         /// </summary>
@@ -54,14 +58,14 @@ namespace mgcrypt
         /// <param name="btKey">鍵</param>
         /// <param name="btIv">IV</param>
         /// <returns></returns>
-        protected abstract int getProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv);
+        protected abstract int GetProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv);
 
 
         /// <summary>
         /// 復号を実際に行うメソッド
         /// </summary>
         /// <returns></returns>
-        protected abstract int decryptMain(byte[] decTarget, out byte[] decResult);
+        protected abstract int DecryptMain(byte[] decTarget, out byte[] decResult);
 
 
         ///// <summary>
@@ -96,7 +100,7 @@ namespace mgcrypt
         /// </summary>
         /// <param name="btDecInfo"></param>
         /// <returns></returns>
-        private string getExtention(byte[] decResult)
+        private string GetExtention(byte[] decResult)
         {
             byte[] btExt = new byte[32];
             Buffer.BlockCopy(decResult, 0, btExt, 0, 32);
@@ -112,7 +116,7 @@ namespace mgcrypt
         /// </summary>
         /// <param name="btDecInfo"></param>
         /// <returns></returns>
-        private byte[] getSalt(byte[] decTarget)
+        private byte[] GetSalt(byte[] decTarget)
         {
             byte[] btSalt = new byte[16];
             Buffer.BlockCopy(decTarget, 16, btSalt, 0, 16);
@@ -122,65 +126,153 @@ namespace mgcrypt
 
 
         /// <summary>
-        /// 復号処理メソッド
+        /// 
         /// </summary>
-        /// <param name="sPassInf">秘密鍵の生成に使う情報</param>
-        /// <param name="iMode">復号モード</param>
+        /// <param name="sStrPass"></param>
+        /// <param name="decTarget"></param>
         /// <returns></returns>
-        public int decrypt(string sPassInf, int iMode, int iKeyLength, int iBlockSize, byte[] decTarget)
+        public int Decrypt(SecureString sStrPass, byte[] decTarget)
         {
-            // メソッドの戻り値
             int iRet = -99;
 
-            // Saltを取得する
-            KeyGen.Salt = getSalt(decTarget);
-            
-            // モードで場合分け
-            switch (iMode)
+            char[] cPassInf = null;
+            IntPtr ptrPass = IntPtr.Zero;
+            try
             {
-                case 0: // パスワードによる復号の場合
-                    char[] cPassword = sPassInf.ToCharArray();
+                cPassInf = new char[sStrPass.Length];
+                ptrPass = Marshal.SecureStringToCoTaskMemUnicode(sStrPass);
 
-                    iRet = KeyGen.generateKey(cPassword);
-                    break;
-
-                case 1: // 鍵ファイルによる復号の場合
-                    FileInfo fiPass = new FileInfo(sPassInf);
-
-                    iRet = KeyGen.generateKey(fiPass);
-                    break;
-
-                case 2: // 鍵ドライブによる復号の場合
-                    
-                    iRet = KeyGen.generateKey(sPassInf);
-                    break;
+                Marshal.Copy(ptrPass, cPassInf, 0, cPassInf.Length);
             }
-            
-            if (iRet < 0)
+            catch
             {
-                // 戻り値が負の場合はエラーコードを返す
                 return iRet;
             }
+            finally
+            {
+                sStrPass.Dispose();
+
+                if (ptrPass != IntPtr.Zero)
+                {
+                    Marshal.ZeroFreeCoTaskMemUnicode(ptrPass);
+                }
+            }
+
+            KeyGen.Salt = GetSalt(decTarget);
+            iRet = KeyGen.GenerateKey(cPassInf);
+            if (iRet < 0)
+            {
+                return iRet;
+            }
+
+            return Decrypt(decTarget);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fiPass"></param>
+        /// <param name="decTarget"></param>
+        /// <returns></returns>
+        public int Decrypt(FileInfo fiPass, byte[] decTarget)
+        {
+            int iRet = -99;
+
+            KeyGen.Salt = GetSalt(decTarget);
+            iRet = KeyGen.GenerateKey(fiPass);
+            if (iRet < 0)
+            {
+                fiPass = null;
+                return iRet;
+            }
+
+            fiPass = null;
+            return Decrypt(decTarget);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sPass"></param>
+        /// <param name="decTarget"></param>
+        /// <returns></returns>
+        public int Decrypt(string sPass, byte[] decTarget)
+        {
+            int iRet = -99;
+
+            KeyGen.Salt = GetSalt(decTarget);
+            iRet = KeyGen.GenerateKey(sPass);
+            if (iRet < 0)
+            {
+                sPass = null;
+                return iRet;
+            }
+
+            sPass = null;
+            return Decrypt(decTarget);
+        }
+
+
+        /// <summary>
+        /// 復号処理メソッド（コア）
+        /// </summary>
+        /// <param name="decTarget">復号対象データ</param>
+        /// <returns></returns>
+        private int Decrypt(byte[] decTarget)
+        {
+            int iRet = -99;
+
+            //// Saltを取得する
+            //KeyGen.Salt = GetSalt(decTarget);
+
+            //// モードで場合分け
+            //switch (iMode)
+            //{
+            //    case 0: // パスワードによる復号の場合
+            //        char[] cPassword = sPassInf.ToCharArray();
+
+            //        iRet = KeyGen.GenerateKey(cPassword);
+            //        break;
+
+            //    case 1: // 鍵ファイルによる復号の場合
+            //        FileInfo fiPass = new FileInfo(sPassInf);
+
+            //        iRet = KeyGen.GenerateKey(fiPass);
+            //        break;
+
+            //    case 2: // 鍵ドライブによる復号の場合
+
+            //        iRet = KeyGen.GenerateKey(sPassInf);
+            //        break;
+            //}
+
+            //if (iRet < 0)
+            //{
+            //    // 戻り値が負の場合はエラーコードを返す
+            //    return iRet;
+            //}
 
             // 復号プロバイダの生成
-            iRet = getProvider(iKeyLength, iBlockSize, KeyGen.SecKey, KeyGen.InitVec);
+            iRet = GetProvider(KEY_LENGTH, BLOCK_SIZE, KeyGen.SecKey, KeyGen.InitVec);
             if (iRet < 0)
             {
                 // 戻り値が負の場合はエラーコードを返す
                 return iRet;
             }
 
-            
+
             // 復号開始
             byte[] decResult = null;
-            iRet = decryptMain(decTarget, out decResult);
+            iRet = DecryptMain(decTarget, out decResult);
             if (iRet < 0)
             {
                 // 戻り値が負の場合はエラーコードを返す
                 return iRet;
             }
 
-            string strExtention = getExtention(decResult);
+            string strExtention = GetExtention(decResult);
             byte[] writeData = decResult.Skip(32).Take(decResult.Length - 32).ToArray();
 
             File.WriteAllBytes(Path.ChangeExtension(OutPath, strExtention), writeData);

@@ -1,4 +1,12 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <summary>ファイル選択ダイアログ表示メッセージクラス</summary>
+// <author>MayaTakimoto</author> 
+// <date>$Date: 2013-03-23 10:25:37  +9:00 $</date>
+// <copyright file="$Name: SelectFileMessage.cs $" > 
+//     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 namespace MoonGate.Component.Message
 {
     /// <summary>
@@ -41,10 +49,10 @@ namespace MoonGate.Component.Message
         /// </summary>
         public string InitialDirectory { get; set; }
 
-        /// <summary>
-        /// 処理結果
-        /// </summary>
-        public bool Result { get; set; }
+        ///// <summary>
+        ///// 処理結果
+        ///// </summary>
+        //public bool Result { get; set; }
 
 
         /// <summary>

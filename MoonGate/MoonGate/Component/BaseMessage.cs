@@ -11,6 +11,11 @@ namespace MoonGate.Component
         /// </summary>
         public object Sender { get; protected set; }
 
+        /// <summary>
+        /// 結果
+        /// </summary>
+        public bool Result { get; set; }
+
 
         /// <summary>
         /// コンストラクタ

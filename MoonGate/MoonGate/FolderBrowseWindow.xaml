@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Entity="clr-namespace:MoonGate.Component.Entity"
         Title="Select Folders" Height="498" Width="329" Icon="pic/Moongate.ico" FontFamily="Tahoma" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" DataContext="{DynamicResource Tree}">
-    <Grid>
-        <TreeView x:Name="FolderTreeView" Margin="0,0,0,155" FontSize="14" Background="WhiteSmoke" SelectedItemChanged="FolderTreeView_SelectedItemChanged" 
-                  ItemsSource="{Binding Path=Nodes}" VirtualizingStackPanel.VirtualizationMode="Recycling" VirtualizingStackPanel.IsVirtualizing="True" ContextMenu="{DynamicResource DlgContextMenu}">
+    <Canvas>
+        <TreeView x:Name="FolderTreeView" FontSize="14" Background="WhiteSmoke" SelectedItemChanged="FolderTreeView_SelectedItemChanged" 
+                  ItemsSource="{Binding Path=Nodes}" VirtualizingStackPanel.VirtualizationMode="Recycling" VirtualizingStackPanel.IsVirtualizing="True" ContextMenu="{DynamicResource DlgContextMenu}" Canvas.Left="10" Canvas.Top="10" Height="308" Width="303">
             <TreeView.ItemTemplate>
                 <!-- ノードのテンプレート -->
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=ListTreeNodes}">
@@ -17,12 +17,12 @@
             </TreeView.ItemTemplate>
         </TreeView>
         <Control x:Name="SelectedNode" Visibility="Hidden" DataContext="{Binding Path=SelectedNode,Mode=OneWayToSource}" />
-        <Button x:Name="BtnOK" Content="OK" Margin="0,0,2,4" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="80" Command="ApplicationCommands.Close"/>
-        <Button x:Name="BtnAdd" Content="Add" HorizontalAlignment="Right" Margin="0,0,87,4" VerticalAlignment="Bottom" Width="80" Height="25" Command="{Binding Path=AddNodesCommand}" IsDefault="True"/>
-        <ListBox x:Name="ListSelected" HorizontalAlignment="Left" Height="116" Margin="0,323,0,0" VerticalAlignment="Top" Width="321" 
-                 Background="WhiteSmoke" FontSize="14" ItemsSource="{Binding Path=SelectedNodes}" IsTextSearchEnabled="False" />
-    </Grid>
-    
+        <Button x:Name="BtnOK" Content="OK" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="80" Command="ApplicationCommands.Close" Canvas.Left="233" Canvas.Top="444"/>
+        <Button x:Name="BtnAdd" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="80" Height="25" Command="{Binding Path=AddNodesCommand}" IsDefault="True" Canvas.Left="138" Canvas.Top="444"/>
+        <ListBox x:Name="ListSelected" HorizontalAlignment="Left" Height="116" VerticalAlignment="Top" Width="303" 
+                 Background="WhiteSmoke" FontSize="14" ItemsSource="{Binding Path=SelectedNodes}" IsTextSearchEnabled="False" Canvas.Left="10" Canvas.Top="323" />
+    </Canvas>
+
     <Window.Resources>
         <!-- VM定義 -->
         <ObjectDataProvider x:Key="Tree" x:Name="Tree" ObjectType="{x:Type Entity:FolderBrowserInfoEntity}" />

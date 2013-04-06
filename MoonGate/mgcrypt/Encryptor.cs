@@ -7,8 +7,9 @@
  **************************************************************************************/
 
 using System;
-using System.Collections.Specialized;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 
 namespace mgcrypt
@@ -24,10 +25,8 @@ namespace mgcrypt
 
         /*定数*/
         protected const string sType = @".mgen";    // 暗号化ファイルの拡張子
-
-        // 進捗
-        public int iProgress;
-
+        protected const int KEY_LENGTH = 256;
+        protected const int BLOCK_SIZE = 128;
 
         /*************************************************
          *  プロパティ                                   *
@@ -42,7 +41,25 @@ namespace mgcrypt
         // キージェネレータのプロパティ
         internal KeyGenerator KeyGen { get; set; }
 
-        
+
+        /// <summary>
+        /// 暗号化プロバイダの呼び出し
+        /// </summary>
+        /// <param name="iKeyLength">鍵長</param>
+        /// <param name="iBlockSize">ブロックサイズ</param>
+        /// <param name="btKey">鍵</param>
+        /// <param name="btIv">IV</param>
+        /// <returns></returns>
+        protected abstract int GetProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv);
+
+
+        /// <summary>
+        /// 暗号化を実際に行うメソッド
+        /// </summary>
+        /// <returns></returns>
+        protected abstract int EncryptMain(byte[] decInfo, out byte[] encData);
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -55,30 +72,12 @@ namespace mgcrypt
             KeyGen = new KeyGenerator();
         }
 
-                
-        /// <summary>
-        /// 暗号化プロバイダの呼び出し
-        /// </summary>
-        /// <param name="iKeyLength">鍵長</param>
-        /// <param name="iBlockSize">ブロックサイズ</param>
-        /// <param name="btKey">鍵</param>
-        /// <param name="btIv">IV</param>
-        /// <returns></returns>
-        protected abstract int getProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv);
-
-
-        /// <summary>
-        /// 暗号化を実際に行うメソッド
-        /// </summary>
-        /// <returns></returns>
-        protected abstract int encryptMain(byte[] decInfo, out byte[] encData);
-
 
         /// <summary>
         /// 復号用情報の取得
         /// </summary>
         /// <returns></returns>
-        private byte[] getDecInfo()
+        private byte[] GetDecInfo()
         {
             // ファイル拡張子の情報
             StringBuilder sbDecInfo = new StringBuilder(16);
@@ -99,56 +98,122 @@ namespace mgcrypt
 
 
         /// <summary>
-        /// 暗号化処理メソッド
+        /// 暗号化処理メソッド（パスワード）
         /// </summary>
-        /// <param name="sPassInf">秘密鍵の生成に使う情報</param>
-        /// <param name="iMode">暗号化モード</param>
+        /// <param name="sStrPass"></param>
+        /// <param name="encData"></param>
         /// <returns></returns>
-        public int encrypt(string sPassInf, int iMode, int iKeyLength, int iBlockSize, out byte[] encData)
+        public int Encrypt(SecureString sStrPass, out byte[] encData)
         {
             int iRet = -99;
             encData = null;
 
-            // モードで場合分け
-            switch (iMode)
+            char[] cPassInf = null;
+            IntPtr ptrPass = IntPtr.Zero;
+            try
             {
-                case 0: 
-                    char[] cPassword = sPassInf.ToCharArray();
+                cPassInf = new char[sStrPass.Length];
+                ptrPass = Marshal.SecureStringToCoTaskMemUnicode(sStrPass);
 
-                    iRet = KeyGen.generateKey(cPassword);
-                    break;
-
-                case 1: 
-                    FileInfo fiPass = new FileInfo(sPassInf);
-
-                    iRet = KeyGen.generateKey(fiPass);
-                    break;
-
-                case 2: 
-                    iRet = KeyGen.generateKey(sPassInf);
-                    break;
+                Marshal.Copy(ptrPass, cPassInf, 0, cPassInf.Length);
             }
-            
+            catch
+            {
+                return iRet;
+            }
+            finally
+            {
+                sStrPass.Dispose();
+
+                if (ptrPass != IntPtr.Zero)
+                {
+                    Marshal.ZeroFreeCoTaskMemUnicode(ptrPass);
+                }
+            }
+
+            iRet = KeyGen.GenerateKey(cPassInf);
             if (iRet < 0)
             {
                 return iRet;
             }
 
+            return Encrypt(out encData);
+        }
+
+
+        /// <summary>
+        /// 暗号化処理メソッド（パスファイル）
+        /// </summary>
+        /// <param name="fiPass"></param>
+        /// <param name="encData"></param>
+        /// <returns></returns>
+        public int Encrypt(FileInfo fiPass, out byte[] encData)
+        {
+            int iRet = -99;
+            encData = null;
+
+            iRet = KeyGen.GenerateKey(fiPass);
+            if (iRet < 0)
+            {
+                fiPass = null;
+                return iRet;
+            }
+
+            fiPass = null;
+            return Encrypt(out encData);
+        }
+
+
+        /// <summary>
+        /// 暗号化処理メソッド（ハードウェアキー）
+        /// </summary>
+        /// <param name="sPass"></param>
+        /// <param name="encData"></param>
+        /// <returns></returns>
+        public int Encrypt(string sPass, out byte[] encData)
+        {
+            int iRet = -99;
+            encData = null;
+
+            iRet = KeyGen.GenerateKey(sPass);
+            if (iRet < 0)
+            {
+                sPass = null;
+                return iRet;
+            }
+
+            sPass = null;
+            return Encrypt(out encData);
+        }
+
+
+        /// <summary>
+        /// 暗号化処理メソッド（コア）
+        /// </summary>
+        /// <param name="sPassInf">秘密鍵の生成に使う情報</param>
+        /// <param name="iMode">暗号化モード</param>
+        /// <returns></returns>
+        private int Encrypt(out byte[] encData)
+        {
+            int iRet = -99;
+            
             // 暗号化プロバイダの生成
-            iRet = getProvider(iKeyLength, iBlockSize, KeyGen.SecKey, KeyGen.InitVec);
+            iRet = GetProvider(KEY_LENGTH, BLOCK_SIZE, KeyGen.SecKey, KeyGen.InitVec);
             if (iRet < 0)
             {
                 // 戻り値が負の場合はエラーコードを返す
+                encData = null;
                 return iRet;
             }
 
             // 復号用情報取得
-            byte[] btDecInfo = getDecInfo();
+            byte[] btDecInfo = GetDecInfo();
 
             // 暗号化開始
-            iRet = encryptMain(btDecInfo, out encData);
+            iRet = EncryptMain(btDecInfo, out encData);
             if (iRet < 0)
             {
+                encData = null;
                 return iRet;
             }
 
