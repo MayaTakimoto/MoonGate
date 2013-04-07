@@ -1,4 +1,5 @@
-﻿using MoonGate.Component.Message;
+﻿using MoonGate.Component.Entity;
+using MoonGate.Component.Message;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,20 +30,50 @@ namespace MoonGate.Component.Action
         private static void ShowSelectFolderDialog(SelectFolderMessage message)
         {
             FolderBrowseWindow DialogGetFolder = new FolderBrowseWindow();
-            DialogGetFolder.ShowDialog();
+            var resDlg = DialogGetFolder.ShowDialog();
 
-            if (DialogGetFolder.ListSelected.Items.Count == 0)
+            if ((bool)resDlg == false)
+            {
+                message.Result = false;
+
+                DialogGetFolder = null;
+                return;
+            }
+            if (DialogGetFolder.SelectedFolder.Items.Count == 0)
             {
                 message.FolderNames = null;
                 message.Result = false;
+
+                DialogGetFolder = null;
+                return;
             }
-            else
-            {
-                message.FolderNames = DialogGetFolder.ListSelected.Items.Cast<string>().ToArray();
-                message.Result = true;
-            }
+            
+            message.FolderNames = DialogGetFolder.SelectedFolder.Items.Cast<string>().ToArray();
+            message.Result = true;
 
             DialogGetFolder = null;
         }
+
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="listFolder"></param>
+        ///// <returns></returns>
+        //private static void GetSelectedFolderList(List<TreeNodeEntity> Nodes, ref List<string> listFolder)
+        //{
+        //    foreach (TreeNodeEntity node in Nodes)
+        //    {
+        //        if (node.IsChecked)
+        //        {
+        //            listFolder.Add(node.FolderInfo.FilePath);
+        //        }
+
+        //        if (node.ListTreeNodes != null)
+        //        {
+        //            GetSelectedFolderList(node.ListTreeNodes.ToList<TreeNodeEntity>(), ref listFolder);
+        //        }
+        //    }
+        //}
     }
 }

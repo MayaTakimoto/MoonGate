@@ -2,40 +2,30 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Entity="clr-namespace:MoonGate.Component.Entity"
-        Title="Select Folders" Height="498" Width="329" Icon="pic/Moongate.ico" FontFamily="Tahoma" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" DataContext="{DynamicResource Tree}">
+        Title="Select Folders" Height="407" Width="329" Icon="pic/Moongate.ico" FontFamily="Tahoma" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" DataContext="{DynamicResource EntFolder}">
     <Canvas>
-        <TreeView x:Name="FolderTreeView" FontSize="14" Background="WhiteSmoke" SelectedItemChanged="FolderTreeView_SelectedItemChanged" 
-                  ItemsSource="{Binding Path=Nodes}" VirtualizingStackPanel.VirtualizationMode="Recycling" VirtualizingStackPanel.IsVirtualizing="True" ContextMenu="{DynamicResource DlgContextMenu}" Canvas.Left="10" Canvas.Top="10" Height="308" Width="303">
+        <TreeView x:Name="FolderTreeView" FontSize="14" Background="WhiteSmoke" 
+                  ItemsSource="{Binding Path=Nodes}" VirtualizingStackPanel.VirtualizationMode="Recycling" VirtualizingStackPanel.IsVirtualizing="True" Canvas.Left="10" Canvas.Top="10" Height="332" Width="303">
             <TreeView.ItemTemplate>
                 <!-- ノードのテンプレート -->
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=ListTreeNodes}">
                     <StackPanel Orientation="Horizontal" Height="20">
+                        <CheckBox VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Tag="{Binding Path=FolderInfo.FilePath}" />
                         <Image Height="12" Width="15" Source="pic/glyphicons/glyphicons_145_folder_plus.png" />
                         <TextBlock Text="{Binding Path=FolderInfo.FileName}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <Control x:Name="SelectedNode" Visibility="Hidden" DataContext="{Binding Path=SelectedNode,Mode=OneWayToSource}" />
-        <Button x:Name="BtnOK" Content="OK" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="80" Command="ApplicationCommands.Close" Canvas.Left="233" Canvas.Top="444"/>
-        <Button x:Name="BtnAdd" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="80" Height="25" Command="{Binding Path=AddNodesCommand}" IsDefault="True" Canvas.Left="138" Canvas.Top="444"/>
-        <ListBox x:Name="ListSelected" HorizontalAlignment="Left" Height="116" VerticalAlignment="Top" Width="303" 
-                 Background="WhiteSmoke" FontSize="14" ItemsSource="{Binding Path=SelectedNodes}" IsTextSearchEnabled="False" Canvas.Left="10" Canvas.Top="323" />
+        <ItemsControl Name="SelectedFolder" Visibility="Hidden" />
+        <Button x:Name="BtnOK" Content="OK" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="80" Canvas.Left="153" Canvas.Top="347" Click="BtnOK_Click" IsDefault="True"/>
+        <Button x:Name="BtnCancel" Content="Cancel" Canvas.Left="238" Canvas.Top="347" Width="75" Height="25" IsCancel="True" Click="BtnCancel_Click"/>
     </Canvas>
 
     <Window.Resources>
         <!-- VM定義 -->
-        <ObjectDataProvider x:Key="Tree" x:Name="Tree" ObjectType="{x:Type Entity:FolderBrowserInfoEntity}" />
-        <!-- コンテキストメニュー定義 -->
-        <ContextMenu x:Key="DlgContextMenu" FontFamily="Tahoma">
-            <MenuItem Name="MenuItemRemove" Header="Add" Command="{Binding Path=AddNodesCommand}"/>
-        </ContextMenu>
+        <Entity:FolderBrowserInfoEntity x:Key="EntFolder" />      
     </Window.Resources>
-
-    <Window.CommandBindings>
-        <CommandBinding Command="ApplicationCommands.Close"
-                        Executed="CloseCommandHandler"/>
-    </Window.CommandBindings>
 
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

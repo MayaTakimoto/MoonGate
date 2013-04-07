@@ -100,11 +100,29 @@ namespace MoonGate.Properties {
         }
         
         /// <summary>
-        ///   Value is Required! に類似しているローカライズされた文字列を検索します。
+        ///   Value is Empty! に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string mesErrValisNull {
             get {
                 return ResourceManager.GetString("mesErrValisNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Unexpected Error! に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string mesExp {
+            get {
+                return ResourceManager.GetString("mesExp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ERROR に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string titleErr {
+            get {
+                return ResourceManager.GetString("titleErr", resourceCulture);
             }
         }
     }

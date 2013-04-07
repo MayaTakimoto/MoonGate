@@ -122,7 +122,6 @@
     <Compile Include="Component\Entity\CloudInfoEntity.cs" />
     <Compile Include="Component\Entity\FileInfoEntity.cs" />
     <Compile Include="Component\Entity\FolderBrowserInfoEntity.cs" />
-    <Compile Include="Component\Entity\InputPassWndInfoEntity.cs" />
     <Compile Include="Component\Entity\TreeNodeEntity.cs" />
     <Compile Include="Component\Message\InputPassMessage.cs" />
     <Compile Include="Component\Message\SelectCloudFilesMessage.cs" />

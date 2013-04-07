@@ -46,18 +46,18 @@ namespace mgcloud
         /// <summary>
         /// コンシューマキー
         /// </summary>
-        internal string ConsumerKey { get; set; }
+        internal char[] ConsumerKey { get; set; }
 
         /// <summary>
         /// コンシューマシークレット
         /// </summary>
-        internal string ConsumerSecret { get; set; }
+        internal char[] ConsumerSecret { get; set; }
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public BaseCloudOperator(string cKey, string cSec)
+        public BaseCloudOperator(char[] cKey, char[] cSec)
         {
             ConsumerKey = cKey;
             ConsumerSecret = cSec;

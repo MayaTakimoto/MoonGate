@@ -20,6 +20,11 @@ namespace MoonGate.Component.Entity
         /// </summary>
         public FileInfoEntity FolderInfo { get; set; }
 
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public bool IsChecked { get; set; }
+
         /// <summary>
         /// 子ノードのリストのプロパティ
         /// </summary>

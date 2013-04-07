@@ -15,18 +15,34 @@ namespace mgcloud.Config
         /// <param name="str"></param>
         /// <param name="containerName"></param>
         /// <returns></returns>
-        public string EncryptRsa(string str, string containerName)
+        public char[] EncryptRsa(char[] authInf, string containerName)
         {
-            string PublicKey = GetPublicKey(containerName);
+            byte[] encryptedData = null;
+            try
+            {
+                string PublicKey = GetPublicKey(containerName);
 
-            var rsaProv = new RSACryptoServiceProvider();
+                var rsaProv = new RSACryptoServiceProvider();
+                rsaProv.FromXmlString(PublicKey);
 
-            rsaProv.FromXmlString(PublicKey);
+                byte[] data = Encoding.UTF8.GetBytes(authInf);
+                encryptedData = rsaProv.Encrypt(data, false);
+            }
+            catch (CryptographicException)
+            {
+                return null;
+            }
 
-            byte[] data = Encoding.UTF8.GetBytes(str);
-            byte[] encryptedData = rsaProv.Encrypt(data, false);
+            long arrayLength = (long)((4.0d / 3.0d) * encryptedData.Length);
+            if (arrayLength % 4 != 0)
+            {
+                arrayLength += 4 - arrayLength % 4;
+            }
 
-            return Convert.ToBase64String(encryptedData);
+            char[] result = new char[arrayLength];
+            Convert.ToBase64CharArray(encryptedData, 0, encryptedData.Length, result, 0);
+
+            return result;
         }
 
 
@@ -36,14 +52,22 @@ namespace mgcloud.Config
         /// <param name="str"></param>
         /// <param name="containerName"></param>
         /// <returns></returns>
-        public string DecryptRsa(string str, string containerName)
-        {
-            var rsaProv = InitRsa(containerName);
+        public char[] DecryptRsa(char[] str, string containerName)
+        { 
+            byte[] decryptedData;
+            try
+            {
+                var rsaProv = InitRsa(containerName);
 
-            byte[] data = System.Convert.FromBase64String(str);
-            byte[] decryptedData = rsaProv.Decrypt(data, false);
+                byte[] data = Convert.FromBase64CharArray(str, 0, str.Length);
+                decryptedData = rsaProv.Decrypt(data, false);
+            }
+            catch (CryptographicException)
+            {
+                return null;
+            }
 
-            return Encoding.UTF8.GetString(decryptedData);
+            return Encoding.UTF8.GetChars(decryptedData);
         }
 
 

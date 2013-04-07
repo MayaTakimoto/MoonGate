@@ -14,38 +14,88 @@ namespace MoonGate.utility
         /// <summary>
         /// RSA暗号化
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="cData"></param>
         /// <param name="containerName"></param>
         /// <returns></returns>
-        public string EncryptRsa(string str, string containerName)
+        public char[] EncryptRsa(char[] cData, string containerName)
         {
-            string PublicKey = GetPublicKey(containerName);
+            if (cData == null || cData.Length == 0)
+            {
+                return null;
+            }
 
-            var rsaProv = new RSACryptoServiceProvider();
+            if (string.IsNullOrEmpty(containerName))
+            {
+                return null;
+            }
 
-            rsaProv.FromXmlString(PublicKey);
+            byte[] encryptedData = null;
 
-            byte[] data = Encoding.UTF8.GetBytes(str);
-            byte[] encryptedData = rsaProv.Encrypt(data, false);
+            // RSA暗号化を行う
+            try
+            {
+                string PublicKey = GetPublicKey(containerName);
 
-            return Convert.ToBase64String(encryptedData);
+                var rsaProv = new RSACryptoServiceProvider();
+                rsaProv.FromXmlString(PublicKey);
+
+                byte[] data = Encoding.UTF8.GetBytes(cData);
+                encryptedData = rsaProv.Encrypt(data, false);
+            }
+            catch (CryptographicException)
+            {
+                return null;
+            }
+
+            // Base64エンコード後のデータ長を計算する
+            long arrayLength = (long)((4.0d / 3.0d) * encryptedData.Length);
+            if (arrayLength % 4 != 0)
+            {
+                arrayLength += 4 - arrayLength % 4;
+            }
+
+            // Base64エンコードを行う
+            char[] encChar = new char[arrayLength];
+            Convert.ToBase64CharArray(encryptedData, 0, encryptedData.Length, encChar, 0);
+
+            return encChar;
         }
 
 
         /// <summary>
         /// RSA復号
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="cData"></param>
         /// <param name="containerName"></param>
         /// <returns></returns>
-        public string DecryptRsa(string str, string containerName)
+        public char[] DecryptRsa(char[] cData, string containerName)
         {
-            var rsaProv = InitRsa(containerName);
+            if (cData == null || cData.Length == 0)
+            {
+                return null;
+            }
 
-            byte[] data = System.Convert.FromBase64String(str);
-            byte[] decryptedData = rsaProv.Decrypt(data, false);
+            if (string.IsNullOrEmpty(containerName))
+            {
+                return null;
+            }
 
-            return Encoding.UTF8.GetString(decryptedData);
+            byte[] decryptedData = null;
+
+            // RSA復号を行う
+            try
+            {
+                var rsaProv = InitRsa(containerName);
+
+                byte[] data = Encoding.UTF8.GetBytes(cData);
+                decryptedData = rsaProv.Decrypt(data, false);
+            }
+            catch (CryptographicException)
+            {
+                return null;
+            }
+
+            return Encoding.UTF8.GetChars(decryptedData);
         }
 
 
@@ -57,7 +107,7 @@ namespace MoonGate.utility
         public void DeleteKeys(string containerName)
         {
             var rsaProv = InitRsa(containerName);
-            
+
             rsaProv.PersistKeyInCsp = false;
             rsaProv.Clear();
         }

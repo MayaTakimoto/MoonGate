@@ -11,5 +11,15 @@ namespace ConsumerSignup
         {
             InitializeComponent();
         }
+
+        private void KeyInput_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            this.Key.Tag = this.KeyInput.SecurePassword;
+        }
+
+        private void SecInput_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            this.Secret.Tag = this.SecInput.SecurePassword;
+        }
     }
 }

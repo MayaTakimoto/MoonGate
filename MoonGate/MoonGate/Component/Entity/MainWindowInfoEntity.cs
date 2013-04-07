@@ -279,7 +279,15 @@ namespace MoonGate.Component.Entity
                 {
                     ListItemEntity listItem = new ListItemEntity();
 
-                    listItem.FileName = Path.GetFileName(folderPath);
+                    string dirName = Path.GetFileName(folderPath);
+                    if (string.IsNullOrEmpty(dirName))
+                    {
+                        listItem.FileName = folderPath;
+                    }
+                    else
+                    {
+                        listItem.FileName = dirName;
+                    }
                     listItem.FilePath = folderPath;
                     listItem.IsCloud = false;
                     listItem.IsDirectory = true;
@@ -317,18 +325,19 @@ namespace MoonGate.Component.Entity
         /// <param name="param"></param>
         private void Upload(object param)
         {
-            string strKey;
-            string strSec;
+            char[] cKey;
+            char[] cSec;
             
-            LoadConsumerInfo(param, out strKey, out strSec);
-            if (string.IsNullOrEmpty(strKey) || string.IsNullOrEmpty(strSec))
+            LoadConsumerInfo(param, out cKey, out cSec);
+            if (cKey == null || cKey.Length == 0
+                || cSec == null || cSec.Length == 0)
             {
 
             }
 
             using (Encryptor encData = new RijndaelEncryptor())
             {
-                using (BaseCloudOperator oprCld = new GoogleDriveOperator(strKey, strSec))
+                using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
                 {
                     int iRes = -1;
 
@@ -370,13 +379,13 @@ namespace MoonGate.Component.Entity
                 }
             }
 
-            if (!SaveConsumerInfo(param, strKey, strSec))
+            if (!SaveConsumerInfo(param, cKey, cSec))
             {
 
             }
 
-            strKey = null;
-            strSec = null;
+            cKey = null;
+            cSec = null;
             RemoveItems();
         }
 
@@ -415,12 +424,12 @@ namespace MoonGate.Component.Entity
         /// コンシューマ情報の読み込み
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="strKey"></param>
-        /// <param name="strSec"></param>
-        private void LoadConsumerInfo(object param, out string strKey, out string strSec)
+        /// <param name="cKey"></param>
+        /// <param name="cSec"></param>
+        private void LoadConsumerInfo(object param, out char[] cKey, out char[] cSec)
         {
-            strKey = null;
-            strSec = null;
+            cKey = null;
+            cSec = null;
             DataCipher dcp = new DataCipher();
 
             object objConsumerInfo = new List<ConsumerInfoEntity>();
@@ -441,8 +450,8 @@ namespace MoonGate.Component.Entity
                 }
             }
 
-            strKey = dcp.DecryptRsa(conInfo.ConsumerKey, param.ToString());
-            strSec = dcp.DecryptRsa(conInfo.ConsumerSecret, param.ToString());
+            cKey = dcp.DecryptRsa(conInfo.ConsumerKey, param.ToString());
+            cSec = dcp.DecryptRsa(conInfo.ConsumerSecret, param.ToString());
 
             // 秘密鍵の削除
             dcp.DeleteKeys(param.ToString());
@@ -453,14 +462,14 @@ namespace MoonGate.Component.Entity
         /// コンシューマ情報リスト保存
         /// </summary>
         /// <param name="conInfo"></param>
-        private bool SaveConsumerInfo(object param, string strKey, string strSec)
+        private bool SaveConsumerInfo(object param, char[] cKey, char[] cSec)
         {
             DataCipher dcp = new DataCipher();
 
             ConsumerInfoEntity conInfo = new ConsumerInfoEntity();
             conInfo.StorageKey = param.ToString();
-            conInfo.ConsumerKey = dcp.EncryptRsa(strKey, param.ToString());
-            conInfo.ConsumerSecret = dcp.EncryptRsa(strSec, param.ToString());
+            conInfo.ConsumerKey = dcp.EncryptRsa(cKey, param.ToString());
+            conInfo.ConsumerSecret = dcp.EncryptRsa(cSec, param.ToString());
 
             listConsumerInfo.Add(conInfo);
 

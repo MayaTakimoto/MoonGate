@@ -5,13 +5,13 @@
 
     <Canvas>
         <Canvas.Background>
-            <LinearGradientBrush EndPoint="420,0" MappingMode="Absolute">
+            <LinearGradientBrush EndPoint="370,0" MappingMode="Absolute">
                 <GradientStop Color="#FFD4D0C8" Offset="0"/>
                 <GradientStop Color="#FFF5F5F4" Offset="1"/>
             </LinearGradientBrush>
         </Canvas.Background>
-        <Button x:Name="btnOK" Content="OK" RenderTransformOrigin="0.32,-0.238" FontSize="14" HorizontalAlignment="Right" Width="94" Height="28" VerticalAlignment="Bottom" Canvas.Left="206" Canvas.Top="174"/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Right" Width="97" RenderTransformOrigin="0.32,-0.238" FontSize="14" IsCancel="True" Height="28" VerticalAlignment="Bottom" Canvas.Left="305" Canvas.Top="174"/>
+        <Button x:Name="btnOK" Content="OK" RenderTransformOrigin="0.32,-0.238" FontSize="14" HorizontalAlignment="Right" Width="94" Height="28" VerticalAlignment="Bottom" Canvas.Left="206" Canvas.Top="174" Click="btnOK_Click" IsDefault="True"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Right" Width="97" RenderTransformOrigin="0.32,-0.238" FontSize="14" IsCancel="True" Height="28" VerticalAlignment="Bottom" Canvas.Left="305" Canvas.Top="174" Click="btnCancel_Click"/>
         <Label x:Name="lblInfo" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Width="206" FontSize="14" Background="Transparent" Canvas.Top="174"/>
         <TabControl Name="TabMain" HorizontalAlignment="Left" Width="408" FontSize="14" Background="{x:Null}" Height="169" >
             <TabItem Header="Password">
@@ -30,9 +30,8 @@
             </TabItem>
             <TabItem Header="Passfile">
                 <Canvas>
-                    <Control Name="FilePath" Visibility="Hidden" Tag=""/>
-                    <Rectangle Height="132" Width="398"/>
-                    <TextBlock Canvas.Left="163" TextWrapping="Wrap" Text="Drop Here!" Canvas.Top="58"/>
+                    <Button Name="BtnKeyFile" Content="Click or Drop Here!" Width="398" Height="132" Background="{x:Null}" AllowDrop="True" Click="BtnKeyFile_Click"/>
+                    <Control Name="ConKeyFile" Visibility="Hidden"/>
                 </Canvas>
             </TabItem>
             <TabItem Header="Passdrive" >
@@ -40,7 +39,7 @@
                     <StackPanel Height="112" Canvas.Top="10" Width="398" Orientation="Horizontal">
                         <TextBlock TextWrapping="NoWrap" TextAlignment="Center" VerticalAlignment="Center" Text="Choose Drive!" Height="22" Margin="0,45"/>
                         <Rectangle Width="10"/>
-                        <ListBox Name="ListDrive" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="298" RenderTransformOrigin="0.503,-0.263" SelectedIndex="0"/>
+                        <ListBox Name="ListDrive" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="298" RenderTransformOrigin="0.503,-0.263"/>
                     </StackPanel>
                 </Canvas>
             </TabItem>

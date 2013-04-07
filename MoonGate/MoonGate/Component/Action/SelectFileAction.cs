@@ -34,8 +34,11 @@ namespace MoonGate.Component.Action
 
             var resDlg = dlgGetFiles.ShowDialog();
 
-            message.FileNames = dlgGetFiles.FileNames;
-            message.Result = (bool)resDlg;
+            if ((bool)resDlg == true)
+            {
+                message.FileNames = dlgGetFiles.FileNames;
+                message.Result = (bool)resDlg;
+            }
 
             dlgGetFiles = null;
         }

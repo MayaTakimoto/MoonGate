@@ -63,8 +63,6 @@ namespace mgcloud.CloudOperator
         /// </summary>
         private const string KEY_CONTAINER_NAME = @"GDR_AUTH";
 
-        //private const string CLIENT_ID = @"815568550348.apps.googleusercontent.com";
-        //private const string CLIENT_SECRET = @"yRDhSlYssPrYYjTNuVRpsiEh";
         //private const string REDIRECT_URI = @"urn:ietf:wg:oauth:2.0:oob";
         
         /// <summary>
@@ -83,7 +81,7 @@ namespace mgcloud.CloudOperator
         /// </summary>
         /// <param name="cKey"></param>
         /// <param name="cSec"></param>
-        public GoogleDriveOperator(string cKey, string cSec)
+        public GoogleDriveOperator(char[] cKey, char[] cSec)
             : base(cKey, cSec) 
         {
             authPath = @"./user/GoogleDrive.xml"; 
@@ -280,8 +278,8 @@ namespace mgcloud.CloudOperator
         {
             AuthInfoCipher cipher = new AuthInfoCipher();
 
-            EntAuth.AccessToken = cipher.EncryptRsa(state.AccessToken, KEY_CONTAINER_NAME);
-            EntAuth.RefreshToken = cipher.EncryptRsa(state.RefreshToken, KEY_CONTAINER_NAME);
+            EntAuth.AccessToken = cipher.EncryptRsa(state.AccessToken.ToCharArray(), KEY_CONTAINER_NAME);
+            EntAuth.RefreshToken = cipher.EncryptRsa(state.RefreshToken.ToCharArray(), KEY_CONTAINER_NAME);
             EntAuth.TokenLimit = (DateTime)state.AccessTokenExpirationUtc;
         }
 
@@ -293,7 +291,7 @@ namespace mgcloud.CloudOperator
         private DriveService InitConnection()
         {
             // GoogleDriveとコネクトするためのお決まり
-            var provider = new NativeApplicationClient(GoogleAuthenticationServer.Description, ConsumerKey, ConsumerSecret);
+            var provider = new NativeApplicationClient(GoogleAuthenticationServer.Description, ConsumerKey.ToString(), ConsumerSecret.ToString());
             var auth = new OAuth2Authenticator<NativeApplicationClient>(provider, GetAuthorization);
             dServ = new DriveService(auth);
 
@@ -322,10 +320,12 @@ namespace mgcloud.CloudOperator
                 if (!ReadyConFlg)
                 {
                     AuthInfoCipher cipher = new AuthInfoCipher();
+                    var accessToken = cipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);
+                    var refreshToken = cipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);
 
-                    state.AccessToken = cipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);     // アクセストークンをセット
-                    state.RefreshToken = cipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);   // リフレッシュトークンをセット
-                    state.AccessTokenExpirationUtc = EntAuth.TokenLimit;                                // アクセストークンの有効期限をセット
+                    state.AccessToken = new string(accessToken);             // アクセストークンをセット
+                    state.RefreshToken = new string(refreshToken);           // リフレッシュトークンをセット
+                    state.AccessTokenExpirationUtc = EntAuth.TokenLimit;     // アクセストークンの有効期限をセット
 
                     cipher.DeleteKeys(KEY_CONTAINER_NAME);
                 }

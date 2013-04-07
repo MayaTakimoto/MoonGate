@@ -1,9 +1,12 @@
 ﻿using MoonGate.Component;
 using MoonGate.Component.Entity;
 using MoonGate.utility;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Windows.Input;
 
 namespace ConsumerSignup.Entity
@@ -31,12 +34,12 @@ namespace ConsumerSignup.Entity
         /// <summary>
         /// 
         /// </summary>
-        public string ConsumerKey { get; set; }
+        public SecureString ConsumerKey { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string ConsumerSecret { get; set; }
+        public SecureString ConsumerSecret { get; set; }
 
         /// <summary>
         /// 
@@ -73,7 +76,11 @@ namespace ConsumerSignup.Entity
                 param => this.OKProcess(param),
                 param =>
                 {
-                    if (string.IsNullOrEmpty(ConsumerSecret) || string.IsNullOrEmpty(ConsumerKey) || param == null)
+                    if (ConsumerKey == null ||
+                        ConsumerKey.Length == 0 ||
+                        ConsumerSecret == null ||
+                        ConsumerSecret.Length == 0 ||
+                        param == null)
                     {
                         return false;
                     }
@@ -99,9 +106,37 @@ namespace ConsumerSignup.Entity
                 Directory.CreateDirectory(Path.GetDirectoryName(USERFILE_PATH));
             }
 
+            char[] cKey, cSec;
+            IntPtr ptrKey = IntPtr.Zero;
+            IntPtr ptrSec = IntPtr.Zero;
+            try
+            {
+                cKey = new char[ConsumerKey.Length];
+                cSec = new char[ConsumerSecret.Length];
+
+                ptrKey = Marshal.SecureStringToCoTaskMemUnicode(ConsumerKey);
+                Marshal.Copy(ptrKey, cKey, 0, cKey.Length);
+
+                ptrSec = Marshal.SecureStringToCoTaskMemUnicode(ConsumerSecret);
+                Marshal.Copy(ptrSec, cSec, 0, cSec.Length);
+            }
+            catch
+            {
+                return;
+            }
+            finally
+            {
+                if (ptrKey != IntPtr.Zero)
+                {
+                    Marshal.ZeroFreeCoTaskMemUnicode(ptrKey);
+                    Marshal.ZeroFreeCoTaskMemUnicode(ptrSec);
+                }
+            }
+
+
             DataCipher dc = new DataCipher();
-            string ck = dc.EncryptRsa(ConsumerKey, param.ToString());
-            string cs = dc.EncryptRsa(ConsumerSecret, param.ToString());
+            char[] ck = dc.EncryptRsa(cKey, param.ToString());
+            char[] cs = dc.EncryptRsa(cSec, param.ToString());
 
             // コンシューマ情報セット
             ConsumerInfoEntity conInfo = new ConsumerInfoEntity();

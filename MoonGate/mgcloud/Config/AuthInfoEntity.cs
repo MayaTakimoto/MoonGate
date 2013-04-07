@@ -8,27 +8,32 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Runtime.Serialization;
 
 namespace mgcloud.Config
 {
     /// <summary>
     /// OAuth認証情報のエンティティ
     /// </summary>
+    [DataContract]
     class AuthInfoEntity
     {
         /// <summary>
         /// アクセストークン
         /// </summary>
-        public string AccessToken { get; set; }
+        [DataMember]
+        public char[] AccessToken { get; set; }
 
         /// <summary>
         /// リフレッシュトークン
         /// </summary>
-        public string RefreshToken { get; set; }
+        [DataMember]
+        public char[] RefreshToken { get; set; }
 
         /// <summary>
         /// アクセストークンの有効期限
         /// </summary>
+        [DataMember]
         public DateTime TokenLimit { get; set; }
     }
 }

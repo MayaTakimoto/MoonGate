@@ -1,5 +1,6 @@
 ﻿using MoonGate.Component.Entity;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace MoonGate
@@ -19,24 +20,55 @@ namespace MoonGate
 
 
         /// <summary>
-        /// 選択ノード変更時イベント
+        /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void FolderTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-            SelectedNode.DataContext = e.NewValue;
+            this.DialogResult = false;
         }
 
 
         /// <summary>
-        /// ダイアログを閉じる
+        /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CloseCommandHandler(object sender, ExecutedRoutedEventArgs e)
+        private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            this.DialogResult = true;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = e.Source as CheckBox;
+            SelectedFolder.Items.Add(selected.Tag);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            CheckBox released = e.Source as CheckBox;
+            foreach (var item in SelectedFolder.Items)
+            {
+                if (item == released.Tag)
+                {
+                    SelectedFolder.Items.Remove(item);
+                    break;
+                }
+            }
         }
     }
 }
