@@ -70,5 +70,17 @@ namespace MoonGate
                 }
             }
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FolderTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            
+            //CheckBox checkBox = e.Source as CheckBox;
+        }
     }
 }

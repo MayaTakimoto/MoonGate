@@ -31,7 +31,7 @@
             <TabItem Header="Passfile">
                 <Canvas>
                     <Button Name="BtnKeyFile" Content="Click or Drop Here!" Width="398" Height="132" Background="{x:Null}" AllowDrop="True" Click="BtnKeyFile_Click"/>
-                    <Control Name="ConKeyFile" Visibility="Hidden"/>
+                    <Control Name="ConKeyFile" Visibility="Hidden" Tag="."/>
                 </Canvas>
             </TabItem>
             <TabItem Header="Passdrive" >

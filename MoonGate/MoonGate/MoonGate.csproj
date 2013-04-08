@@ -124,6 +124,7 @@
     <Compile Include="Component\Entity\FolderBrowserInfoEntity.cs" />
     <Compile Include="Component\Entity\TreeNodeEntity.cs" />
     <Compile Include="Component\Message\InputPassMessage.cs" />
+    <Compile Include="Component\Message\MesBoxMessage.cs" />
     <Compile Include="Component\Message\SelectCloudFilesMessage.cs" />
     <Compile Include="Component\Message\SelectFileMessage.cs" />
     <Compile Include="Component\BaseMessage.cs" />

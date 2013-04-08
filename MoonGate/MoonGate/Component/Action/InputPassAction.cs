@@ -34,12 +34,7 @@ namespace MoonGate.Component.Action
 
             message.SelectedIndex = wnd.TabMain.SelectedIndex;
             message.PassWord = wnd.pswdInput.SecurePassword;
-
-            //if (File.Exists(wnd.FilePath.Tag.ToString()))
-            //{
-            //    message.PassFile = new FileInfo(wnd.FilePath.Tag.ToString());
-            //}
-
+            message.PassFile = new FileInfo(wnd.ConKeyFile.Tag.ToString());
             message.PassDrive = wnd.ListDrive.SelectedItem.ToString();
             message.Result = (bool)resDlg;
 

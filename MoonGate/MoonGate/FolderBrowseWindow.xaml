@@ -8,8 +8,8 @@
                   ItemsSource="{Binding Path=Nodes}" VirtualizingStackPanel.VirtualizationMode="Recycling" VirtualizingStackPanel.IsVirtualizing="True" Canvas.Left="10" Canvas.Top="10" Height="332" Width="303">
             <TreeView.ItemTemplate>
                 <!-- ノードのテンプレート -->
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=ListTreeNodes}">
-                    <StackPanel Orientation="Horizontal" Height="20">
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=ListTreeNodes}" >
+                    <StackPanel Orientation="Horizontal" Height="20" Background="{x:Null}">
                         <CheckBox VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Tag="{Binding Path=FolderInfo.FilePath}" />
                         <Image Height="12" Width="15" Source="pic/glyphicons/glyphicons_145_folder_plus.png" />
                         <TextBlock Text="{Binding Path=FolderInfo.FileName}" />
@@ -24,7 +24,7 @@
 
     <Window.Resources>
         <!-- VM定義 -->
-        <Entity:FolderBrowserInfoEntity x:Key="EntFolder" />      
+        <Entity:FolderBrowserInfoEntity x:Key="EntFolder" />
     </Window.Resources>
 
     <Window.Background>

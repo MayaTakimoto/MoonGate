@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Security;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -327,12 +328,23 @@ namespace MoonGate.Component.Entity
         {
             char[] cKey;
             char[] cSec;
-            
-            LoadConsumerInfo(param, out cKey, out cSec);
-            if (cKey == null || cKey.Length == 0
-                || cSec == null || cSec.Length == 0)
-            {
 
+            LoadConsumerInfo(param, out cKey, out cSec);
+            if (cKey == null || cKey.Length == 0)
+            {
+                return;
+            }
+            if (cSec == null || cSec.Length == 0)
+            {
+                return;
+            }
+
+            InputPassMessage inputPassMessage = new InputPassMessage(this);
+            Indicator.Instance.Order<InputPassMessage>(this, inputPassMessage);
+
+            if (inputPassMessage.Result == false)
+            {
+                return;
             }
 
             using (Encryptor encData = new RijndaelEncryptor())
@@ -360,17 +372,31 @@ namespace MoonGate.Component.Entity
 
                         // 暗号化
                         byte[] encryptedData = null;
-                        
+                        switch (inputPassMessage.SelectedIndex)
+                        {
+                            case 0:
+                                iRes = encData.Encrypt(inputPassMessage.PassWord, out encryptedData);
+                                break;
+                            case 1:
+                                iRes = encData.Encrypt(inputPassMessage.PassFile, out encryptedData);
+                                break;
+                            case 2:
+                                iRes = encData.Encrypt(inputPassMessage.PassDrive, out encryptedData);
+                                break;
+                            default:
+                                break;
+                        }
+
                         if (iRes < 0)
                         {
-
+                            return;
                         }
 
                         // アップロード
                         iRes = oprCld.UploadFile(item.FilePath, encryptedData);
                         if (iRes < 0)
                         {
-
+                            return;
                         }
                     }
 
@@ -379,6 +405,11 @@ namespace MoonGate.Component.Entity
                 }
             }
 
+            inputPassMessage.PassWord.Dispose();
+            inputPassMessage.PassFile = null;
+            inputPassMessage.PassDrive = null;
+            inputPassMessage = null;
+            
             if (!SaveConsumerInfo(param, cKey, cSec))
             {
 
@@ -397,6 +428,16 @@ namespace MoonGate.Component.Entity
         private void UproadAll(object param)
         {
             throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// メッセージ表示
+        /// </summary>
+        /// <param name="param"></param>
+        private void ShowMessageBox(int iMesType, string param)
+        {
+
         }
 
 
