@@ -1,15 +1,20 @@
-﻿using MoonGate.Component.Message;
-using System;
-using System.Collections.Generic;
+﻿//-----------------------------------------------------------------------
+// <summary>鍵情報入力ダイアログ表示のActionクラス</summary>
+// <author>MayaTakimoto</author> 
+// <date>$Date: 2013-04-06 ‏‎23:09:37  +9:00 $</date>
+// <copyright file="$Name: InputPassAction.cs $" > 
+//     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using MoonGate.Component.Message;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace MoonGate.Component.Action
 {
     /// <summary>
-    /// 
+    /// InputPassWindow表示Actionクラス
     /// </summary>
     class InputPassAction : BaseAction
     {
@@ -29,16 +34,18 @@ namespace MoonGate.Component.Action
         /// <param name="message"></param>
         private static void ShowInputPassWindow(InputPassMessage message)
         {
-            InputPassWindow wnd = new InputPassWindow();
-            var resDlg = wnd.ShowDialog();
+            InputPassWindow dialogInputPass = new InputPassWindow();
+            //wnd.Owner = wnd;
+            //wnd.
+            var resDlg = dialogInputPass.ShowDialog();
 
-            message.SelectedIndex = wnd.TabMain.SelectedIndex;
-            message.PassWord = wnd.pswdInput.SecurePassword;
-            message.PassFile = new FileInfo(wnd.ConKeyFile.Tag.ToString());
-            message.PassDrive = wnd.ListDrive.SelectedItem.ToString();
+            message.SelectedIndex = dialogInputPass.TabMain.SelectedIndex;
+            message.PassWord = dialogInputPass.pswdInput.SecurePassword;
+            message.PassFile = new FileInfo(dialogInputPass.ConKeyFile.Tag.ToString());
+            message.PassDrive = dialogInputPass.ListDrive.SelectedItem.ToString();
             message.Result = (bool)resDlg;
 
-            wnd = null;
+            dialogInputPass = null;
         }
     }
 }

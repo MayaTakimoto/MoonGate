@@ -3,7 +3,6 @@ using MoonGate.Component.Entity;
 using MoonGate.utility;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -12,7 +11,7 @@ using System.Windows.Input;
 namespace ConsumerSignup.Entity
 {
     /// <summary>
-    /// 
+    /// ConsumerSignUpのVMクラス
     /// </summary>
     class MainEntity
     {

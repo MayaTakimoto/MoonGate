@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <summary>メインウィンドウ各情報保持クラス</summary>
+// <summary>メインウィンドウVMクラス</summary>
 // <author>MayaTakimoto</author> 
 // <date>$Date: 2013-02-13 14:00:00  +9:00 $</date>
 // <copyright file="$Name: TargetListEntity.cs $" > 
@@ -19,7 +19,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Security;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -28,7 +27,7 @@ using System.Windows.Media.Imaging;
 namespace MoonGate.Component.Entity
 {
     /// <summary>
-    /// MainWindow情報保持クラス
+    /// MainWindowのVMクラス
     /// </summary>
     public class MainWindowInfoEntity : INotifyPropertyChanged
     {
@@ -37,7 +36,9 @@ namespace MoonGate.Component.Entity
         /// </summary>
         private const string MASTERFILE_PATH = "./mst.xml";
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         private const string USERFILE_PATH = "./user/consumer.xml";
 
         /// <summary>
@@ -347,7 +348,7 @@ namespace MoonGate.Component.Entity
                 return;
             }
 
-            using (Encryptor encData = new RijndaelEncryptor())
+            using (Encryptor encryptor = new RijndaelEncryptor())
             {
                 using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
                 {
@@ -368,20 +369,20 @@ namespace MoonGate.Component.Entity
                         }
 
                         // 暗号化対象をセット
-                        encData.InitEncrypt(item.FilePath);
+                        encryptor.InitEncrypt(item.FilePath);
 
                         // 暗号化
                         byte[] encryptedData = null;
                         switch (inputPassMessage.SelectedIndex)
                         {
                             case 0:
-                                iRes = encData.Encrypt(inputPassMessage.PassWord, out encryptedData);
+                                iRes = encryptor.Encrypt(inputPassMessage.PassWord, out encryptedData);
                                 break;
                             case 1:
-                                iRes = encData.Encrypt(inputPassMessage.PassFile, out encryptedData);
+                                iRes = encryptor.Encrypt(inputPassMessage.PassFile, out encryptedData);
                                 break;
                             case 2:
-                                iRes = encData.Encrypt(inputPassMessage.PassDrive, out encryptedData);
+                                iRes = encryptor.Encrypt(inputPassMessage.PassDrive, out encryptedData);
                                 break;
                             default:
                                 break;
@@ -422,12 +423,99 @@ namespace MoonGate.Component.Entity
 
 
         /// <summary>
-        /// 
+        /// 全アップロード
         /// </summary>
         /// <param name="param"></param>
         private void UproadAll(object param)
         {
-            throw new NotImplementedException();
+            char[] cKey;
+            char[] cSec;
+
+            LoadConsumerInfo(param, out cKey, out cSec);
+            if (cKey == null || cKey.Length == 0)
+            {
+                return;
+            }
+            if (cSec == null || cSec.Length == 0)
+            {
+                return;
+            }
+
+            InputPassMessage inputPassMessage = new InputPassMessage(this);
+            Indicator.Instance.Order<InputPassMessage>(this, inputPassMessage);
+
+            if (inputPassMessage.Result == false)
+            {
+                return;
+            }
+
+            using (Encryptor encryptor = new RijndaelEncryptor())
+            {
+                using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+                {
+                    int iRes = -1;
+
+                    // 認証情報のロード
+                    oprCld.LoadAuthInfo();
+
+                    foreach (var item in ObsFileList)
+                    {
+                        if (item.IsCloud)
+                        {
+                            continue;
+                        }
+
+                        // 暗号化対象をセット
+                        encryptor.InitEncrypt(item.FilePath);
+
+                        // 暗号化
+                        byte[] encryptedData = null;
+                        switch (inputPassMessage.SelectedIndex)
+                        {
+                            case 0:
+                                iRes = encryptor.Encrypt(inputPassMessage.PassWord, out encryptedData);
+                                break;
+                            case 1:
+                                iRes = encryptor.Encrypt(inputPassMessage.PassFile, out encryptedData);
+                                break;
+                            case 2:
+                                iRes = encryptor.Encrypt(inputPassMessage.PassDrive, out encryptedData);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (iRes < 0)
+                        {
+                            return;
+                        }
+
+                        // アップロード
+                        iRes = oprCld.UploadFile(item.FilePath, encryptedData);
+                        if (iRes < 0)
+                        {
+                            return;
+                        }
+                    }
+
+                    // 認証情報のセーブ
+                    oprCld.SaveAuthInfo();
+                }
+            }
+
+            inputPassMessage.PassWord.Dispose();
+            inputPassMessage.PassFile = null;
+            inputPassMessage.PassDrive = null;
+            inputPassMessage = null;
+
+            if (!SaveConsumerInfo(param, cKey, cSec))
+            {
+
+            }
+
+            cKey = null;
+            cSec = null;
+            RemoveItems();
         }
 
 

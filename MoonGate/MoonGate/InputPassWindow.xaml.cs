@@ -1,4 +1,13 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <summary>鍵情報入力ダイアログ</summary>
+// <author>MayaTakimoto</author> 
+// <date>$Date: 2013-02-13 14:00:00  +9:00 $</date>
+// <copyright file="$Name: TargetListEntity.cs $" > 
+//     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -26,11 +35,13 @@ namespace MoonGate
         /// <param name="e"></param>
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
-
             if (IsPassInfOK())
             {
                 this.DialogResult = true;
+            }
+            else
+            {
+                this.DialogResult = false;
             }
         }
 

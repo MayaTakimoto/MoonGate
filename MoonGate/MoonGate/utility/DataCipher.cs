@@ -87,7 +87,7 @@ namespace MoonGate.utility
             {
                 var rsaProv = InitRsa(containerName);
 
-                byte[] data = Encoding.UTF8.GetBytes(cData);
+                byte[] data = Convert.FromBase64CharArray(cData, 0, cData.Length);
                 decryptedData = rsaProv.Decrypt(data, false);
             }
             catch (CryptographicException)

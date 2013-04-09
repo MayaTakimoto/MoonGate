@@ -1,15 +1,20 @@
-﻿using MoonGate.Component.Entity;
+﻿//-----------------------------------------------------------------------
+// <summary>フォルダ選択ダイアログ表示のActionクラス</summary>
+// <author>MayaTakimoto</author> 
+// <date>$Date: 2013‎/0‎3/‎‎23‎ ‏‎10:25:37  +9:00 $</date>
+// <copyright file="$Name: SelectFolderAction.cs $" > 
+//     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 using MoonGate.Component.Message;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace MoonGate.Component.Action
 {
     /// <summary>
-    /// 
+    /// FolderBrowserWindow表示Actionクラス
     /// </summary>
     class SelectFolderAction : BaseAction
     {
@@ -53,27 +58,5 @@ namespace MoonGate.Component.Action
 
             DialogGetFolder = null;
         }
-
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="listFolder"></param>
-        ///// <returns></returns>
-        //private static void GetSelectedFolderList(List<TreeNodeEntity> Nodes, ref List<string> listFolder)
-        //{
-        //    foreach (TreeNodeEntity node in Nodes)
-        //    {
-        //        if (node.IsChecked)
-        //        {
-        //            listFolder.Add(node.FolderInfo.FilePath);
-        //        }
-
-        //        if (node.ListTreeNodes != null)
-        //        {
-        //            GetSelectedFolderList(node.ListTreeNodes.ToList<TreeNodeEntity>(), ref listFolder);
-        //        }
-        //    }
-        //}
     }
 }

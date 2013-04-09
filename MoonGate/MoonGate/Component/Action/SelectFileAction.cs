@@ -1,10 +1,22 @@
-﻿using Microsoft.Win32;
+﻿//-----------------------------------------------------------------------
+// <summary>ファイル選択ダイアログ表示のActionクラス</summary>
+// <author>MayaTakimoto</author> 
+// <date>$Date: 2013‎/0‎3/‎‎23‎ 10:25:37  +9:00 $</date>
+// <copyright file="$Name: SelectFolderAction.cs $" > 
+//     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using Microsoft.Win32;
 using MoonGate.Component;
 using MoonGate.Component.Message;
 using System.Windows;
 
 namespace MoonGate.Component.Action
 {
+    /// <summary>
+    /// OpenFileDialog表示Actionクラス
+    /// </summary>
     class SelectFileAction : BaseAction
     {
         /// <summary>
