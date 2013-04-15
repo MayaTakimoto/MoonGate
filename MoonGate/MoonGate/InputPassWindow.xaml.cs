@@ -8,6 +8,8 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -20,11 +22,14 @@ namespace MoonGate
     public partial class InputPassWindow : Window
     {
         /// <summary>
-        /// 
+        /// コンストラクタ
         /// </summary>
         public InputPassWindow()
         {
             InitializeComponent();
+
+            // ドライブ情報取得
+            this.DriveList.ItemsSource = Directory.GetLogicalDrives().ToList<string>();
         }
 
 
@@ -124,7 +129,7 @@ namespace MoonGate
                     break;
 
                 case 2:
-                    if (this.ListDrive.SelectedItem == null)
+                    if (this.DriveList.SelectedItem == null)
                     {
                         return false;
                     }

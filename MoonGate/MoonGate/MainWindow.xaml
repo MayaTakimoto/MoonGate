@@ -90,7 +90,8 @@
                         ToolTip="Upload" Command="{Binding Path=UploadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}">
                     <Image Source="pic/glyphicons/glyphicons_363_cloud_upload.png" />
                 </Button>
-                <Button x:Name="BtnDownload" Uid="BtnDownload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Download">
+                <Button x:Name="BtnDownload" Uid="BtnDownload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" 
+                        ToolTip="Download" Command="{Binding Path=DownloadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}">
                     <Image Source="pic/glyphicons/glyphicons_364_cloud_download.png" />
                 </Button>
                 <ToggleButton x:Name="tbtnUnifying" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsBundle,Mode=OneWayToSource}" >
@@ -138,7 +139,13 @@
         <Entity:MainWindowInfoEntity x:Key="EntMain"/>
         <!-- コンテキストメニュー定義 -->
         <ContextMenu x:Key="ContextMenuMain" FontFamily="Tahoma">
+            <MenuItem Name="ConItemUpload" Header="Upload" 
+                      Command="{Binding Path=UploadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}" />
+            <MenuItem Name="ConItemUpAll" Header="Upload All"
+                      Command="{Binding Path=UploadAllCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}" />
+            <Separator />
             <MenuItem Name="ConItemRemove" Header="Remove from List" Command="{Binding Path=RemoveItemsCommand}"/>
+            <Separator />
             <MenuItem Name="ConItemShowPath" Header="Show FullPath"/>
         </ContextMenu>
         <!-- 選択時スタイル定義 -->

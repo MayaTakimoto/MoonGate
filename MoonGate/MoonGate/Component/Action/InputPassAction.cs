@@ -35,14 +35,12 @@ namespace MoonGate.Component.Action
         private static void ShowInputPassWindow(InputPassMessage message)
         {
             InputPassWindow dialogInputPass = new InputPassWindow();
-            //wnd.Owner = wnd;
-            //wnd.
             var resDlg = dialogInputPass.ShowDialog();
 
             message.SelectedIndex = dialogInputPass.TabMain.SelectedIndex;
             message.PassWord = dialogInputPass.pswdInput.SecurePassword;
             message.PassFile = new FileInfo(dialogInputPass.ConKeyFile.Tag.ToString());
-            message.PassDrive = dialogInputPass.ListDrive.SelectedItem.ToString();
+            message.PassDrive = dialogInputPass.DriveList.SelectedItem.ToString();
             message.Result = (bool)resDlg;
 
             dialogInputPass = null;

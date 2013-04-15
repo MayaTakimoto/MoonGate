@@ -39,7 +39,7 @@
                     <StackPanel Height="112" Canvas.Top="10" Width="398" Orientation="Horizontal">
                         <TextBlock TextWrapping="NoWrap" TextAlignment="Center" VerticalAlignment="Center" Text="Choose Drive!" Height="22" Margin="0,45"/>
                         <Rectangle Width="10"/>
-                        <ListBox Name="ListDrive" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="298" RenderTransformOrigin="0.503,-0.263" SelectedIndex="0"/>
+                        <ListBox x:Name="DriveList" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="298" RenderTransformOrigin="0.503,-0.263" SelectedIndex="0"/>
                     </StackPanel>
                 </Canvas>
             </TabItem>

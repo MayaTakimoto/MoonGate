@@ -10,6 +10,7 @@
 using mgcloud.Config;
 using System;
 using System.Collections.Specialized;
+using System.IO;
 
 namespace mgcloud
 {
@@ -24,7 +25,7 @@ namespace mgcloud
         public HybridDictionary DownloadFileList { get; set; }
 
         /// <summary>
-        /// 
+        /// 認証情報保持ファイルのパス
         /// </summary>
         protected string authPath;
 
@@ -115,6 +116,11 @@ namespace mgcloud
         /// <param name="authPath"></param>
         public void LoadAuthInfo()
         {
+            if (!File.Exists(authPath))
+            {
+                File.Create(authPath);
+            }
+
             AuthInfoEntity entAuth = new AuthInfoEntity();
 
             AuthInfoSerializer aiSerializer = new AuthInfoSerializer(authPath);
@@ -136,6 +142,11 @@ namespace mgcloud
         public bool SaveAuthInfo()
         {
             bool bSerialize = true;
+
+            if (!File.Exists(authPath))
+            {
+                File.Create(authPath);
+            }
 
             SetAuthInfo();
 
