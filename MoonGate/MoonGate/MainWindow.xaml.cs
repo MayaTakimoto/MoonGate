@@ -6,13 +6,8 @@
  *                                                                                    *
  **************************************************************************************/
 
-using Microsoft.Win32;
-using MoonGate.Component;
-using MoonGate.Component.Entity;
-using MoonGate.Component.Message;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace MoonGate
 {

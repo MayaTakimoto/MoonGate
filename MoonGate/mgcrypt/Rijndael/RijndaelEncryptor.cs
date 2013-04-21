@@ -8,7 +8,6 @@
 
 using System.IO;
 using System.Security.Cryptography;
-using System.Threading;
 
 namespace mgcrypt.Rijndael
 {
@@ -80,7 +79,7 @@ namespace mgcrypt.Rijndael
                             try
                             {
                                 outMs.Write(KeyGen.Salt, 0, KeyGen.Salt.Length);
-                                cryptStrm.Position = KeyGen.Salt.Length;
+                                //cryptStrm.Position = KeyGen.Salt.Length;
 
                                 cryptStrm.Write(decInfo, 0, decInfo.Length);
                                 while ((iReadLength = inFs.Read(btTmp, 0, btTmp.Length)) > 0)

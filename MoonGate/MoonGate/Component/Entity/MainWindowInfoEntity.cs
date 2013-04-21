@@ -56,10 +56,10 @@ namespace MoonGate.Component.Entity
         /// </summary>
         public List<CloudInfoEntity> ListCloudInfo { get; set; }
 
-        /// <summary>
-        /// 複数ファイルを一つに圧縮するかプロパティ
-        /// </summary>
-        public bool IsBundle { get; set; }
+        ///// <summary>
+        ///// 複数ファイルを一つに圧縮するかプロパティ
+        ///// </summary>
+        //public bool IsBundle { get; set; }
 
         /// <summary>
         /// ローカルに暗号化ファイルを残すかプロパティ
@@ -171,7 +171,7 @@ namespace MoonGate.Component.Entity
             );
 
             UploadCommand = new CommandSetter(
-                param => this.Upload(param),
+                param => this.UploadSelectedItems(param),
                 param =>
                 {
                     return IsSelected();
@@ -179,7 +179,7 @@ namespace MoonGate.Component.Entity
             );
 
             UploadAllCommand = new CommandSetter(
-                param => this.UproadAll(param),
+                param => this.UproadAllItems(param),
                 param =>
                 {
                     if (ObsFileList.Count == 0)
@@ -192,7 +192,7 @@ namespace MoonGate.Component.Entity
             );
 
             DownloadCommand = new CommandSetter(
-                param => this.Download(param),
+                param => this.DownloadSelectedItems(param),
                 param =>
                 {
                     return IsSelected();
@@ -342,96 +342,20 @@ namespace MoonGate.Component.Entity
         /// アップロード
         /// </summary>
         /// <param name="param"></param>
-        private void Upload(object param)
+        private void UploadSelectedItems(object param)
         {
-            char[] cKey;
-            char[] cSec;
+            int iRes = -1;
+            List<ListItemEntity> listTargets = new List<ListItemEntity>();
 
-            LoadConsumerInfo(param, out cKey, out cSec);
-            if (cKey == null || cKey.Length == 0)
+            foreach (var item in ObsFileList)
             {
-                return;
-            }
-            if (cSec == null || cSec.Length == 0)
-            {
-                return;
-            }
-
-            InputPassMessage inputPassMessage = new InputPassMessage(this);
-            Indicator.Instance.Order<InputPassMessage>(this, inputPassMessage);
-
-            if (inputPassMessage.Result == false)
-            {
-                return;
-            }
-
-            using (Encryptor encryptor = new RijndaelEncryptor())
-            {
-                using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+                if (item.IsSelected && !item.IsCloud)
                 {
-                    int iRes = -1;
-
-                    // 認証情報のロード
-                    oprCld.LoadAuthInfo();
-
-                    foreach (var item in ObsFileList)
-                    {
-                        if (item.IsCloud || !item.IsSelected)
-                        {
-                            continue;
-                        }
-
-                        // 暗号化対象をセット
-                        encryptor.InitEncrypt(item.FilePath);
-
-                        // 暗号化
-                        byte[] encryptedData = null;
-                        switch (inputPassMessage.SelectedIndex)
-                        {
-                            case 0:
-                                iRes = encryptor.Encrypt(inputPassMessage.PassWord, out encryptedData);
-                                break;
-                            case 1:
-                                iRes = encryptor.Encrypt(inputPassMessage.PassFile, out encryptedData);
-                                break;
-                            case 2:
-                                iRes = encryptor.Encrypt(inputPassMessage.PassDrive, out encryptedData);
-                                break;
-                            default:
-                                break;
-                        }
-
-                        if (iRes < 0)
-                        {
-                            //return;
-                        }
-
-                        // アップロード
-                        iRes = oprCld.UploadFile(item.FilePath, encryptedData);
-                        if (iRes < 0)
-                        {
-                            //return;
-                        }
-                    }
-
-                    // 認証情報のセーブ
-                    oprCld.SaveAuthInfo();
+                    listTargets.Add(item);
                 }
             }
 
-            inputPassMessage.PassWord.Dispose();
-            inputPassMessage.PassFile = null;
-            inputPassMessage.PassDrive = null;
-            inputPassMessage = null;
-            
-            if (!SaveConsumerInfo(param, cKey, cSec))
-            {
-
-            }
-
-            cKey = null;
-            cSec = null;
-            RemoveItems();
+            iRes = Upload(param, listTargets);
         }
 
 
@@ -439,19 +363,132 @@ namespace MoonGate.Component.Entity
         /// 全アップロード
         /// </summary>
         /// <param name="param"></param>
-        private void UproadAll(object param)
+        private void UproadAllItems(object param)
         {
+            int iRes = -1;
+            List<ListItemEntity> listTargets = new List<ListItemEntity>();
+
+            foreach (var item in ObsFileList)
+            {
+                if (!item.IsCloud)
+                {
+                    listTargets.Add(item);
+                }
+            }
+
+            iRes = Upload(param, listTargets);
+
+            //char[] cKey;
+            //char[] cSec;
+
+            //LoadConsumerInfo(param, out cKey, out cSec);
+            //if (cKey == null || cKey.Length == 0)
+            //{
+            //    return;
+            //}
+            //if (cSec == null || cSec.Length == 0)
+            //{
+            //    return;
+            //}
+
+            //InputPassMessage inputPassMessage = new InputPassMessage(this);
+            //Indicator.Instance.Order<InputPassMessage>(this, inputPassMessage);
+
+            //if (inputPassMessage.Result == false)
+            //{
+            //    return;
+            //}
+
+            //using (Encryptor encryptor = new RijndaelEncryptor())
+            //{
+            //    using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+            //    {
+            //        int iRes = -1;
+
+            //        // 認証情報のロード
+            //        oprCld.LoadAuthInfo();
+
+            //        foreach (var item in ObsFileList)
+            //        {
+            //            if (item.IsCloud)
+            //            {
+            //                continue;
+            //            }
+
+            //            // 暗号化対象をセット
+            //            encryptor.InitEncrypt(item.FilePath);
+
+            //            // 暗号化
+            //            byte[] encryptedData = null;
+            //            switch (inputPassMessage.SelectedIndex)
+            //            {
+            //                case 0:
+            //                    iRes = encryptor.Encrypt(inputPassMessage.PassWord, out encryptedData);
+            //                    break;
+            //                case 1:
+            //                    iRes = encryptor.Encrypt(inputPassMessage.PassFile, out encryptedData);
+            //                    break;
+            //                case 2:
+            //                    iRes = encryptor.Encrypt(inputPassMessage.PassDrive, out encryptedData);
+            //                    break;
+            //                default:
+            //                    break;
+            //            }
+
+            //            if (iRes < 0)
+            //            {
+            //                return;
+            //            }
+
+            //            // アップロード
+            //            iRes = oprCld.UploadFile(item.FilePath, encryptedData);
+            //            if (iRes < 0)
+            //            {
+            //                return;
+            //            }
+            //        }
+
+            //        // 認証情報のセーブ
+            //        oprCld.SaveAuthInfo();
+            //    }
+            //}
+
+            //inputPassMessage.PassWord.Dispose();
+            //inputPassMessage.PassFile = null;
+            //inputPassMessage.PassDrive = null;
+            //inputPassMessage = null;
+
+            //if (!SaveConsumerInfo(param, cKey, cSec))
+            //{
+
+            //}
+
+            //cKey = null;
+            //cSec = null;
+            //RemoveItems();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private int Upload(object param, List<ListItemEntity> list)
+        {
+            int iRes = 0;
             char[] cKey;
             char[] cSec;
 
             LoadConsumerInfo(param, out cKey, out cSec);
             if (cKey == null || cKey.Length == 0)
             {
-                return;
+                return -101;
             }
             if (cSec == null || cSec.Length == 0)
             {
-                return;
+                return -101;
             }
 
             InputPassMessage inputPassMessage = new InputPassMessage(this);
@@ -459,27 +496,20 @@ namespace MoonGate.Component.Entity
 
             if (inputPassMessage.Result == false)
             {
-                return;
+                return -111;
             }
 
             using (Encryptor encryptor = new RijndaelEncryptor())
             {
                 using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
                 {
-                    int iRes = -1;
-
                     // 認証情報のロード
                     oprCld.LoadAuthInfo();
 
-                    foreach (var item in ObsFileList)
+                    foreach (var item in list)
                     {
-                        if (item.IsCloud)
-                        {
-                            continue;
-                        }
-
                         // 暗号化対象をセット
-                        encryptor.InitEncrypt(item.FilePath);
+                        encryptor.InitEncrypt(item.FilePath);   
 
                         // 暗号化
                         byte[] encryptedData = null;
@@ -500,14 +530,14 @@ namespace MoonGate.Component.Entity
 
                         if (iRes < 0)
                         {
-                            return;
+                            return iRes;
                         }
 
                         // アップロード
                         iRes = oprCld.UploadFile(item.FilePath, encryptedData);
                         if (iRes < 0)
                         {
-                            return;
+                            return iRes;
                         }
                     }
 
@@ -523,12 +553,14 @@ namespace MoonGate.Component.Entity
 
             if (!SaveConsumerInfo(param, cKey, cSec))
             {
-
+                return -121;
             }
 
             cKey = null;
             cSec = null;
             RemoveItems();
+
+            return 0;
         }
 
 
@@ -536,96 +568,20 @@ namespace MoonGate.Component.Entity
         /// ダウンロード
         /// </summary>
         /// <param name="param"></param>
-        private void Download(object param)
+        private void DownloadSelectedItems(object param)
         {
-            char[] cKey;
-            char[] cSec;
+            int iRes = -1;
+            List<ListItemEntity> listTargets = new List<ListItemEntity>();
 
-            LoadConsumerInfo(param, out cKey, out cSec);
-            if (cKey == null || cKey.Length == 0)
+            foreach (var item in ObsFileList)
             {
-                return;
-            }
-            if (cSec == null || cSec.Length == 0)
-            {
-                return;
-            }
-
-            InputPassMessage inputPassMessage = new InputPassMessage(this);
-            Indicator.Instance.Order<InputPassMessage>(this, inputPassMessage);
-
-            if (inputPassMessage.Result == false)
-            {
-                return;
-            }
-
-            using (Decryptor decryptor = new RijndaelDecryptor())
-            {
-                using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+                if (item.IsSelected && item.IsCloud)
                 {
-                    int iRes = -1;
-
-                    // 認証情報のロード
-                    oprCld.LoadAuthInfo();
-
-                    foreach (var item in ObsFileList)
-                    {
-                        if (!item.IsCloud || !item.IsSelected)
-                        {
-                            continue;
-                        }
-
-                        // ダウンロード
-                        byte[] downloadData = null;
-                        iRes = oprCld.DownloadFile(item.FilePath, out downloadData);
-                        if (iRes < 0)
-                        {
-                            return;
-                        }
-
-                        // 暗号化対象をセット
-                        decryptor.InitDecrypt(item.FilePath);
-
-                        // 暗号化
-                        switch (inputPassMessage.SelectedIndex)
-                        {
-                            case 0:
-                                iRes = decryptor.Decrypt(inputPassMessage.PassWord, downloadData);
-                                break;
-                            case 1:
-                                iRes = decryptor.Decrypt(inputPassMessage.PassFile, downloadData);
-                                break;
-                            case 2:
-                                iRes = decryptor.Decrypt(inputPassMessage.PassDrive, downloadData);
-                                break;
-                            default:
-                                break;
-                        }
-
-                        if (iRes < 0)
-                        {
-                            return;
-                        }
-                    }
-
-                    // 認証情報のセーブ
-                    oprCld.SaveAuthInfo();
+                    listTargets.Add(item);
                 }
             }
 
-            inputPassMessage.PassWord.Dispose();
-            inputPassMessage.PassFile = null;
-            inputPassMessage.PassDrive = null;
-            inputPassMessage = null;
-
-            if (!SaveConsumerInfo(param, cKey, cSec))
-            {
-
-            }
-
-            cKey = null;
-            cSec = null;
-            RemoveItems();
+            iRes = Upload(param, listTargets);
         }
 
 
@@ -635,17 +591,130 @@ namespace MoonGate.Component.Entity
         /// <param name="param"></param>
         private void DownloadAll(object param)
         {
+            int iRes = -1;
+            List<ListItemEntity> listTargets = new List<ListItemEntity>();
+
+            foreach (var item in ObsFileList)
+            {
+                if (item.IsCloud)
+                {
+                    listTargets.Add(item);
+                }
+            }
+
+            iRes = Upload(param, listTargets);
+
+            //char[] cKey;
+            //char[] cSec;
+
+            //LoadConsumerInfo(param, out cKey, out cSec);
+            //if (cKey == null || cKey.Length == 0)
+            //{
+            //    return;
+            //}
+            //if (cSec == null || cSec.Length == 0)
+            //{
+            //    return;
+            //}
+
+            //InputPassMessage inputPassMessage = new InputPassMessage(this);
+            //Indicator.Instance.Order<InputPassMessage>(this, inputPassMessage);
+
+            //if (inputPassMessage.Result == false)
+            //{
+            //    return;
+            //}
+
+            //using (Decryptor decryptor = new RijndaelDecryptor())
+            //{
+            //    using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+            //    {
+            //        int iRes = -1;
+
+            //        // 認証情報のロード
+            //        oprCld.LoadAuthInfo();
+
+            //        foreach (var item in ObsFileList)
+            //        {
+            //            if (!item.IsCloud)
+            //            {
+            //                continue;
+            //            }
+
+            //            // ダウンロード
+            //            byte[] downloadData = null;
+            //            iRes = oprCld.DownloadFile(item.FilePath, out downloadData);
+            //            if (iRes < 0)
+            //            {
+            //                return;
+            //            }
+
+            //            // 暗号化対象をセット
+            //            decryptor.InitDecrypt(item.FilePath);
+
+            //            // 暗号化
+            //            switch (inputPassMessage.SelectedIndex)
+            //            {
+            //                case 0:
+            //                    iRes = decryptor.Decrypt(inputPassMessage.PassWord, downloadData);
+            //                    break;
+            //                case 1:
+            //                    iRes = decryptor.Decrypt(inputPassMessage.PassFile, downloadData);
+            //                    break;
+            //                case 2:
+            //                    iRes = decryptor.Decrypt(inputPassMessage.PassDrive, downloadData);
+            //                    break;
+            //                default:
+            //                    break;
+            //            }
+
+            //            if (iRes < 0)
+            //            {
+            //                return;
+            //            }
+            //        }
+
+            //        // 認証情報のセーブ
+            //        oprCld.SaveAuthInfo();
+            //    }
+            //}
+
+            //inputPassMessage.PassWord.Dispose();
+            //inputPassMessage.PassFile = null;
+            //inputPassMessage.PassDrive = null;
+            //inputPassMessage = null;
+
+            //if (!SaveConsumerInfo(param, cKey, cSec))
+            //{
+
+            //}
+
+            //cKey = null;
+            //cSec = null;
+            //RemoveItems();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private int Download(object param, List<ListItemEntity> list)
+        {
+            int iRes = 0;
             char[] cKey;
             char[] cSec;
-
+            
             LoadConsumerInfo(param, out cKey, out cSec);
             if (cKey == null || cKey.Length == 0)
             {
-                return;
+                return -101;
             }
             if (cSec == null || cSec.Length == 0)
             {
-                return;
+                return -101;
             }
 
             InputPassMessage inputPassMessage = new InputPassMessage(this);
@@ -653,31 +722,25 @@ namespace MoonGate.Component.Entity
 
             if (inputPassMessage.Result == false)
             {
-                return;
+                return -111;
             }
 
             using (Decryptor decryptor = new RijndaelDecryptor())
             {
                 using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
                 {
-                    int iRes = -1;
-
+                   
                     // 認証情報のロード
                     oprCld.LoadAuthInfo();
 
                     foreach (var item in ObsFileList)
                     {
-                        if (!item.IsCloud)
-                        {
-                            continue;
-                        }
-
                         // ダウンロード
                         byte[] downloadData = null;
                         iRes = oprCld.DownloadFile(item.FilePath, out downloadData);
                         if (iRes < 0)
                         {
-                            return;
+                            return iRes;
                         }
 
                         // 暗号化対象をセット
@@ -701,7 +764,7 @@ namespace MoonGate.Component.Entity
 
                         if (iRes < 0)
                         {
-                            return;
+                            return iRes;
                         }
                     }
 
@@ -717,12 +780,14 @@ namespace MoonGate.Component.Entity
 
             if (!SaveConsumerInfo(param, cKey, cSec))
             {
-
+                return -121;
             }
 
             cKey = null;
             cSec = null;
             RemoveItems();
+
+            return 0;
         }
 
 
@@ -790,7 +855,7 @@ namespace MoonGate.Component.Entity
             cSec = dcp.DecryptRsa(conInfo.ConsumerSecret, param.ToString());
 
             // 秘密鍵の削除
-            dcp.DeleteKeys(param.ToString());
+            //dcp.DeleteKeys(param.ToString());
         }
 
 

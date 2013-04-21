@@ -94,9 +94,11 @@
                         ToolTip="Download" Command="{Binding Path=DownloadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}">
                     <Image Source="pic/glyphicons/glyphicons_364_cloud_download.png" />
                 </Button>
+                <!--
                 <ToggleButton x:Name="tbtnUnifying" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsBundle,Mode=OneWayToSource}" >
                     <Image Source="pic/glyphicons/glyphicons_134_inbox_in.png" />
-                </ToggleButton>
+                </ToggleButton
+                >-->
                 <ToggleButton x:Name="tbLocalCopy" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Local Copy" IsChecked="{Binding Path=IsLocal,Mode=OneWayToSource}" >
                     <Image Source="pic/glyphicons/glyphicons_358_file_import.png" />
                 </ToggleButton>

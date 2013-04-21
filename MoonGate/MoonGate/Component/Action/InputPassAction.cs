@@ -42,8 +42,6 @@ namespace MoonGate.Component.Action
             message.PassFile = new FileInfo(dialogInputPass.ConKeyFile.Tag.ToString());
             message.PassDrive = dialogInputPass.DriveList.SelectedItem.ToString();
             message.Result = (bool)resDlg;
-
-            dialogInputPass = null;
         }
     }
 }

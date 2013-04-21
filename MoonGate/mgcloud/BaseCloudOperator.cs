@@ -9,6 +9,7 @@
 
 using mgcloud.Config;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 
@@ -20,14 +21,24 @@ namespace mgcloud
     public abstract class BaseCloudOperator : IDisposable
     {
         /// <summary>
-        /// ダウンロード対象ファイルの名前とダウンロードURLの一覧
-        /// </summary>
-        public HybridDictionary DownloadFileList { get; set; }
-
-        /// <summary>
         /// 認証情報保持ファイルのパス
         /// </summary>
         protected string authPath;
+
+        ///// <summary>
+        ///// ダウンロード対象ファイルの名前とダウンロードURLの一覧
+        ///// </summary>
+        //internal Dictionary<string, string> DownloadFileList { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal List<string> ListDlFileName { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal List<string> ListDlFileUrl { get; set; }
 
         /// <summary>
         /// 初回認証フラグ
@@ -116,17 +127,20 @@ namespace mgcloud
         /// <param name="authPath"></param>
         public void LoadAuthInfo()
         {
+            AuthInfoEntity entAuth = new AuthInfoEntity();
+
             if (!File.Exists(authPath))
             {
                 File.Create(authPath);
-            }
-
-            AuthInfoEntity entAuth = new AuthInfoEntity();
-
-            AuthInfoSerializer aiSerializer = new AuthInfoSerializer(authPath);
-            if (!aiSerializer.TryDeserialize(out entAuth))
-            {
                 FirstAuthFlg = true;
+            }
+            else
+            {
+                AuthInfoSerializer aiSerializer = new AuthInfoSerializer(authPath);
+                if (!aiSerializer.TryDeserialize(out entAuth))
+                {
+                    FirstAuthFlg = true;
+                }
             }
 
             EntAuth = entAuth;
@@ -158,6 +172,16 @@ namespace mgcloud
 
             return bSerialize;
         }
+
+
+        //// <summary>
+         
+        //// </summary>
+        //// <returns></returns>
+        ////public List<string> GetDownloadUrl()
+        ////{
+        ////    DownloadFileList.
+        ////}
 
 
         /// <summary>

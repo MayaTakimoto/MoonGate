@@ -8,7 +8,6 @@
 //-----------------------------------------------------------------------
 
 using Microsoft.Win32;
-using MoonGate.Component;
 using MoonGate.Component.Message;
 using System.Windows;
 

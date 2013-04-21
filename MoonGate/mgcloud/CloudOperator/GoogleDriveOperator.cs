@@ -16,6 +16,7 @@ using Google.Apis.Util;
 using mgcloud.Config;
 using Microsoft.VisualBasic;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
@@ -129,7 +130,8 @@ namespace mgcloud.CloudOperator
         {
             dServ = InitConnection();
 
-            DownloadFileList = new HybridDictionary();
+            ListDlFileName = new List<string>();
+            ListDlFileUrl = new List<string>();
 
             FilesResource.ListRequest listRequest = dServ.Files.List();
             listRequest.Q = QUERY_GETFILES;
@@ -141,7 +143,8 @@ namespace mgcloud.CloudOperator
                     FileList fileList = listRequest.Fetch();
                     foreach (var file in fileList.Items)
                     {
-                        DownloadFileList.Add(file.OriginalFilename, file.DownloadUrl);
+                        ListDlFileName.Add(file.OriginalFilename);
+                        ListDlFileUrl.Add(file.DownloadUrl);
                     }
 
                     listRequest.PageToken = fileList.NextPageToken;
@@ -209,9 +212,11 @@ namespace mgcloud.CloudOperator
                 return -2;
             }
 
+            dServ = InitConnection();
+
             // アップロードファイルのひな形を作る
             var uploadFile = new Google.Apis.Drive.v2.Data.File();
-            uploadFile.Title = fileName;
+            uploadFile.Title = Path.GetFileName(fileName);
             uploadFile.Description = FILE_DESCRIPTION;
             uploadFile.MimeType = MIME_GETFILES;
 
@@ -230,13 +235,11 @@ namespace mgcloud.CloudOperator
         /// <summary>
         /// ダウンロード（メイン）
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="fileUrl"></param>
         /// <returns></returns>
-        public override int DownloadFile(string fileName, out byte[] data)
+        public override int DownloadFile(string fileUrl, out byte[] data)
         {
-            string downloadUrl = DownloadFileList[fileName].ToString();
-
-            HttpWebRequest reqh = (HttpWebRequest)WebRequest.Create(downloadUrl);
+            HttpWebRequest reqh = (HttpWebRequest)WebRequest.Create(fileUrl);
             var auth = dServ.Authenticator;
             auth.ApplyAuthenticationToRequest(reqh);
 
@@ -291,7 +294,8 @@ namespace mgcloud.CloudOperator
         private DriveService InitConnection()
         {
             // GoogleDriveとコネクトするためのお決まり
-            var provider = new NativeApplicationClient(GoogleAuthenticationServer.Description, ConsumerKey.ToString(), ConsumerSecret.ToString());
+            
+            var provider = new NativeApplicationClient(GoogleAuthenticationServer.Description, new string(ConsumerKey), new string(ConsumerSecret));
             var auth = new OAuth2Authenticator<NativeApplicationClient>(provider, GetAuthorization);
             dServ = new DriveService(auth);
 
@@ -309,11 +313,10 @@ namespace mgcloud.CloudOperator
             // 認証URLの取得
             state = new AuthorizationState(new[] { DriveService.Scopes.Drive.GetStringValue() });
             state.Callback = new Uri(NativeApplicationClient.OutOfBandCallbackUrl);
-            Uri authUri = arg.RequestUserAuthorization(state);
-
+            
             if (FirstAuthFlg)
             {
-                return FirstAuthorize(arg, authUri);
+                return FirstAuthorize(arg);
             }
             else
             {
@@ -347,8 +350,10 @@ namespace mgcloud.CloudOperator
         /// <param name="arg"></param>
         /// <param name="authUri"></param>
         /// <returns></returns>
-        private IAuthorizationState FirstAuthorize(NativeApplicationClient arg, Uri authUri)
+        private IAuthorizationState FirstAuthorize(NativeApplicationClient arg)
         {
+            Uri authUri = arg.RequestUserAuthorization(state);
+
             // ブラウザを立ち上げ、認証画面へ遷移させる
             Process.Start(authUri.ToString());
 

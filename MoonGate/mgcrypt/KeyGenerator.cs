@@ -40,12 +40,6 @@ namespace mgcrypt
         // Secret Key
         public byte[] SecKey { get; set; }
 
-        // 鍵長
-        public int KeyLength { get; set; }
-
-        // ブロックサイズ
-        public int BlockSize { get; set; }
-
 
         /*************************************************
          *  メソッド                                     *
@@ -91,7 +85,7 @@ namespace mgcrypt
             }
 
             // 秘密鍵を生成
-            return GenerateKey(pass, KeyLength, BlockSize);
+            return GenerateKey(pass);
         }
 
         /// <summary>
@@ -128,7 +122,7 @@ namespace mgcrypt
             }
 
             // 秘密鍵を生成
-            return GenerateKey(pass, KeyLength, BlockSize);
+            return GenerateKey(pass);
         }
 
         /// <summary>
@@ -179,7 +173,7 @@ namespace mgcrypt
             }
 
             // 秘密鍵を生成
-            return GenerateKey(pass, KeyLength, BlockSize);
+            return GenerateKey(pass);
         }
 
         /// <summary>
@@ -189,7 +183,7 @@ namespace mgcrypt
         /// <param name="keySize">鍵長</param>
         /// <param name="blockSize">ブロックサイズ</param>
         /// <returns></returns>
-        private int GenerateKey(byte[] btPass, int keySize, int blockSize)
+        private int GenerateKey(byte[] btPass)
         {
             try
             {
@@ -201,8 +195,8 @@ namespace mgcrypt
 
                 Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(btPass, Salt, 1024);
 
-                SecKey = deriveBytes.GetBytes(keySize / 8);
-                InitVec = deriveBytes.GetBytes(blockSize / 8);
+                SecKey = deriveBytes.GetBytes(256 / 8);
+                InitVec = deriveBytes.GetBytes(128 / 8);
             }
             catch
             {
