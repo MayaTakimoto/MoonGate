@@ -123,7 +123,7 @@ namespace mgcrypt
             }
             finally
             {
-                sStrPass.Dispose();
+                //sStrPass.Dispose();
 
                 if (ptrPass != IntPtr.Zero)
                 {
@@ -159,7 +159,7 @@ namespace mgcrypt
                 return iRet;
             }
 
-            fiPass = null;
+            //fiPass = null;
             return Encrypt(out encData);
         }
 
@@ -182,7 +182,7 @@ namespace mgcrypt
                 return iRet;
             }
 
-            sPass = null;
+            //sPass = null;
             return Encrypt(out encData);
         }
 

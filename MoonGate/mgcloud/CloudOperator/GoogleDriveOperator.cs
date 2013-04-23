@@ -32,17 +32,17 @@ namespace mgcloud.CloudOperator
         /// <summary>
         /// MimeType（フォルダ）
         /// </summary>
-        private const string MIME_FDSEARCH = @"mimeType = 'application/vnd.google-apps.folder'";
+        private const string MIME_DIR = @"mimeType = 'application/vnd.google-apps.folder'";
 
         /// <summary>
         /// MimeType（ファイル）
         /// </summary>
-        private const string MIME_GETFILES = @"application/octet-stream";
+        private const string MIME_BINARY = @"application/octet-stream";
 
         /// <summary>
         /// ファイルリスト取得時の条件
         /// </summary>
-        private const string QUERY_GETFILES = @"fullText contains 'zip'";
+        private const string QUERY_GETFILES = @"fullText contains 'mgenf'";
 
         /// <summary>
         /// ファイルに付加する説明
@@ -69,12 +69,12 @@ namespace mgcloud.CloudOperator
         /// <summary>
         /// 
         /// </summary>
-        private IAuthorizationState state;
+        private IAuthorizationState state = null;
         
         /// <summary>
         /// 
         /// </summary>
-        private DriveService dServ;
+        private DriveService dServ = null;
 
 
         /// <summary>
@@ -121,6 +121,45 @@ namespace mgcloud.CloudOperator
         //}
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override int GetDirList()
+        {
+            if (dServ == null)
+            {
+                dServ = InitConnection();
+            }
+
+            CloudDirList = new HybridDictionary(true);
+
+            FilesResource.ListRequest listRequest = dServ.Files.List();
+            listRequest.Q = MIME_DIR;
+
+            do
+            {
+                try
+                {
+                    FileList fileList = listRequest.Fetch();
+                    foreach (var file in fileList.Items)
+                    {
+                        CloudDirList.Add(file.OriginalFilename, file.Id);
+                    }
+
+                    listRequest.PageToken = fileList.NextPageToken;
+                }
+                catch
+                {
+                    listRequest.PageToken = null;
+                    return -1;
+                }
+            }
+            while (!String.IsNullOrEmpty(listRequest.PageToken));
+
+            return 0;
+        }
+
 
         /// <summary>
         ///MoonGate互換暗号化ファイルを一覧取得する
@@ -128,10 +167,12 @@ namespace mgcloud.CloudOperator
         /// <returns></returns>
         public override int GetFileList()
         {
-            dServ = InitConnection();
+            if (dServ == null)
+            {
+                dServ = InitConnection();
+            }
 
-            ListDlFileName = new List<string>();
-            ListDlFileUrl = new List<string>();
+            DownloadFileList = new HybridDictionary(true);
 
             FilesResource.ListRequest listRequest = dServ.Files.List();
             listRequest.Q = QUERY_GETFILES;
@@ -143,8 +184,7 @@ namespace mgcloud.CloudOperator
                     FileList fileList = listRequest.Fetch();
                     foreach (var file in fileList.Items)
                     {
-                        ListDlFileName.Add(file.OriginalFilename);
-                        ListDlFileUrl.Add(file.DownloadUrl);
+                        DownloadFileList.Add(file.OriginalFilename, file.DownloadUrl);
                     }
 
                     listRequest.PageToken = fileList.NextPageToken;
@@ -212,18 +252,21 @@ namespace mgcloud.CloudOperator
                 return -2;
             }
 
-            dServ = InitConnection();
+            if (dServ == null)
+            {
+                dServ = InitConnection();
+            }
 
             // アップロードファイルのひな形を作る
             var uploadFile = new Google.Apis.Drive.v2.Data.File();
-            uploadFile.Title = Path.GetFileName(fileName);
+            uploadFile.Title = Path.GetFileName(Path.ChangeExtension(fileName, FILE_EXT));
             uploadFile.Description = FILE_DESCRIPTION;
-            uploadFile.MimeType = MIME_GETFILES;
+            uploadFile.MimeType = MIME_BINARY;
 
             //byte[] ulData = System.IO.File.ReadAllBytes(fileName);
             MemoryStream ms = new MemoryStream(data);
 
-            FilesResource.InsertMediaUpload uploadRequest = dServ.Files.Insert(uploadFile, ms, MIME_GETFILES);
+            FilesResource.InsertMediaUpload uploadRequest = dServ.Files.Insert(uploadFile, ms, MIME_BINARY);
             
             uploadRequest.Upload();
             var file = uploadRequest.ResponseBody;
@@ -239,6 +282,11 @@ namespace mgcloud.CloudOperator
         /// <returns></returns>
         public override int DownloadFile(string fileUrl, out byte[] data)
         {
+            if (dServ == null)
+            {
+                dServ = InitConnection();
+            }
+
             HttpWebRequest reqh = (HttpWebRequest)WebRequest.Create(fileUrl);
             var auth = dServ.Authenticator;
             auth.ApplyAuthenticationToRequest(reqh);
@@ -248,7 +296,6 @@ namespace mgcloud.CloudOperator
             using (Stream fsSave = res.GetResponseStream())
             {
                 using(MemoryStream msDl = new MemoryStream())
-                //using (FileStream dlFile = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
                     try
                     {
@@ -257,7 +304,6 @@ namespace mgcloud.CloudOperator
                         while ((iReadLength = fsSave.Read(bytes, 0, bytes.Length)) > 0)
                         {
                             msDl.Write(bytes, 0, iReadLength);
-                            //dlFile.Write(bytes, 0, iReadLength);
                         }
                     }
                     catch
@@ -293,8 +339,7 @@ namespace mgcloud.CloudOperator
         /// <returns></returns>
         private DriveService InitConnection()
         {
-            // GoogleDriveとコネクトするためのお決まり
-            
+            // DriverServiceオブジェクトを初期化する
             var provider = new NativeApplicationClient(GoogleAuthenticationServer.Description, new string(ConsumerKey), new string(ConsumerSecret));
             var auth = new OAuth2Authenticator<NativeApplicationClient>(provider, GetAuthorization);
             dServ = new DriveService(auth);
@@ -310,21 +355,24 @@ namespace mgcloud.CloudOperator
         /// <returns></returns>
         private IAuthorizationState GetAuthorization(NativeApplicationClient arg)
         {
-            // 認証URLの取得
+            // stateオブジェクトの初期化
             state = new AuthorizationState(new[] { DriveService.Scopes.Drive.GetStringValue() });
-            state.Callback = new Uri(NativeApplicationClient.OutOfBandCallbackUrl);
-            
+             
+            // 初回認証時
             if (FirstAuthFlg)
             {
+                state.Callback = new Uri(NativeApplicationClient.OutOfBandCallbackUrl);
                 return FirstAuthorize(arg);
             }
+            // 過去に認証に成功している場合
             else
             {
+                // まだ接続していない場合
                 if (!ReadyConFlg)
                 {
                     AuthInfoCipher cipher = new AuthInfoCipher();
-                    var accessToken = cipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);
-                    var refreshToken = cipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);
+                    char[] accessToken = cipher.DecryptRsa(EntAuth.AccessToken, KEY_CONTAINER_NAME);
+                    char[] refreshToken = cipher.DecryptRsa(EntAuth.RefreshToken, KEY_CONTAINER_NAME);
 
                     state.AccessToken = new string(accessToken);             // アクセストークンをセット
                     state.RefreshToken = new string(refreshToken);           // リフレッシュトークンをセット
@@ -333,6 +381,7 @@ namespace mgcloud.CloudOperator
                     cipher.DeleteKeys(KEY_CONTAINER_NAME);
                 }
 
+                // アクセストークンの有効期限が切れていたら再取得する
                 if (state.AccessTokenExpirationUtc < DateTime.Now)
                 {
                     arg.RefreshToken(state);
@@ -367,7 +416,7 @@ namespace mgcloud.CloudOperator
 
 
         /// <summary>
-        /// 
+        /// 後始末メソッド
         /// </summary>
         public override void Dispose()
         {

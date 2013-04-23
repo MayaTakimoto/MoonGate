@@ -21,24 +21,24 @@ namespace mgcloud
     public abstract class BaseCloudOperator : IDisposable
     {
         /// <summary>
+        /// 拡張子
+        /// </summary>
+        internal const string FILE_EXT = @"mgenf";
+
+        /// <summary>
         /// 認証情報保持ファイルのパス
         /// </summary>
         protected string authPath;
 
-        ///// <summary>
-        ///// ダウンロード対象ファイルの名前とダウンロードURLの一覧
-        ///// </summary>
-        //internal Dictionary<string, string> DownloadFileList { get; set; }
+        /// <summary>
+        /// ダウンロード元となるフォルダの一覧
+        /// </summary>
+        public HybridDictionary CloudDirList { get; internal set; }
 
         /// <summary>
-        /// 
+        /// ダウンロード対象ファイルの名前とダウンロードURLの一覧
         /// </summary>
-        internal List<string> ListDlFileName { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        internal List<string> ListDlFileUrl { get; set; }
+        public HybridDictionary DownloadFileList { get; internal set; }
 
         /// <summary>
         /// 初回認証フラグ
@@ -49,7 +49,7 @@ namespace mgcloud
         /// クラウド接続済みフラグ
         /// </summary>
         internal bool ReadyConFlg { get; set; }
-                
+
         /// <summary>
         /// 認証情報保持エンティティ
         /// </summary>
@@ -78,12 +78,11 @@ namespace mgcloud
         }
 
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="fileList"></param>
-        ///// <returns></returns>
-        //public abstract int UploadFiles(string[] fileList);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public abstract int GetDirList();
 
 
         /// <summary>
@@ -91,16 +90,8 @@ namespace mgcloud
         /// </summary>
         /// <returns></returns>
         public abstract int GetFileList();
-
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="fileList"></param>
-        ///// <returns></returns>
-        //public abstract int DownloadFiles(string[] fileList);
-
-
+        
+        
         /// <summary>
         /// クラウドストレージにアップロード
         /// </summary>
@@ -172,16 +163,6 @@ namespace mgcloud
 
             return bSerialize;
         }
-
-
-        //// <summary>
-         
-        //// </summary>
-        //// <returns></returns>
-        ////public List<string> GetDownloadUrl()
-        ////{
-        ////    DownloadFileList.
-        ////}
 
 
         /// <summary>
