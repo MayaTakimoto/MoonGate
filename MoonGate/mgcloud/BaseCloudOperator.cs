@@ -31,16 +31,6 @@ namespace mgcloud
         protected string authPath;
 
         /// <summary>
-        /// ダウンロード元となるフォルダの一覧
-        /// </summary>
-        public HybridDictionary CloudDirList { get; internal set; }
-
-        /// <summary>
-        /// ダウンロード対象ファイルの名前とダウンロードURLの一覧
-        /// </summary>
-        public HybridDictionary DownloadFileList { get; internal set; }
-
-        /// <summary>
         /// 初回認証フラグ
         /// </summary>
         internal bool FirstAuthFlg { get; set; }
@@ -82,14 +72,14 @@ namespace mgcloud
         /// 
         /// </summary>
         /// <returns></returns>
-        public abstract int GetDirList();
+        public abstract HybridDictionary GetDirList();
 
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public abstract int GetFileList();
+        public abstract HybridDictionary GetFileList();
         
         
         /// <summary>

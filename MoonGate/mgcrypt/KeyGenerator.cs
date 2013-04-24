@@ -142,7 +142,7 @@ namespace mgcrypt
 
             // 取得した鍵ドライブに対してManagementObjectインスタンスを生成
             StringBuilder sbKeyDrv = new StringBuilder(64);
-            sbKeyDrv.Append("win32_logicaldisk.deviceid=\"").Append(sKeyDrive).Append("\"");
+            sbKeyDrv.Append("win32_logicaldisk.deviceid=\"").Append(sKeyDrive.Remove(sKeyDrive.Length - 1)).Append("\"");
             ManagementObject moKeyDrive = new ManagementObject(sbKeyDrv.ToString());
 
             // 鍵ドライブのボリュームシリアル情報を取得する
@@ -170,6 +170,10 @@ namespace mgcrypt
             catch (ObjectDisposedException)
             {
                 return -4;
+            }
+            catch (Exception)
+            {
+                return -99;
             }
 
             // 秘密鍵を生成

@@ -125,14 +125,14 @@ namespace mgcloud.CloudOperator
         /// 
         /// </summary>
         /// <returns></returns>
-        public override int GetDirList()
+        public override HybridDictionary GetDirList()
         {
             if (dServ == null)
             {
                 dServ = InitConnection();
             }
 
-            CloudDirList = new HybridDictionary(true);
+            HybridDictionary CloudDirList = new HybridDictionary(true);
 
             FilesResource.ListRequest listRequest = dServ.Files.List();
             listRequest.Q = MIME_DIR;
@@ -146,18 +146,18 @@ namespace mgcloud.CloudOperator
                     {
                         CloudDirList.Add(file.OriginalFilename, file.Id);
                     }
-
+                    
                     listRequest.PageToken = fileList.NextPageToken;
                 }
                 catch
                 {
                     listRequest.PageToken = null;
-                    return -1;
+                    return null;
                 }
             }
             while (!String.IsNullOrEmpty(listRequest.PageToken));
 
-            return 0;
+            return CloudDirList;
         }
 
 
@@ -165,14 +165,14 @@ namespace mgcloud.CloudOperator
         ///MoonGate互換暗号化ファイルを一覧取得する
         /// </summary>
         /// <returns></returns>
-        public override int GetFileList()
+        public override HybridDictionary GetFileList()
         {
             if (dServ == null)
             {
                 dServ = InitConnection();
             }
 
-            DownloadFileList = new HybridDictionary(true);
+            HybridDictionary DownloadFileList = new HybridDictionary(true);
 
             FilesResource.ListRequest listRequest = dServ.Files.List();
             listRequest.Q = QUERY_GETFILES;
@@ -192,12 +192,12 @@ namespace mgcloud.CloudOperator
                 catch
                 {
                     listRequest.PageToken = null;
-                    return -1;
+                    return null;
                 }
             }
             while (!String.IsNullOrEmpty(listRequest.PageToken));
 
-            return 0;
+            return DownloadFileList;
         }
 
 
@@ -263,7 +263,6 @@ namespace mgcloud.CloudOperator
             uploadFile.Description = FILE_DESCRIPTION;
             uploadFile.MimeType = MIME_BINARY;
 
-            //byte[] ulData = System.IO.File.ReadAllBytes(fileName);
             MemoryStream ms = new MemoryStream(data);
 
             FilesResource.InsertMediaUpload uploadRequest = dServ.Files.Insert(uploadFile, ms, MIME_BINARY);

@@ -7,6 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Linq;
@@ -45,11 +46,11 @@ namespace MoonGate
             }
             else
             {
-                this.DialogResult = false;
+                return;
             }
         }
 
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -62,13 +63,25 @@ namespace MoonGate
 
 
         /// <summary>
-        /// 
+        /// 鍵ファイル選択ボタン押下時イベント
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void BtnKeyFile_Click(object sender, RoutedEventArgs e)
         {
+            OpenFileDialog dlgKeyFile = new OpenFileDialog();
 
+            dlgKeyFile.AddExtension = true;
+            dlgKeyFile.CheckFileExists = true;
+            dlgKeyFile.CheckPathExists = true;
+            dlgKeyFile.Title = "Select Key File!";
+
+            bool bRes = (bool)dlgKeyFile.ShowDialog();
+            if (bRes)
+            {
+                this.ConKeyFile.Tag = dlgKeyFile.FileName;
+                this.BtnKeyFile.Content = "KeyFile has Selected!";
+            }
         }
 
 
