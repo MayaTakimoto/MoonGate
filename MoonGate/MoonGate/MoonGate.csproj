@@ -80,13 +80,13 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mgcloud, Version=1.0.4835.41714, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="mgcloud, Version=1.0.4873.40518, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\MoonGate\bin\mgcloud.dll</HintPath>
+      <HintPath>bin\mgcloud.dll</HintPath>
     </Reference>
-    <Reference Include="mgcrypt, Version=1.0.4835.41711, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="mgcrypt, Version=1.0.4862.42045, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\MoonGate\bin\mgcrypt.dll</HintPath>
+      <HintPath>bin\mgcrypt.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

@@ -21,6 +21,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace mgcloud.CloudOperator
 {
@@ -54,11 +55,6 @@ namespace mgcloud.CloudOperator
         /// </summary>
         private const string OAUTH_SCOPE = @"https://www.googleapis.com/auth/drive.file";
 
-        ///// <summary>
-        ///// 認証情報保持ファイルのパス
-        ///// </summary>
-        //private const string AUTH_PATH = @"GoogleDriveAuthInfo.xml";
-
         /// <summary>
         /// RSAキーコンテナ名
         /// </summary>
@@ -87,38 +83,6 @@ namespace mgcloud.CloudOperator
         {
             authPath = @"./user/GoogleDrive.xml"; 
         }
-
-        
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="fileList"></param>
-        ///// <returns>アップロードしたファイル数</returns>
-        //public override int UploadFiles(string[] fileList)
-        //{
-        //    int OKCount = 0;
-
-        //    LoadAuthInfo(AUTH_PATH);
-
-        //    dServ = InitConnection();
-
-        //    foreach (string file in fileList)
-        //    {
-        //        //int iRet = UploadFile(file);
-        //        //if (iRet == 0)
-        //        //{
-        //        //    OKCount++;
-        //        //}
-        //    }
-
-        //    // 認証情報の保存。失敗した場合は既存の認証情報を削除する
-        //    if (!SaveAuthInfo(AUTH_PATH) && System.IO.File.Exists(AUTH_PATH))
-        //    {
-        //        System.IO.File.Delete(AUTH_PATH);
-        //    }
-
-        //    return OKCount;
-        //}
 
 
         /// <summary>
@@ -155,27 +119,39 @@ namespace mgcloud.CloudOperator
                     return null;
                 }
             }
-            while (!String.IsNullOrEmpty(listRequest.PageToken));
+            while (!string.IsNullOrEmpty(listRequest.PageToken));
 
             return CloudDirList;
         }
 
 
         /// <summary>
-        ///MoonGate互換暗号化ファイルを一覧取得する
+        /// MoonGate互換暗号化ファイルを一覧取得する
         /// </summary>
+        /// <param name="dirId">ディレクトリのID(任意)</param>
         /// <returns></returns>
-        public override HybridDictionary GetFileList()
+        public override HybridDictionary GetFileList(string dirId = null)
         {
+            // 変数初期化
+            HybridDictionary DownloadFileList = new HybridDictionary(true); // ダウンロード対象ファイル一覧
+            StringBuilder sbQuery = new StringBuilder(128);                 // 検索条件設定用変数
+
+            // 接続されていない場合は接続
             if (dServ == null)
             {
                 dServ = InitConnection();
             }
 
-            HybridDictionary DownloadFileList = new HybridDictionary(true);
+            // 検索条件を組み立てる
+            sbQuery.Append(QUERY_GETFILES);
+            if (!string.IsNullOrEmpty(dirId))
+            {
+                sbQuery.Append(@"and parents in '").Append(dirId).Append(@"'");
+            }
 
-            FilesResource.ListRequest listRequest = dServ.Files.List();
-            listRequest.Q = QUERY_GETFILES;
+            // リクエストを作成
+            FilesResource.ListRequest listRequest = dServ.Files.List();  
+            listRequest.Q = sbQuery.ToString();     // 検索条件セット
 
             do
             {
@@ -195,42 +171,10 @@ namespace mgcloud.CloudOperator
                     return null;
                 }
             }
-            while (!String.IsNullOrEmpty(listRequest.PageToken));
+            while (!string.IsNullOrEmpty(listRequest.PageToken));
 
             return DownloadFileList;
         }
-
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="fileList"></param>
-        ///// <returns></returns>
-        //public override int DownloadFiles(string[] fileList)
-        //{
-        //    int OKCount = 0;
-
-        //    LoadAuthInfo(AUTH_PATH);
-
-        //    dServ = InitConnection();
-
-        //    foreach (string file in fileList)
-        //    {
-        //        //int iRet = DownloadFile(file);
-        //        //if (iRet == 0)
-        //        //{
-        //        //    OKCount++;
-        //        //}
-        //    }
-
-        //    // 認証情報の保存。失敗した場合は既存の認証情報を削除する
-        //    if (!SaveAuthInfo(AUTH_PATH) && System.IO.File.Exists(AUTH_PATH))
-        //    {
-        //        System.IO.File.Delete(AUTH_PATH);
-        //    }
-
-        //    return OKCount;
-        //}
 
 
         /// <summary>

@@ -79,7 +79,7 @@ namespace mgcloud
         /// 
         /// </summary>
         /// <returns></returns>
-        public abstract HybridDictionary GetFileList();
+        public abstract HybridDictionary GetFileList(string dirId = null);
         
         
         /// <summary>

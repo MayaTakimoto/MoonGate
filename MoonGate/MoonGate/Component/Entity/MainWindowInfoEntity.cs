@@ -16,6 +16,7 @@ using MoonGate.utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -248,6 +249,7 @@ namespace MoonGate.Component.Entity
         /// <param name="isCloud"></param>
         private void AddFiles()
         {
+            ListItemEntity listItem = null;
             SelectFileMessage selectFileMessage = new SelectFileMessage(this);
 
             selectFileMessage.Title = "Select Files";
@@ -263,7 +265,7 @@ namespace MoonGate.Component.Entity
             {
                 foreach (string filePath in selectFileMessage.FileNames)
                 {
-                    ListItemEntity listItem = new ListItemEntity();
+                    listItem = new ListItemEntity();
 
                     // 新規項目に情報をセットする
                     listItem.FileName = Path.GetFileName(filePath);
@@ -288,6 +290,7 @@ namespace MoonGate.Component.Entity
         /// <returns></returns>
         private void AddFolders()
         {
+            ListItemEntity listItem = null;
             SelectFolderMessage selectFolderMessage = new SelectFolderMessage(this);
 
             Indicator.Instance.Order<SelectFolderMessage>(this, selectFolderMessage);
@@ -296,7 +299,7 @@ namespace MoonGate.Component.Entity
             {
                 foreach (string folderPath in selectFolderMessage.FolderNames)
                 {
-                    ListItemEntity listItem = new ListItemEntity();
+                    listItem = new ListItemEntity();
 
                     string dirName = Path.GetFileName(folderPath);
                     if (string.IsNullOrEmpty(dirName))
@@ -788,6 +791,51 @@ namespace MoonGate.Component.Entity
             RemoveItems();
 
             return 0;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        private void GetCloudFileList(object param)
+        {
+            char[] cKey;
+            char[] cSec;
+            ListItemEntity listItem = null;
+            HybridDictionary hDic = new HybridDictionary(true);
+
+            LoadConsumerInfo(param, out cKey, out cSec);
+            if (cKey == null || cKey.Length == 0)
+            {
+                return;
+            }
+            if (cSec == null || cSec.Length == 0)
+            {
+                return;
+            }
+
+            using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+            {
+                hDic = oprCld.GetFileList();
+            }
+
+            foreach (KeyValuePair<string, string> kvp in hDic)
+            {
+                listItem = new ListItemEntity();
+
+                listItem.FileName = kvp.Key;
+                listItem.FilePath = kvp.Value;
+                listItem.IsCloud = true;
+                listItem.IsDirectory = false;
+                listItem.IconPath = Imaging.CreateBitmapSourceFromHBitmap(
+                        Properties.Resources.glyphicons_232_cloud.GetHbitmap(),
+                        IntPtr.Zero,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromEmptyOptions());
+
+                ObsFileList.Add(listItem);
+            }
         }
 
 
