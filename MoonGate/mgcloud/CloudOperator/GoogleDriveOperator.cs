@@ -61,12 +61,12 @@ namespace mgcloud.CloudOperator
         private const string KEY_CONTAINER_NAME = @"GDR_AUTH";
 
         //private const string REDIRECT_URI = @"urn:ietf:wg:oauth:2.0:oob";
-        
+
         /// <summary>
         /// 
         /// </summary>
         private IAuthorizationState state = null;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -79,9 +79,9 @@ namespace mgcloud.CloudOperator
         /// <param name="cKey"></param>
         /// <param name="cSec"></param>
         public GoogleDriveOperator(char[] cKey, char[] cSec)
-            : base(cKey, cSec) 
+            : base(cKey, cSec)
         {
-            authPath = @"./user/GoogleDrive.xml"; 
+            authPath = @"./user/GoogleDrive.xml";
         }
 
 
@@ -110,7 +110,7 @@ namespace mgcloud.CloudOperator
                     {
                         CloudDirList.Add(file.OriginalFilename, file.Id);
                     }
-                    
+
                     listRequest.PageToken = fileList.NextPageToken;
                 }
                 catch
@@ -150,7 +150,7 @@ namespace mgcloud.CloudOperator
             }
 
             // リクエストを作成
-            FilesResource.ListRequest listRequest = dServ.Files.List();  
+            FilesResource.ListRequest listRequest = dServ.Files.List();
             listRequest.Q = sbQuery.ToString();     // 検索条件セット
 
             do
@@ -165,10 +165,11 @@ namespace mgcloud.CloudOperator
 
                     listRequest.PageToken = fileList.NextPageToken;
                 }
-                catch
+                catch (Exception e)
                 {
+                    e.Message.ToString();
                     listRequest.PageToken = null;
-                    return null;
+                    //return null;
                 }
             }
             while (!string.IsNullOrEmpty(listRequest.PageToken));
@@ -210,7 +211,7 @@ namespace mgcloud.CloudOperator
             MemoryStream ms = new MemoryStream(data);
 
             FilesResource.InsertMediaUpload uploadRequest = dServ.Files.Insert(uploadFile, ms, MIME_BINARY);
-            
+
             uploadRequest.Upload();
             var file = uploadRequest.ResponseBody;
 
@@ -238,7 +239,7 @@ namespace mgcloud.CloudOperator
 
             using (Stream fsSave = res.GetResponseStream())
             {
-                using(MemoryStream msDl = new MemoryStream())
+                using (MemoryStream msDl = new MemoryStream())
                 {
                     try
                     {
@@ -258,7 +259,7 @@ namespace mgcloud.CloudOperator
                     data = msDl.ToArray();
                 }
             }
-            
+
             return 0;
         }
 
@@ -300,7 +301,7 @@ namespace mgcloud.CloudOperator
         {
             // stateオブジェクトの初期化
             state = new AuthorizationState(new[] { DriveService.Scopes.Drive.GetStringValue() });
-             
+
             // 初回認証時
             if (FirstAuthFlg)
             {
@@ -329,7 +330,7 @@ namespace mgcloud.CloudOperator
                 {
                     arg.RefreshToken(state);
                 }
-                
+
                 ReadyConFlg = true;
                 return state;
             }

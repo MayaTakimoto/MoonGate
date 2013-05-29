@@ -14,6 +14,7 @@ using mgcrypt.Rijndael;
 using MoonGate.Component.Message;
 using MoonGate.utility;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -161,6 +162,10 @@ namespace MoonGate.Component.Entity
 
             AddFoldersCommand = new CommandSetter(
                 param => this.AddFolders()
+            );
+
+            AddCloudFilesCommand = new CommandSetter(
+                param => this.GetCloudFileList(param)
             );
 
             RemoveItemsCommand = new CommandSetter(
@@ -746,10 +751,10 @@ namespace MoonGate.Component.Entity
                             return iRes;
                         }
 
-                        // 暗号化対象をセット
+                        // 復号対象をセット
                         decryptor.InitDecrypt(item.FilePath);
 
-                        // 暗号化
+                        // 復号
                         switch (inputPassMessage.SelectedIndex)
                         {
                             case 0:
@@ -817,15 +822,18 @@ namespace MoonGate.Component.Entity
 
             using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
             {
+                oprCld.LoadAuthInfo();
                 hDic = oprCld.GetFileList();
+                oprCld.SaveAuthInfo();
             }
 
-            foreach (KeyValuePair<string, string> kvp in hDic)
+            IDictionaryEnumerator hDicEnu = hDic.GetEnumerator();
+            while (hDicEnu.MoveNext())
             {
                 listItem = new ListItemEntity();
 
-                listItem.FileName = kvp.Key;
-                listItem.FilePath = kvp.Value;
+                listItem.FileName = hDicEnu.Key.ToString();
+                listItem.FilePath = hDicEnu.Value.ToString();
                 listItem.IsCloud = true;
                 listItem.IsDirectory = false;
                 listItem.IconPath = Imaging.CreateBitmapSourceFromHBitmap(
@@ -836,6 +844,23 @@ namespace MoonGate.Component.Entity
 
                 ObsFileList.Add(listItem);
             }
+
+            //foreach (KeyValuePair<object, object> kvp in hDic)
+            //{
+            //    listItem = new ListItemEntity();
+
+            //    listItem.FileName = kvp.Key.ToString();
+            //    listItem.FilePath = kvp.Value.ToString();
+            //    listItem.IsCloud = true;
+            //    listItem.IsDirectory = false;
+            //    listItem.IconPath = Imaging.CreateBitmapSourceFromHBitmap(
+            //            Properties.Resources.glyphicons_232_cloud.GetHbitmap(),
+            //            IntPtr.Zero,
+            //            Int32Rect.Empty,
+            //            BitmapSizeOptions.FromEmptyOptions());
+
+            //    ObsFileList.Add(listItem);
+            //}
         }
 
 
