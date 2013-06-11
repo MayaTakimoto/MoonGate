@@ -589,7 +589,7 @@ namespace MoonGate.Component.Entity
                 }
             }
 
-            iRes = Upload(param, listTargets);
+            iRes = Download(param, listTargets);
         }
 
 
@@ -610,7 +610,7 @@ namespace MoonGate.Component.Entity
                 }
             }
 
-            iRes = Upload(param, listTargets);
+            iRes = Download(param, listTargets);
 
             //char[] cKey;
             //char[] cSec;

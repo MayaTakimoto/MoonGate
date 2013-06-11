@@ -265,7 +265,9 @@ namespace mgcrypt
 
             // 復号開始
             byte[] decResult = null;
-            iRet = DecryptMain(decTarget, out decResult);
+            byte[] decRealTgt = decTarget.Skip(KeyGen.Salt.Length).Take(decTarget.Length - KeyGen.Salt.Length).ToArray();
+
+            iRet = DecryptMain(decRealTgt, out decResult);
             if (iRet < 0)
             {
                 // 戻り値が負の場合はエラーコードを返す

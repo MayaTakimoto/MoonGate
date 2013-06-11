@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace mgcrypt.Rijndael
@@ -63,7 +64,8 @@ namespace mgcrypt.Rijndael
                             try
                             {
                                 int readLen;
-                                cryptStrm.Position = KeyGen.Salt.Length;
+                                //inMs.Position = KeyGen.Salt.Length;
+                                //long test = cryptStrm.Position;
 
                                 while ((readLen = cryptStrm.Read(bs, 0, bs.Length)) > 0)
                                 {
@@ -72,8 +74,9 @@ namespace mgcrypt.Rijndael
 
                                 decResult = outMs.ToArray();
                             }
-                            catch
+                            catch (Exception e)
                             {
+                                e.StackTrace.ToString();
                                 decResult = null;
                                 return -99;
                             }
