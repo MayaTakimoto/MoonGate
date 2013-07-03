@@ -110,11 +110,11 @@
     <Compile Include="Component\MessengerBehavior.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Component\Messenger\InputPassMessenger.cs" />
-    <Compile Include="Component\Messenger\SelectCloudFilesMessenger.cs" />
-    <Compile Include="Component\Messenger\SelectFileMessenger.cs" />
-    <Compile Include="Component\Messenger\SelectFolderMessenger.cs" />
-    <Compile Include="Component\BaseMessenger.cs" />
+    <Compile Include="Component\Action\InputPassAction.cs" />
+    <Compile Include="Component\Action\SelectCloudFilesAction.cs" />
+    <Compile Include="Component\Action\SelectFileAction.cs" />
+    <Compile Include="Component\Action\SelectFolderAction.cs" />
+    <Compile Include="Component\BaseAction.cs" />
     <Compile Include="Component\Entity\ConsumerInfoEntity.cs" />
     <Compile Include="Component\Entity\CloudInfoEntity.cs" />
     <Compile Include="Component\Entity\FileInfoEntity.cs" />
@@ -125,7 +125,7 @@
     <Compile Include="Component\Message\SelectCloudFilesMessage.cs" />
     <Compile Include="Component\Message\SelectFileMessage.cs" />
     <Compile Include="Component\BaseMessage.cs" />
-    <Compile Include="Component\Indicator.cs" />
+    <Compile Include="Component\Messenger.cs" />
     <Compile Include="Component\Entity\MainWindowInfoEntity.cs" />
     <Compile Include="utility\DataCipher.cs" />
     <Compile Include="utility\DataSerializer.cs" />

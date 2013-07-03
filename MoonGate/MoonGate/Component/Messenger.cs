@@ -9,12 +9,12 @@ namespace MoonGate.Component
     /// <summary>
     /// VMとViewを仲介するMessengerクラス
     /// </summary>
-    class Indicator
+    class Messenger
     {
         /// <summary>
         /// Messengerクラスのインスタンス
         /// </summary>
-        private static Indicator instance = new Indicator();
+        private static Messenger instance = new Messenger();
 
         /// <summary>
         /// 
@@ -24,7 +24,7 @@ namespace MoonGate.Component
         /// <summary>
         /// Messengerクラスのインスタンスのプロパティ
         /// </summary>
-        public static Indicator Instance
+        public static Messenger Instance
         {
             get { return instance; }
         }

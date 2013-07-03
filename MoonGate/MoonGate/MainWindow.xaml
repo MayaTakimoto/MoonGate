@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Entity="clr-namespace:MoonGate.Component.Entity"
-    xmlns:Action="clr-namespace:MoonGate.Component.Messenger"
+    xmlns:Action="clr-namespace:MoonGate.Component.Action"
     xmlns:Component="clr-namespace:MoonGate.Component"
     Title="MoonGate" Height="471.724" Width="604.415"
     Icon="pic/Moongate.ico" WindowStartupLocation="CenterScreen" 
@@ -184,9 +184,9 @@
     <!-- ActionとMessageを関連付ける -->
     <Component:MessengerBehavior.ListAction>
         <Component:ActionList>
-            <Action:SelectFileMessenger />
-            <Action:SelectFolderMessenger />
-            <Action:InputPassMessenger />
+            <Action:SelectFileAction />
+            <Action:SelectFolderAction />
+            <Action:InputPassAction />
         </Component:ActionList>
     </Component:MessengerBehavior.ListAction>
 

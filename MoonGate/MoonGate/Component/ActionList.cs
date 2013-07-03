@@ -6,7 +6,7 @@ namespace MoonGate.Component
     /// <summary>
     /// MessageとActionの関連付けの介助を行う
     /// </summary>
-    class ActionList : Collection<BaseMessenger>
+    class ActionList : Collection<BaseAction>
     {
         /// <summary>
         /// 自クラス内に保持されたActionを一括で関連付ける

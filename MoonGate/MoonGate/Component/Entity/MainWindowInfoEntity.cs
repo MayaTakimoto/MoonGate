@@ -264,7 +264,7 @@ namespace MoonGate.Component.Entity
             selectFileMessage.DefaultExt = "*.*";
             selectFileMessage.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
-            Indicator.Instance.Order<SelectFileMessage>(this, selectFileMessage);
+            Messenger.Instance.Order<SelectFileMessage>(this, selectFileMessage);
 
             if (selectFileMessage.Result == true)
             {
@@ -298,7 +298,7 @@ namespace MoonGate.Component.Entity
             ListItemEntity listItem = null;
             SelectFolderMessage selectFolderMessage = new SelectFolderMessage(this);
 
-            Indicator.Instance.Order<SelectFolderMessage>(this, selectFolderMessage);
+            Messenger.Instance.Order<SelectFolderMessage>(this, selectFolderMessage);
 
             if (selectFolderMessage.Result == true)
             {
@@ -412,7 +412,7 @@ namespace MoonGate.Component.Entity
             }
 
             InputPassMessage inputPassMessage = new InputPassMessage(this);
-            Indicator.Instance.Order<InputPassMessage>(this, inputPassMessage);
+            Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
 
             if (inputPassMessage.Result == false)
             {
@@ -574,7 +574,7 @@ namespace MoonGate.Component.Entity
             }
 
             InputPassMessage inputPassMessage = new InputPassMessage(this);
-            Indicator.Instance.Order<InputPassMessage>(this, inputPassMessage);
+            Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
 
             if (inputPassMessage.Result == false)
             {
