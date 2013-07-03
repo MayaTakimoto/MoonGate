@@ -204,7 +204,7 @@ namespace mgcloud.CloudOperator
 
             // アップロードファイルのひな形を作る
             var uploadFile = new Google.Apis.Drive.v2.Data.File();
-            uploadFile.Title = Path.GetFileName(Path.ChangeExtension(fileName, FILE_EXT));
+            uploadFile.Title = Path.ChangeExtension(Path.GetFileName(fileName), FILE_EXT);
             uploadFile.Description = FILE_DESCRIPTION;
             uploadFile.MimeType = MIME_BINARY;
 

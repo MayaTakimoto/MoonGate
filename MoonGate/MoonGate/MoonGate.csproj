@@ -80,11 +80,11 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mgcloud, Version=1.0.4873.40518, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="mgcloud, Version=1.0.4931.37731, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\mgcloud.dll</HintPath>
     </Reference>
-    <Reference Include="mgcrypt, Version=1.0.4862.42045, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="mgcrypt, Version=1.0.4931.37728, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\mgcrypt.dll</HintPath>
     </Reference>
@@ -107,14 +107,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Component\ActionList.cs" />
-    <Compile Include="Component\ActionRegistHelper.cs">
+    <Compile Include="Component\MessengerBehavior.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Component\Action\InputPassAction.cs" />
-    <Compile Include="Component\Action\SelectCloudFilesAction.cs" />
-    <Compile Include="Component\Action\SelectFileAction.cs" />
-    <Compile Include="Component\Action\SelectFolderAction.cs" />
-    <Compile Include="Component\BaseAction.cs" />
+    <Compile Include="Component\Messenger\InputPassMessenger.cs" />
+    <Compile Include="Component\Messenger\SelectCloudFilesMessenger.cs" />
+    <Compile Include="Component\Messenger\SelectFileMessenger.cs" />
+    <Compile Include="Component\Messenger\SelectFolderMessenger.cs" />
+    <Compile Include="Component\BaseMessenger.cs" />
     <Compile Include="Component\Entity\ConsumerInfoEntity.cs" />
     <Compile Include="Component\Entity\CloudInfoEntity.cs" />
     <Compile Include="Component\Entity\FileInfoEntity.cs" />
@@ -145,7 +145,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Component\CommandSetter.cs">
+    <Compile Include="Component\RelayCommand.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Component\Entity\ListItemEntity.cs" />

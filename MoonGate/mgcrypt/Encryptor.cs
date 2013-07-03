@@ -1,13 +1,15 @@
-﻿/**************************************************************************************
- *                                                                                    *
- * Program Name : Encryptor.cs                                                        *
- *                                                                                    *
- * Designed on 2013.02.01 by MayaTakimoto                                             *
- *                                                                                    *
- **************************************************************************************/
+﻿//-----------------------------------------------------------------------
+// <summary>暗号化処理クラス</summary>
+// <author>MayaTakimoto</author> 
+// <date>$Date: 2013-02-13 14:00:00  +9:00 $</date>
+// <copyright file="$Name: Encryptor.cs $" > 
+//     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -19,28 +21,26 @@ namespace mgcrypt
     /// </summary>
     public abstract class Encryptor : IDisposable
     {
-        /*************************************************
-         *  フィールド                                   *
-         *************************************************/
-
-        /*定数*/
-        protected const string sType = @".mgen";    // 暗号化ファイルの拡張子
+        #region フィールド
+                
+        /// <summary>
+        /// 鍵長
+        /// </summary>
         protected const int KEY_LENGTH = 256;
+
+        /// <summary>
+        /// ブロック長
+        /// </summary>
         protected const int BLOCK_SIZE = 128;
 
-        /*************************************************
-         *  プロパティ                                   *
-         *************************************************/
-
-        // 暗号化の対象ファイルのプロパティ
-        protected string Target { get; set; }
-
-        // ファイルに書き込む復号用情報のプロパティ
-        protected byte[] DecInfo { get; set; }
-
-        // キージェネレータのプロパティ
+        /// <summary>
+        /// キージェネレータ
+        /// </summary>
         internal KeyGenerator KeyGen { get; set; }
 
+        #endregion
+
+        #region メソッド
 
         /// <summary>
         /// 暗号化プロバイダの呼び出し
@@ -49,39 +49,28 @@ namespace mgcrypt
         /// <param name="iBlockSize">ブロックサイズ</param>
         /// <param name="btKey">鍵</param>
         /// <param name="btIv">IV</param>
-        /// <returns></returns>
+        /// <returns>0：正常終了 負数：異常終了</returns>
         protected abstract int GetProvider(int iKeyLength, int iBlockSize, byte[] btKey, byte[] btIv);
 
 
         /// <summary>
         /// 暗号化を実際に行うメソッド
         /// </summary>
-        /// <returns></returns>
-        protected abstract int EncryptMain(byte[] decInfo, out byte[] encData);
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="strTarget"></param>
-        public void InitEncrypt(string strTarget)
-        {
-            Target = strTarget;
-
-            // キージェネレータの生成
-            KeyGen = new KeyGenerator();
-        }
+        /// <param name="extInfo">拡張子のバイト情報</param>
+        /// <param name="bt">暗号化データ</param>
+        /// <returns>0：正常終了 負数：異常終了</returns>
+        protected abstract int EncryptMain(string strTarget, byte[] extInfo, out byte[] bt);
 
 
         /// <summary>
         /// 復号用情報の取得
         /// </summary>
         /// <returns></returns>
-        private byte[] GetDecInfo()
+        private byte[] GetDecInfo(string strTarget)
         {
             // ファイル拡張子の情報
             StringBuilder sbDecInfo = new StringBuilder(16);
-            sbDecInfo.Append(Path.GetExtension(Target));
+            sbDecInfo.Append(Path.GetExtension(strTarget));
 
             // 半角スペースで埋める
             while (sbDecInfo.Length < 16)
@@ -89,11 +78,7 @@ namespace mgcrypt
                 sbDecInfo.Append(" ");
             }
 
-            //byte[] decInfo = new byte[32];
-
-            //.CopyTo(decInfo, 0);
-
-            return Encoding.Unicode.GetBytes(sbDecInfo.ToString());
+            return Encoding.UTF8.GetBytes(sbDecInfo.ToString());
         }
 
 
@@ -103,13 +88,15 @@ namespace mgcrypt
         /// <param name="sStrPass"></param>
         /// <param name="encData"></param>
         /// <returns></returns>
-        public int Encrypt(SecureString sStrPass, out byte[] encData)
+        public int Encrypt(string strTarget, SecureString sStrPass, out byte[] encData)
         {
             int iRet = -99;
-            encData = null;
-
             char[] cPassInf = null;
             IntPtr ptrPass = IntPtr.Zero;
+            
+            KeyGen = new KeyGenerator();
+            encData = null;
+
             try
             {
                 cPassInf = new char[sStrPass.Length];
@@ -123,8 +110,6 @@ namespace mgcrypt
             }
             finally
             {
-                //sStrPass.Dispose();
-
                 if (ptrPass != IntPtr.Zero)
                 {
                     Marshal.ZeroFreeCoTaskMemUnicode(ptrPass);
@@ -137,7 +122,12 @@ namespace mgcrypt
                 return iRet;
             }
 
-            return Encrypt(out encData);
+            iRet = Encrypt(strTarget, out encData);
+
+            KeyGen.ClearKeyInfo();
+            KeyGen = null;
+
+            return iRet;
         }
 
 
@@ -147,9 +137,11 @@ namespace mgcrypt
         /// <param name="fiPass"></param>
         /// <param name="encData"></param>
         /// <returns></returns>
-        public int Encrypt(FileInfo fiPass, out byte[] encData)
+        public int Encrypt(string strTarget, FileInfo fiPass, out byte[] encData)
         {
             int iRet = -99;
+            
+            KeyGen = new KeyGenerator();
             encData = null;
 
             iRet = KeyGen.GenerateKey(fiPass);
@@ -159,8 +151,12 @@ namespace mgcrypt
                 return iRet;
             }
 
-            //fiPass = null;
-            return Encrypt(out encData);
+            iRet = Encrypt(strTarget, out encData);
+
+            KeyGen.ClearKeyInfo();
+            KeyGen = null;
+
+            return iRet;
         }
 
 
@@ -170,9 +166,11 @@ namespace mgcrypt
         /// <param name="sPass"></param>
         /// <param name="encData"></param>
         /// <returns></returns>
-        public int Encrypt(string sPass, out byte[] encData)
+        public int Encrypt(string strTarget, string sPass, out byte[] encData)
         {
             int iRet = -99;
+            
+            KeyGen = new KeyGenerator();
             encData = null;
 
             iRet = KeyGen.GenerateKey(sPass);
@@ -182,8 +180,12 @@ namespace mgcrypt
                 return iRet;
             }
 
-            //sPass = null;
-            return Encrypt(out encData);
+            iRet = Encrypt(strTarget, out encData);
+
+            KeyGen.ClearKeyInfo();
+            KeyGen = null;
+
+            return iRet;
         }
 
 
@@ -193,7 +195,7 @@ namespace mgcrypt
         /// <param name="sPassInf">秘密鍵の生成に使う情報</param>
         /// <param name="iMode">暗号化モード</param>
         /// <returns></returns>
-        private int Encrypt(out byte[] encData)
+        private int Encrypt(string strTarget, out byte[] encData)
         {
             int iRet = -99;
             
@@ -207,15 +209,18 @@ namespace mgcrypt
             }
 
             // 復号用情報取得
-            byte[] btDecInfo = GetDecInfo();
+            byte[] extInfo = GetDecInfo(strTarget);
 
             // 暗号化開始
-            iRet = EncryptMain(btDecInfo, out encData);
+            byte[] bt = null;
+            iRet = EncryptMain(strTarget, extInfo, out bt);
             if (iRet < 0)
             {
                 encData = null;
                 return iRet;
             }
+
+            encData = KeyGen.Salt.Concat(bt).ToArray();
 
             return 0;
         }
@@ -226,8 +231,13 @@ namespace mgcrypt
         /// </summary>
         public void Dispose()
         {
-            KeyGen.ClearKeyInfo();
-            KeyGen = null;
+            if (KeyGen != null)
+            {
+                KeyGen.ClearKeyInfo();
+                KeyGen = null;
+            }
         }
+
+        #endregion
     }
 }

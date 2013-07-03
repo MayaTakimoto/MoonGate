@@ -37,17 +37,17 @@ namespace mgcrypt
         internal KeyGenerator KeyGen { get; set; }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="strOutPath"></param>
-        public void InitDecrypt(string strOutPath)
-        {
-            OutPath = strOutPath;
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="strOutPath"></param>
+        //public void InitDecrypt(string strOutPath)
+        //{
+        //    OutPath = strOutPath;
 
-            // キージェネレータの生成
-            KeyGen = new KeyGenerator();
-        }
+        //    // キージェネレータの生成
+        //    KeyGen = new KeyGenerator();
+        //}
 
 
         /// <summary>
@@ -95,34 +95,33 @@ namespace mgcrypt
         //}
 
 
-        /// <summary>
-        /// ファイル拡張子取得
-        /// </summary>
-        /// <param name="btDecInfo"></param>
-        /// <returns></returns>
-        private string GetExtention(byte[] decResult)
-        {
-            byte[] btExt = new byte[32];
-            Buffer.BlockCopy(decResult, 0, btExt, 0, 32);
+        ///// <summary>
+        ///// ファイル拡張子取得
+        ///// </summary>
+        ///// <param name="btDecInfo"></param>
+        ///// <returns></returns>
+        //private string GetExtention(byte[] decResult)
+        //{
+        //    byte[] btExt = decResult.Skip(decResult.Length - 16).Take(16).ToArray();
+        //    //Buffer.BlockCopy(decResult, decResult.Length - 16, btExt, 0, 16);
 
-            string strExtention = Encoding.Unicode.GetString(btExt);
+        //    string strExtention = Encoding.UTF8.GetString(btExt);
 
-            return strExtention.Trim();
-        }
+        //    return Encoding.UTF8.GetString(btExt).Trim();
+        //}
 
 
-        /// <summary>
-        /// Salt取得
-        /// </summary>
-        /// <param name="btDecInfo"></param>
-        /// <returns></returns>
-        private byte[] GetSalt(byte[] decTarget)
-        {
-            byte[] btSalt = new byte[16];
-            Buffer.BlockCopy(decTarget, 16, btSalt, 0, 16);
+        ///// <summary>
+        ///// Salt取得
+        ///// </summary>
+        ///// <param name="btDecInfo"></param>
+        ///// <returns></returns>
+        //private byte[] GetSalt(byte[] decTarget)
+        //{
+        //    byte[] btSalt = decTarget.Take(16).ToArray();
 
-            return btSalt;
-        }
+        //    return btSalt;
+        //}
 
 
         /// <summary>
@@ -131,12 +130,14 @@ namespace mgcrypt
         /// <param name="sStrPass"></param>
         /// <param name="decTarget"></param>
         /// <returns></returns>
-        public int Decrypt(SecureString sStrPass, byte[] decTarget)
+        public int Decrypt(string strOutPath, SecureString sStrPass, byte[] decTarget)
         {
             int iRet = -99;
-
             char[] cPassInf = null;
             IntPtr ptrPass = IntPtr.Zero;
+
+            KeyGen = new KeyGenerator();
+
             try
             {
                 cPassInf = new char[sStrPass.Length];
@@ -150,7 +151,7 @@ namespace mgcrypt
             }
             finally
             {
-                sStrPass.Dispose();
+                //sStrPass.Dispose();
 
                 if (ptrPass != IntPtr.Zero)
                 {
@@ -158,14 +159,19 @@ namespace mgcrypt
                 }
             }
 
-            KeyGen.Salt = GetSalt(decTarget);
+            KeyGen.Salt = decTarget.Take(16).ToArray();
             iRet = KeyGen.GenerateKey(cPassInf);
             if (iRet < 0)
             {
                 return iRet;
             }
 
-            return Decrypt(decTarget);
+            iRet = Decrypt(strOutPath, decTarget);
+
+            KeyGen.ClearKeyInfo();
+            KeyGen = null;
+
+            return iRet;
         }
 
 
@@ -175,11 +181,13 @@ namespace mgcrypt
         /// <param name="fiPass"></param>
         /// <param name="decTarget"></param>
         /// <returns></returns>
-        public int Decrypt(FileInfo fiPass, byte[] decTarget)
+        public int Decrypt(string strOutPath, FileInfo fiPass, byte[] decTarget)
         {
             int iRet = -99;
 
-            KeyGen.Salt = GetSalt(decTarget);
+            KeyGen = new KeyGenerator();
+
+            KeyGen.Salt = decTarget.Take(16).ToArray();
             iRet = KeyGen.GenerateKey(fiPass);
             if (iRet < 0)
             {
@@ -187,8 +195,12 @@ namespace mgcrypt
                 return iRet;
             }
 
-            fiPass = null;
-            return Decrypt(decTarget);
+            iRet = Decrypt(strOutPath, decTarget);
+
+            KeyGen.ClearKeyInfo();
+            KeyGen = null;
+
+            return iRet;
         }
 
 
@@ -198,11 +210,13 @@ namespace mgcrypt
         /// <param name="sPass"></param>
         /// <param name="decTarget"></param>
         /// <returns></returns>
-        public int Decrypt(string sPass, byte[] decTarget)
+        public int Decrypt(string strOutPath, string sPass, byte[] decTarget)
         {
             int iRet = -99;
 
-            KeyGen.Salt = GetSalt(decTarget);
+            KeyGen = new KeyGenerator();
+
+            KeyGen.Salt = decTarget.Take(16).ToArray();
             iRet = KeyGen.GenerateKey(sPass);
             if (iRet < 0)
             {
@@ -210,8 +224,12 @@ namespace mgcrypt
                 return iRet;
             }
 
-            sPass = null;
-            return Decrypt(decTarget);
+            iRet = Decrypt(strOutPath, decTarget);
+
+            KeyGen.ClearKeyInfo();
+            KeyGen = null;
+
+            return iRet;
         }
 
 
@@ -220,39 +238,9 @@ namespace mgcrypt
         /// </summary>
         /// <param name="decTarget">復号対象データ</param>
         /// <returns></returns>
-        private int Decrypt(byte[] decTarget)
+        private int Decrypt(string strOutPath, byte[] decTarget)
         {
             int iRet = -99;
-
-            //// Saltを取得する
-            //KeyGen.Salt = GetSalt(decTarget);
-
-            //// モードで場合分け
-            //switch (iMode)
-            //{
-            //    case 0: // パスワードによる復号の場合
-            //        char[] cPassword = sPassInf.ToCharArray();
-
-            //        iRet = KeyGen.GenerateKey(cPassword);
-            //        break;
-
-            //    case 1: // 鍵ファイルによる復号の場合
-            //        FileInfo fiPass = new FileInfo(sPassInf);
-
-            //        iRet = KeyGen.GenerateKey(fiPass);
-            //        break;
-
-            //    case 2: // 鍵ドライブによる復号の場合
-
-            //        iRet = KeyGen.GenerateKey(sPassInf);
-            //        break;
-            //}
-
-            //if (iRet < 0)
-            //{
-            //    // 戻り値が負の場合はエラーコードを返す
-            //    return iRet;
-            //}
 
             // 復号プロバイダの生成
             iRet = GetProvider(KEY_LENGTH, BLOCK_SIZE, KeyGen.SecKey, KeyGen.InitVec);
@@ -261,11 +249,10 @@ namespace mgcrypt
                 // 戻り値が負の場合はエラーコードを返す
                 return iRet;
             }
-
-
+            
             // 復号開始
             byte[] decResult = null;
-            byte[] decRealTgt = decTarget.Skip(KeyGen.Salt.Length).Take(decTarget.Length - KeyGen.Salt.Length).ToArray();
+            byte[] decRealTgt = decTarget.Skip(KeyGen.Salt.Length).ToArray();
 
             iRet = DecryptMain(decRealTgt, out decResult);
             if (iRet < 0)
@@ -274,10 +261,12 @@ namespace mgcrypt
                 return iRet;
             }
 
-            string strExtention = GetExtention(decResult);
-            byte[] writeData = decResult.Skip(32).Take(decResult.Length - 32).ToArray();
+            byte[] writeData = decResult.Take(decResult.Length - 16).ToArray();
+            
+            byte[] btExt = decResult.Skip(decResult.Length - 16).ToArray();
+            string strExtention = Encoding.UTF8.GetString(btExt);
 
-            File.WriteAllBytes(Path.ChangeExtension(OutPath, strExtention), writeData);
+            File.WriteAllBytes(Path.ChangeExtension(strOutPath, strExtention), writeData);
 
             // 正常に終了
             return 0;
@@ -289,8 +278,11 @@ namespace mgcrypt
         /// </summary>
         public void Dispose()
         {
-            KeyGen.ClearKeyInfo();
-            KeyGen = null;
+            if (KeyGen != null)
+            {
+                KeyGen.ClearKeyInfo();
+                KeyGen = null;
+            }
         }
     }
 }

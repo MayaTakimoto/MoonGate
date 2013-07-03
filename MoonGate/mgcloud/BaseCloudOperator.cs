@@ -23,7 +23,7 @@ namespace mgcloud
         /// <summary>
         /// 拡張子
         /// </summary>
-        internal const string FILE_EXT = @"mgenf";
+        internal const string FILE_EXT = @".mgenf";
 
         /// <summary>
         /// 認証情報保持ファイルのパス

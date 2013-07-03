@@ -35,10 +35,11 @@ namespace mgcrypt.Rijndael
                 return -80;
             }
 
-            rijnProvider.BlockSize = iBlockSize;     // 暗号化ブロックサイズ
-            rijnProvider.KeySize = iKeyLength;       // 鍵長
-            rijnProvider.Key = btKey;                // 鍵
-            rijnProvider.IV = btIv;                  // 初期化ベクトル
+            rijnProvider.BlockSize = iBlockSize;            // 暗号化ブロックサイズ
+            rijnProvider.KeySize = iKeyLength;              // 鍵長
+            rijnProvider.Key = btKey;                       // 鍵
+            rijnProvider.IV = btIv;                         // 初期化ベクトル
+            rijnProvider.Padding = PaddingMode.ANSIX923;    // パディング
 
             // 正常終了
             return 0;
@@ -64,15 +65,11 @@ namespace mgcrypt.Rijndael
                             try
                             {
                                 int readLen;
-                                //inMs.Position = KeyGen.Salt.Length;
-                                //long test = cryptStrm.Position;
 
                                 while ((readLen = cryptStrm.Read(bs, 0, bs.Length)) > 0)
                                 {
                                     outMs.Write(bs, 0, readLen);
                                 }
-
-                                decResult = outMs.ToArray();
                             }
                             catch (Exception e)
                             {
@@ -81,6 +78,8 @@ namespace mgcrypt.Rijndael
                                 return -99;
                             }
                         }
+
+                        decResult = outMs.ToArray();
                     }
                 }
             }

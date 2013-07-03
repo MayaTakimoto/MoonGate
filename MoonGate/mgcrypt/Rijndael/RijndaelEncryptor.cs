@@ -6,6 +6,7 @@
  *                                                                                    *
  **************************************************************************************/
 
+using System;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -48,10 +49,11 @@ namespace mgcrypt.Rijndael
                 return -80;
             }
 
-            rijnProvider.BlockSize = iBlockSize;     // 暗号化ブロックサイズ
-            rijnProvider.KeySize = iKeyLength;       // 鍵長
-            rijnProvider.Key = btKey;                // 鍵
-            rijnProvider.IV = btIv;                  // 初期化ベクトル
+            rijnProvider.BlockSize = iBlockSize;            // 暗号化ブロックサイズ
+            rijnProvider.KeySize = iKeyLength;              // 鍵長
+            rijnProvider.Key = btKey;                       // 鍵
+            rijnProvider.IV = btIv;                         // 初期化ベクトル
+            rijnProvider.Padding = PaddingMode.ANSIX923;    // パディング
 
             // 正常終了
             return 0;
@@ -61,47 +63,45 @@ namespace mgcrypt.Rijndael
         /// <summary>
         /// Rijndaelアルゴリズムによる暗号化
         /// </summary>
-        /// <returns></returns>
-        protected override int EncryptMain(byte[] decInfo, out byte[] encData)
+        /// <param name="extInfo">拡張子のバイト情報</param>
+        /// <param name="bt">暗号化データ</param>
+        /// <returns>0：正常終了 負数：異常終了</returns>
+        protected override int EncryptMain(string strTarget, byte[] extInfo, out byte[] bt)
         {
             using (ICryptoTransform iEncryptor = rijnProvider.CreateEncryptor())
             {
                 using (MemoryStream outMs = new MemoryStream())
                 {
-                    using (FileStream inFs = new FileStream(Target, FileMode.Open, FileAccess.Read))
+                    using (FileStream inFs = new FileStream(strTarget, FileMode.Open, FileAccess.Read))
                     {
                         using (CryptoStream cryptStrm = new CryptoStream(outMs, iEncryptor, CryptoStreamMode.Write))
                         {
                             byte[] btTmp = new byte[1024];  // 一時バッファ
                             int iReadLength = 0;            // 読込データサイズ
-                            //int iPosition = 0;           
-
+                            
                             try
                             {
-                                outMs.Write(KeyGen.Salt, 0, KeyGen.Salt.Length);
-                                //cryptStrm.Position = KeyGen.Salt.Length;
-
-                                cryptStrm.Write(decInfo, 0, decInfo.Length);
                                 while ((iReadLength = inFs.Read(btTmp, 0, btTmp.Length)) > 0)
                                 {
                                     cryptStrm.Write(btTmp, 0, iReadLength);
                                 }
 
-                                encData = outMs.ToArray();
+                                cryptStrm.Write(extInfo, 0, extInfo.Length);
                             }
-                            catch
+                            catch(Exception e)
                             {
                                 // 例外発生時は偽を返す
-                                encData = null;
+                                bt = null;
+
+                                e.StackTrace.ToString();
                                 return -90;
                             }
                         }
                     }
+
+                    bt = outMs.ToArray();
                 }
             }
-
-            //// 進捗の更新
-            //Interlocked.Exchange(ref iProgress, Interlocked.Add(ref iProgress, 1));
 
             // 正常終了
             return 0;

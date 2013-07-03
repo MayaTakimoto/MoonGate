@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Entity="clr-namespace:MoonGate.Component.Entity"
-    xmlns:Action="clr-namespace:MoonGate.Component.Action"
+    xmlns:Action="clr-namespace:MoonGate.Component.Messenger"
     xmlns:Component="clr-namespace:MoonGate.Component"
     Title="MoonGate" Height="471.724" Width="604.415"
     Icon="pic/Moongate.ico" WindowStartupLocation="CenterScreen" 
@@ -33,7 +33,9 @@
             </Menu.Background>
             <MenuItem x:Name="MenuMain" Header="File(_F)" Margin="0" FontFamily="Tahoma">
                 <MenuItem Name="MenuItemOpenFiles" Header="Add Files(_F)" HorizontalAlignment="Stretch" Command="{Binding Path=AddFilesCommand}" />
+                <!-- 
                 <MenuItem Name="MenuItemOpenDir" Header="Add Folders(_D)" HorizontalAlignment="Stretch" Command="{Binding Path=AddFoldersCommand}" />
+                -->
                 <MenuItem Name="MenuItemOpenCloud" Header="Add Files from Cloud(_C)" HorizontalAlignment="Stretch" />
                 <Separator />
                 <MenuItem Name="MenuItemExit" Header="Exit(_Q)" HorizontalAlignment="Stretch" Command="{Binding Path=ExitCommand}"/>
@@ -64,11 +66,13 @@
                         Command="{Binding Path=AddFilesCommand}" >
                     <Image Source="pic/glyphicons/glyphicons_144_folder_open.png" />
                 </Button>
+                <!--
                 <Button x:Name="BtnFolderOpen" Uid="BtnFolderOpen" Height="20" Width="23" 
                         VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Add Directory to List"
                         Command="{Binding Path=AddFoldersCommand}" >
                     <Image Source="pic/glyphicons/glyphicons_145_folder_plus.png" />
                 </Button>
+                -->
                 <Button x:Name="BtnCloudFile" Uid="BtnCloudFile" Height="20" 
                         VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Add Files on Cloud"
                         Command="{Binding Path=AddCloudFilesCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}" >
@@ -178,13 +182,13 @@
     </Window.Resources>
 
     <!-- ActionとMessageを関連付ける -->
-    <Component:ActionRegistHelper.ListAction>
+    <Component:MessengerBehavior.ListAction>
         <Component:ActionList>
-            <Action:SelectFileAction />
-            <Action:SelectFolderAction />
-            <Action:InputPassAction />
+            <Action:SelectFileMessenger />
+            <Action:SelectFolderMessenger />
+            <Action:InputPassMessenger />
         </Component:ActionList>
-    </Component:ActionRegistHelper.ListAction>
+    </Component:MessengerBehavior.ListAction>
 
     <!-- 背景色設定 -->
     <Window.Background>
