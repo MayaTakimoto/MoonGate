@@ -1,13 +1,13 @@
 ﻿
 using System.Runtime.Serialization;
 
-namespace MoonGate.Component.Entity
+namespace MoonGate.Component.ViewModel
 {
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    public class CloudInfoEntity
+    public class CloudInfoViewModel
     {
         /// <summary>
         /// 

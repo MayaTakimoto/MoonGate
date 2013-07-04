@@ -83,10 +83,12 @@
     <Reference Include="mgcloud, Version=1.0.4931.37731, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\mgcloud.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="mgcrypt, Version=1.0.4931.37728, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\mgcrypt.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -115,20 +117,21 @@
     <Compile Include="Component\Action\SelectFileAction.cs" />
     <Compile Include="Component\Action\SelectFolderAction.cs" />
     <Compile Include="Component\BaseAction.cs" />
-    <Compile Include="Component\Entity\ConsumerInfoEntity.cs" />
-    <Compile Include="Component\Entity\CloudInfoEntity.cs" />
-    <Compile Include="Component\Entity\FileInfoEntity.cs" />
-    <Compile Include="Component\Entity\FolderBrowserInfoEntity.cs" />
-    <Compile Include="Component\Entity\TreeNodeEntity.cs" />
+    <Compile Include="Component\ViewModel\ConsumerInfoViewModel.cs" />
+    <Compile Include="Component\ViewModel\CloudInfoViewModel.cs" />
+    <Compile Include="Component\ViewModel\FileInfoViewModel.cs" />
+    <Compile Include="Component\ViewModel\FolderBrowserInfoViewModel.cs" />
+    <Compile Include="Component\ViewModel\TreeNodeViewModel.cs" />
     <Compile Include="Component\Message\InputPassMessage.cs" />
     <Compile Include="Component\Message\MesBoxMessage.cs" />
     <Compile Include="Component\Message\SelectCloudFilesMessage.cs" />
     <Compile Include="Component\Message\SelectFileMessage.cs" />
     <Compile Include="Component\BaseMessage.cs" />
     <Compile Include="Component\Messenger.cs" />
-    <Compile Include="Component\Entity\MainWindowInfoEntity.cs" />
-    <Compile Include="utility\DataCipher.cs" />
-    <Compile Include="utility\DataSerializer.cs" />
+    <Compile Include="Component\ViewModel\MainWindowInfoViewModel.cs" />
+    <Compile Include="Model\DataCipherModel.cs" />
+    <Compile Include="Model\DataSerializerModel.cs" />
+    <Compile Include="Model\DataTransceiverModel.cs" />
     <Page Include="FolderBrowseWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -148,7 +151,7 @@
     <Compile Include="Component\RelayCommand.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Component\Entity\ListItemEntity.cs" />
+    <Compile Include="Component\ViewModel\ListItemViewModel.cs" />
     <Compile Include="Component\Message\SelectFolderMessage.cs" />
     <Compile Include="FolderBrowseWindow.xaml.cs">
       <DependentUpon>FolderBrowseWindow.xaml</DependentUpon>
@@ -232,6 +235,7 @@
   <ItemGroup>
     <Resource Include="pic\glyphicons\glyphicons_194_circle_question_mark.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

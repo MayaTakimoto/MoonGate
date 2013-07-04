@@ -2,12 +2,12 @@
 using System.Runtime.Serialization;
 using System.Xml;
 
-namespace MoonGate.utility
+namespace MoonGate.Model
 {
     /// <summary>
     /// シリアライズ・デシリアライズクラス
     /// </summary>
-    public class DataSerializer
+    public class DataSerializerModel
     {
         /// <summary>
         /// シリアライズメソッド

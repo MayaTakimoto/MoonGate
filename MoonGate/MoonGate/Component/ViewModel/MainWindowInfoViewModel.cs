@@ -12,7 +12,7 @@ using mgcloud.CloudOperator;
 using mgcrypt;
 using mgcrypt.Rijndael;
 using MoonGate.Component.Message;
-using MoonGate.utility;
+using MoonGate.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,12 +26,12 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-namespace MoonGate.Component.Entity
+namespace MoonGate.Component.ViewModel
 {
     /// <summary>
     /// MainWindowのVMクラス
     /// </summary>
-    public class MainWindowInfoEntity : INotifyPropertyChanged
+    public class MainWindowInfoViewModel : INotifyPropertyChanged
     {
         /// <summary>
         /// 
@@ -46,17 +46,17 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 
         /// </summary>
-        private List<ConsumerInfoEntity> listConsumerInfo;
+        private List<ConsumerInfoViewModel> listConsumerInfo;
 
         /// <summary>
         /// リストのデータソースプロパティ
         /// </summary>
-        public ObservableCollection<ListItemEntity> ObsFileList { get; set; }
+        public ObservableCollection<ListItemViewModel> ObsFileList { get; set; }
 
         /// <summary>
         /// 使用可能クラウドストレージのリストプロパティ
         /// </summary>
-        public List<CloudInfoEntity> ListCloudInfo { get; set; }
+        public List<CloudInfoViewModel> ListCloudInfo { get; set; }
 
         ///// <summary>
         ///// 複数ファイルを一つに圧縮するかプロパティ
@@ -137,14 +137,14 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public MainWindowInfoEntity()
+        public MainWindowInfoViewModel()
         {
-            ObsFileList = new ObservableCollection<ListItemEntity>();
+            ObsFileList = new ObservableCollection<ListItemViewModel>();
 
-            object list = new List<CloudInfoEntity>();
-            if (DataSerializer.TryDeserialize(MASTERFILE_PATH, ref list))
+            object list = new List<CloudInfoViewModel>();
+            if (DataSerializerModel.TryDeserialize(MASTERFILE_PATH, ref list))
             {
-                ListCloudInfo = list as List<CloudInfoEntity>;
+                ListCloudInfo = list as List<CloudInfoViewModel>;
             }
 
             SetCommands();
@@ -165,11 +165,11 @@ namespace MoonGate.Component.Entity
             );
 
             AddCloudFilesCommand = new RelayCommand(
-                param => this.GetCloudFileList(param)
+                param => this.AddCloudFiles(param)
             );
 
             RemoveItemsCommand = new RelayCommand(
-                param => this.RemoveItems(),
+                param => this.RemoveSelectedItems(),
                 param =>
                 {
                     return IsSelected();
@@ -234,7 +234,7 @@ namespace MoonGate.Component.Entity
         /// <returns></returns>
         private bool IsSelected()
         {
-            foreach (ListItemEntity item in ObsFileList)
+            foreach (ListItemViewModel item in ObsFileList)
             {
                 if (item.IsSelected)
                 {
@@ -254,7 +254,7 @@ namespace MoonGate.Component.Entity
         /// <param name="isCloud"></param>
         private void AddFiles()
         {
-            ListItemEntity listItem = null;
+            ListItemViewModel listItem = null;
             SelectFileMessage selectFileMessage = new SelectFileMessage(this);
 
             selectFileMessage.Title = "Select Files";
@@ -270,7 +270,7 @@ namespace MoonGate.Component.Entity
             {
                 foreach (string filePath in selectFileMessage.FileNames)
                 {
-                    listItem = new ListItemEntity();
+                    listItem = new ListItemViewModel();
 
                     // 新規項目に情報をセットする
                     listItem.FileName = Path.GetFileName(filePath);
@@ -295,7 +295,7 @@ namespace MoonGate.Component.Entity
         /// <returns></returns>
         private void AddFolders()
         {
-            ListItemEntity listItem = null;
+            ListItemViewModel listItem = null;
             SelectFolderMessage selectFolderMessage = new SelectFolderMessage(this);
 
             Messenger.Instance.Order<SelectFolderMessage>(this, selectFolderMessage);
@@ -304,7 +304,7 @@ namespace MoonGate.Component.Entity
             {
                 foreach (string folderPath in selectFolderMessage.FolderNames)
                 {
-                    listItem = new ListItemEntity();
+                    listItem = new ListItemViewModel();
 
                     string dirName = Path.GetFileName(folderPath);
                     if (string.IsNullOrEmpty(dirName))
@@ -333,7 +333,7 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 選択されたアイテムの削除
         /// </summary>
-        private void RemoveItems()
+        private void RemoveSelectedItems()
         {
             for (int index = 0; index < ObsFileList.Count; index++)
             {
@@ -347,23 +347,61 @@ namespace MoonGate.Component.Entity
 
 
         /// <summary>
-        /// アップロード
+        /// 
+        /// </summary>
+        private void RemoveTransceivedItems()
+        {
+            for (int index = 0; index < ObsFileList.Count; index++)
+            {
+                if (ObsFileList[index].IsTransceived)
+                {
+                    ObsFileList.RemoveAt(index);
+                    index--;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 選択アップロード
         /// </summary>
         /// <param name="param"></param>
         private void UploadSelectedItems(object param)
         {
             int iRes = -1;
-            List<ListItemEntity> listTargets = new List<ListItemEntity>();
+            List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
 
-            foreach (var item in ObsFileList)
+            
+            InputPassMessage inputPassMessage = new InputPassMessage(this);
+            Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
+
+            if (inputPassMessage.Result == true)
             {
-                if (item.IsSelected && !item.IsCloud)
+                foreach (var item in ObsFileList)
                 {
-                    listTargets.Add(item);
+                    if (item.IsSelected && !item.IsCloud)
+                    {
+                        item.IsTransceived = false;
+                        listTargets.Add(item);
+                    }
                 }
-            }
 
-            iRes = Upload(param, listTargets);
+                DataTransceiverModel transceiver = new DataTransceiverModel();
+                iRes = transceiver.Upload(param, inputPassMessage, listTargets);
+
+                if (iRes < 0)
+                {
+
+                }
+
+                inputPassMessage.PassWord.Dispose();
+                inputPassMessage.PassFile = null;
+                inputPassMessage.PassDrive = null;
+                inputPassMessage = null;
+
+                // アップロードの完了したアイテムはリストから削除
+                RemoveTransceivedItems();
+            }
         }
 
 
@@ -374,137 +412,39 @@ namespace MoonGate.Component.Entity
         private void UproadAllItems(object param)
         {
             int iRes = -1;
-            List<ListItemEntity> listTargets = new List<ListItemEntity>();
+            List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
 
-            foreach (var item in ObsFileList)
-            {
-                if (!item.IsCloud)
-                {
-                    listTargets.Add(item);
-                }
-            }
-
-            iRes = Upload(param, listTargets);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="param"></param>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        private int Upload(object param, List<ListItemEntity> list)
-        {
-            int iRes = 0;
-            char[] cKey = null;
-            char[] cSec = null;
-            byte[] encryptedData = null;
-
-            LoadConsumerInfo(param, out cKey, out cSec);
-            if (cKey == null || cKey.Length == 0)
-            {
-                return -101;
-            }
-            if (cSec == null || cSec.Length == 0)
-            {
-                return -101;
-            }
 
             InputPassMessage inputPassMessage = new InputPassMessage(this);
             Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
 
-            if (inputPassMessage.Result == false)
+            if (inputPassMessage.Result == true)
             {
-                if (!SaveConsumerInfo(param, cKey, cSec))
+                foreach (var item in ObsFileList)
                 {
-                    cKey = null;
-                    cSec = null;
-
-                    return -121;
-                }
-
-                cKey = null;
-                cSec = null;
-
-                return 0;
-            }
-
-            using (Encryptor encryptor = new RijndaelEncryptor())
-            {
-                using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
-                {
-                    try
+                    if (!item.IsCloud)
                     {
-                        // 認証情報のロード
-                        oprCld.LoadAuthInfo();
-
-                        foreach (var item in list)
-                        {
-                            // 暗号化
-                            encryptedData = null;
-                            switch (inputPassMessage.SelectedIndex)
-                            {
-                                case 0:
-                                    iRes = encryptor.Encrypt(item.FilePath, inputPassMessage.PassWord, out encryptedData);
-                                    break;
-                                case 1:
-                                    iRes = encryptor.Encrypt(item.FilePath, inputPassMessage.PassFile, out encryptedData);
-                                    break;
-                                case 2:
-                                    iRes = encryptor.Encrypt(item.FilePath, inputPassMessage.PassDrive, out encryptedData);
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            if (iRes < 0)
-                            {
-                                break;
-                            }
-
-                            // アップロード
-                            iRes = oprCld.UploadFile(item.FilePath, encryptedData);
-                            if (iRes < 0)
-                            {
-                                break;
-                            }
-
-                            if (!item.IsSelected)
-                            {
-                                item.IsSelected = true;
-                            }
-                        }
-
-                        // 認証情報のセーブ
-                        oprCld.SaveAuthInfo();
-                    }
-                    catch(Exception e)
-                    {
-                        string s = e.StackTrace;
+                        item.IsTransceived = false;
+                        listTargets.Add(item);
                     }
                 }
+
+                DataTransceiverModel transceiver = new DataTransceiverModel();
+                iRes = transceiver.Upload(param, inputPassMessage, listTargets);
+
+                if (iRes < 0)
+                {
+
+                }
+
+                inputPassMessage.PassWord.Dispose();
+                inputPassMessage.PassFile = null;
+                inputPassMessage.PassDrive = null;
+                inputPassMessage = null;
+
+                // アップロードの完了したアイテムはリストから削除
+                RemoveTransceivedItems();
             }
-
-            inputPassMessage.PassWord.Dispose();
-            inputPassMessage.PassFile = null;
-            inputPassMessage.PassDrive = null;
-            inputPassMessage = null;
-
-            if (!SaveConsumerInfo(param, cKey, cSec))
-            {
-                cKey = null;
-                cSec = null;
-
-                return -121;
-            }
-
-            cKey = null;
-            cSec = null;
-
-            RemoveItems();
-
-            return iRes;
         }
 
 
@@ -515,17 +455,38 @@ namespace MoonGate.Component.Entity
         private void DownloadSelectedItems(object param)
         {
             int iRes = -1;
-            List<ListItemEntity> listTargets = new List<ListItemEntity>();
+            List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
 
-            foreach (var item in ObsFileList)
+            InputPassMessage inputPassMessage = new InputPassMessage(this);
+            Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
+
+            if (inputPassMessage.Result == true)
             {
-                if (item.IsSelected && item.IsCloud)
+                foreach (var item in ObsFileList)
                 {
-                    listTargets.Add(item);
+                    if (item.IsSelected && item.IsCloud)
+                    {
+                        item.IsTransceived = false;
+                        listTargets.Add(item);
+                    }
                 }
-            }
 
-            iRes = Download(param, listTargets);
+                DataTransceiverModel transceiver = new DataTransceiverModel();
+                iRes = transceiver.Download(param, inputPassMessage, listTargets);
+
+                if (iRes < 0)
+                {
+
+                }
+
+                inputPassMessage.PassWord.Dispose();
+                inputPassMessage.PassFile = null;
+                inputPassMessage.PassDrive = null;
+                inputPassMessage = null;
+
+                // ダウンロードの完了したアイテムはリストから削除
+                RemoveTransceivedItems();
+            }
         }
 
 
@@ -536,136 +497,38 @@ namespace MoonGate.Component.Entity
         private void DownloadAll(object param)
         {
             int iRes = -1;
-            List<ListItemEntity> listTargets = new List<ListItemEntity>();
-
-            foreach (var item in ObsFileList)
-            {
-                if (item.IsCloud)
-                {
-                    listTargets.Add(item);
-                }
-            }
-
-            iRes = Download(param, listTargets);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="param"></param>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        private int Download(object param, List<ListItemEntity> list)
-        {
-            int iRes = 0;
-            char[] cKey;
-            char[] cSec;
-            byte[] downloadData = null;
-            
-            LoadConsumerInfo(param, out cKey, out cSec);
-            if (cKey == null || cKey.Length == 0)
-            {
-                return -101;
-            }
-            if (cSec == null || cSec.Length == 0)
-            {
-                return -101;
-            }
+            List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
 
             InputPassMessage inputPassMessage = new InputPassMessage(this);
             Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
 
-            if (inputPassMessage.Result == false)
+            if (inputPassMessage.Result == true)
             {
-                if (!SaveConsumerInfo(param, cKey, cSec))
+                foreach (var item in ObsFileList)
                 {
-                    cKey = null;
-                    cSec = null;
-
-                    return -121;
-                }
-
-                cKey = null;
-                cSec = null;
-
-                return 0;
-            }
-
-            using (Decryptor decryptor = new RijndaelDecryptor())
-            {
-                using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
-                {
-                    try
+                    if (item.IsCloud)
                     {
-                        // 認証情報のロード
-                        oprCld.LoadAuthInfo();
-
-                        foreach (var item in list)
-                        {
-                            // ダウンロード
-                            downloadData = null;
-                            iRes = oprCld.DownloadFile(item.FilePath, out downloadData);
-                            if (iRes < 0)
-                            {
-                                break;
-                            }
-
-                            // 復号
-                            switch (inputPassMessage.SelectedIndex)
-                            {
-                                case 0:
-                                    iRes = decryptor.Decrypt(item.FileName, inputPassMessage.PassWord, downloadData);
-                                    break;
-                                case 1:
-                                    iRes = decryptor.Decrypt(item.FileName, inputPassMessage.PassFile, downloadData);
-                                    break;
-                                case 2:
-                                    iRes = decryptor.Decrypt(item.FileName, inputPassMessage.PassDrive, downloadData);
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            if (iRes < 0)
-                            {
-                                break;
-                            }
-
-                            if (!item.IsSelected)
-                            {
-                                item.IsSelected = true;
-                            }
-                        }
-
-                        // 認証情報のセーブ
-                        oprCld.SaveAuthInfo();
-                    }
-                    catch (Exception e)
-                    {
-                        string s = e.StackTrace;
+                        item.IsTransceived = false;
+                        listTargets.Add(item);
                     }
                 }
+
+                DataTransceiverModel transceiver = new DataTransceiverModel();
+                iRes = transceiver.Download(param, inputPassMessage, listTargets);
+
+                if (iRes < 0)
+                {
+
+                }
+
+                inputPassMessage.PassWord.Dispose();
+                inputPassMessage.PassFile = null;
+                inputPassMessage.PassDrive = null;
+                inputPassMessage = null;
+
+                // ダウンロードの完了したアイテムはリストから削除
+                RemoveTransceivedItems();
             }
-
-            inputPassMessage.PassWord.Dispose();
-            inputPassMessage.PassFile = null;
-            inputPassMessage.PassDrive = null;
-            inputPassMessage = null;
-
-            if (!SaveConsumerInfo(param, cKey, cSec))
-            {
-                cKey = null;
-                cSec = null;
-
-                return -121;
-            }
-
-            cKey = null;
-            cSec = null;
-            RemoveItems();
-
-            return iRes;
         }
 
 
@@ -673,49 +536,18 @@ namespace MoonGate.Component.Entity
         /// 
         /// </summary>
         /// <param name="param"></param>
-        private void GetCloudFileList(object param)
+        private void AddCloudFiles(object param)
         {
-            char[] cKey;
-            char[] cSec;
-            ListItemEntity listItem = null;
-            HybridDictionary hDic = new HybridDictionary(true);
+            ListItemViewModel listItem = null;
+            HybridDictionary hDic = null;
 
-            LoadConsumerInfo(param, out cKey, out cSec);
-            if (cKey == null || cKey.Length == 0)
-            {
-                return;
-            }
-            if (cSec == null || cSec.Length == 0)
-            {
-                return;
-            }
-
-            using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
-            {
-                try
-                {
-                    oprCld.LoadAuthInfo();
-                    hDic = oprCld.GetFileList();
-                    oprCld.SaveAuthInfo();
-                }
-                catch (Exception e)
-                {
-                    string s = e.StackTrace;
-
-                    if (!SaveConsumerInfo(param, cKey, cSec))
-                    {
-                        cKey = null;
-                        cSec = null;
-                    }
-
-                    return;
-                }
-            }
+            DataTransceiverModel transceiver = new DataTransceiverModel();
+            hDic = transceiver.GetCloudFileList(param);
 
             IDictionaryEnumerator hDicEnu = hDic.GetEnumerator();
             while (hDicEnu.MoveNext())
             {
-                listItem = new ListItemEntity();
+                listItem = new ListItemViewModel();
 
                 listItem.FileName = hDicEnu.Key.ToString();
                 listItem.FilePath = hDicEnu.Value.ToString();
@@ -729,17 +561,6 @@ namespace MoonGate.Component.Entity
 
                 ObsFileList.Add(listItem);
             }
-
-            if (!SaveConsumerInfo(param, cKey, cSec))
-            {
-                cKey = null;
-                cSec = null;
-
-                return;
-            }
-
-            cKey = null;
-            cSec = null;
         }
 
 
@@ -770,68 +591,6 @@ namespace MoonGate.Component.Entity
         private void Shutdown()
         {
             App.Current.Shutdown();
-        }
-
-
-        /// <summary>
-        /// コンシューマ情報の読み込み
-        /// </summary>
-        /// <param name="param"></param>
-        /// <param name="cKey"></param>
-        /// <param name="cSec"></param>
-        private void LoadConsumerInfo(object param, out char[] cKey, out char[] cSec)
-        {
-            cKey = null;
-            cSec = null;
-            DataCipher dcp = new DataCipher();
-
-            object objConsumerInfo = new List<ConsumerInfoEntity>();
-            if (!DataSerializer.TryDeserialize(USERFILE_PATH, ref objConsumerInfo))
-            {
-                return;
-            }
-
-            listConsumerInfo = objConsumerInfo as List<ConsumerInfoEntity>;
-            ConsumerInfoEntity conInfo = new ConsumerInfoEntity();
-            foreach (var item in listConsumerInfo)
-            {
-                if (param.ToString() == item.StorageKey)
-                {
-                    conInfo = item;
-                    listConsumerInfo.Remove(item);
-                    break;
-                }
-            }
-
-            cKey = dcp.DecryptRsa(conInfo.ConsumerKey, param.ToString());
-            cSec = dcp.DecryptRsa(conInfo.ConsumerSecret, param.ToString());
-
-            // 秘密鍵の削除
-            dcp.DeleteKeys(param.ToString());
-        }
-
-
-        /// <summary>
-        /// コンシューマ情報リスト保存
-        /// </summary>
-        /// <param name="conInfo"></param>
-        private bool SaveConsumerInfo(object param, char[] cKey, char[] cSec)
-        {
-            DataCipher dcp = new DataCipher();
-
-            ConsumerInfoEntity conInfo = new ConsumerInfoEntity();
-            conInfo.StorageKey = param.ToString();
-            conInfo.ConsumerKey = dcp.EncryptRsa(cKey, param.ToString());
-            conInfo.ConsumerSecret = dcp.EncryptRsa(cSec, param.ToString());
-
-            listConsumerInfo.Add(conInfo);
-
-            if (!DataSerializer.TrySerialize(USERFILE_PATH, listConsumerInfo))
-            {
-                return false;
-            }
-
-            return true;
         }
 
 

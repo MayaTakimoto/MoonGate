@@ -1,10 +1,10 @@
 ﻿
-namespace MoonGate.Component.Entity
+namespace MoonGate.Component.ViewModel
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ConsumerInfoEntity
+    public class ConsumerInfoViewModel
     {
         /// <summary>
         /// 

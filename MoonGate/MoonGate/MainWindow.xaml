@@ -2,7 +2,7 @@
 <Window x:Name="MgMain" x:Class="MoonGate.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Entity="clr-namespace:MoonGate.Component.Entity"
+    xmlns:ViewModel="clr-namespace:MoonGate.Component.ViewModel"
     xmlns:Action="clr-namespace:MoonGate.Component.Action"
     xmlns:Component="clr-namespace:MoonGate.Component"
     Title="MoonGate" Height="471.724" Width="604.415"
@@ -144,7 +144,7 @@
 
     <Window.Resources>
         <!-- VM定義 -->
-        <Entity:MainWindowInfoEntity x:Key="EntMain"/>
+        <ViewModel:MainWindowInfoViewModel x:Key="EntMain"/>
         <!-- コンテキストメニュー定義 -->
         <ContextMenu x:Key="ContextMenuMain" FontFamily="Tahoma">
             <MenuItem Name="ConItemUpload" Header="Upload" 

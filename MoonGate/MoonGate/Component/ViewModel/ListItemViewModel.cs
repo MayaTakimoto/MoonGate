@@ -1,11 +1,11 @@
 ﻿using System.Windows.Media.Imaging;
 
-namespace MoonGate.Component.Entity
+namespace MoonGate.Component.ViewModel
 {
     /// <summary>
     /// リスト項目クラス
     /// </summary>
-    public class ListItemEntity : FileInfoEntity
+    public class ListItemViewModel : FileInfoViewModel
     {
         /// <summary>
         /// アイコンパス
@@ -26,5 +26,10 @@ namespace MoonGate.Component.Entity
         /// 
         /// </summary>
         public bool IsSelected { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsTransceived { get; set; }
     }
 }

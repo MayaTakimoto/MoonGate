@@ -2,12 +2,12 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MoonGate.utility
+namespace MoonGate.Model
 {
     /// <summary>
     /// コンシューマ情報のRSA暗号化・復号クラス
     /// </summary>
-    public class DataCipher
+    public class DataCipherModel
     {
         /// <summary>
         /// RSA暗号化

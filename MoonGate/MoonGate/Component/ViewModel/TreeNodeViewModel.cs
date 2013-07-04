@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace MoonGate.Component.Entity
+namespace MoonGate.Component.ViewModel
 {
     /// <summary>
     /// ツリーノードクラス
     /// </summary>
-    public class TreeNodeEntity
+    public class TreeNodeViewModel
     {
         /// <summary>
         /// ディレクトリ情報
@@ -18,7 +18,7 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 各ノードが有するファイル情報
         /// </summary>
-        public FileInfoEntity FolderInfo { get; set; }
+        public FileInfoViewModel FolderInfo { get; set; }
 
         ///// <summary>
         ///// 
@@ -28,13 +28,13 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// 子ノードのリストのプロパティ
         /// </summary>
-        public IEnumerable<TreeNodeEntity> ListTreeNodes
+        public IEnumerable<TreeNodeViewModel> ListTreeNodes
         {
             get
             {
                 try
                 {
-                    return Directory.EnumerateDirectories(this.dirInfo.FullName).Select(param => new TreeNodeEntity(param));
+                    return Directory.EnumerateDirectories(this.dirInfo.FullName).Select(param => new TreeNodeViewModel(param));
                 }
                 catch (Exception)
                 {
@@ -52,11 +52,11 @@ namespace MoonGate.Component.Entity
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public TreeNodeEntity(string dirPath)
+        public TreeNodeViewModel(string dirPath)
         {  
             dirInfo = new DirectoryInfo(dirPath);
 
-            FolderInfo = new FileInfoEntity();
+            FolderInfo = new FileInfoViewModel();
             FolderInfo.FileName = dirInfo.Name;
             FolderInfo.FilePath = dirInfo.FullName;
         }

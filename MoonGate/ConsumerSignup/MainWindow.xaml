@@ -1,7 +1,7 @@
 ﻿<Window x:Class="ConsumerSignup.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Entity="clr-namespace:ConsumerSignup.Entity"
+        xmlns:ViewModel="clr-namespace:ConsumerSignup.ViewModel"
         Title="ConsumerSignup" Height="280" Width="371" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" FontFamily="Tahoma" FontSize="14" DataContext="{DynamicResource EntMain}" Icon="Moongate.ico" Topmost="True">
 
     <!-- 背景色設定 -->
@@ -39,6 +39,6 @@
     </Canvas>
 
     <Window.Resources>
-        <Entity:MainEntity x:Key="EntMain"/>
+        <ViewModel:MainViewModel x:Key="EntMain"/>
     </Window.Resources>
 </Window>

@@ -1,7 +1,7 @@
 ﻿<Window x:Name="FolderBrowser" x:Class="MoonGate.FolderBrowseWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Entity="clr-namespace:MoonGate.Component.Entity"
+        xmlns:ViewModel="clr-namespace:MoonGate.Component.ViewModel"
         Title="Select Folders" Height="407" Width="329" Icon="pic/Moongate.ico" FontFamily="Tahoma" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" DataContext="{DynamicResource EntFolder}">
     <Canvas>
         <TreeView x:Name="FolderTreeView" FontSize="14" Background="WhiteSmoke" 
@@ -24,7 +24,7 @@
 
     <Window.Resources>
         <!-- VM定義 -->
-        <Entity:FolderBrowserInfoEntity x:Key="EntFolder" />
+        <ViewModel:FolderBrowserInfoViewModel x:Key="EntFolder" />
     </Window.Resources>
 
     <Window.Background>

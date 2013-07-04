@@ -1,10 +1,10 @@
 ﻿
-namespace MoonGate.Component.Entity
+namespace MoonGate.Component.ViewModel
 {
     /// <summary>
     /// ファイル情報保持クラス
     /// </summary>
-    public class FileInfoEntity
+    public class FileInfoViewModel
     {
         /// <summary>
         /// ファイル名

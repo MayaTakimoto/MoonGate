@@ -1,6 +1,6 @@
 ﻿using MoonGate.Component;
-using MoonGate.Component.Entity;
-using MoonGate.utility;
+using MoonGate.Component.ViewModel;
+using MoonGate.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,12 +8,12 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Windows.Input;
 
-namespace ConsumerSignup.Entity
+namespace ConsumerSignup.ViewModel
 {
     /// <summary>
     /// ConsumerSignUpのVMクラス
     /// </summary>
-    class MainEntity
+    class MainViewModel
     {
         /// <summary>
         /// マスタファイルパス
@@ -28,7 +28,7 @@ namespace ConsumerSignup.Entity
         /// <summary>
         /// 
         /// </summary>
-        public List<CloudInfoEntity> ListCloudInfo { get; private set; }
+        public List<CloudInfoViewModel> ListCloudInfo { get; private set; }
 
         /// <summary>
         /// 
@@ -54,12 +54,12 @@ namespace ConsumerSignup.Entity
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public MainEntity()
+        public MainViewModel()
         {
-            object list = new List<CloudInfoEntity>();
-            if (DataSerializer.TryDeserialize(MASTERFILE_PATH, ref list))
+            object list = new List<CloudInfoViewModel>();
+            if (DataSerializerModel.TryDeserialize(MASTERFILE_PATH, ref list))
             {
-                ListCloudInfo = list as List<CloudInfoEntity>;
+                ListCloudInfo = list as List<CloudInfoViewModel>;
             }
 
             SetCommand();
@@ -71,7 +71,7 @@ namespace ConsumerSignup.Entity
         /// </summary>
         private void SetCommand()
         {
-            ResOKCommand = new CommandSetter(
+            ResOKCommand = new RelayCommand(
                 param => this.OKProcess(param),
                 param =>
                 {
@@ -88,7 +88,7 @@ namespace ConsumerSignup.Entity
                 }
             );
 
-            ResCancelCommand = new CommandSetter(
+            ResCancelCommand = new RelayCommand(
                 param => this.CancelProcess()
             );
         }
@@ -133,20 +133,20 @@ namespace ConsumerSignup.Entity
             }
 
 
-            DataCipher dc = new DataCipher();
+            DataCipherModel dc = new DataCipherModel();
             char[] ck = dc.EncryptRsa(cKey, param.ToString());
             char[] cs = dc.EncryptRsa(cSec, param.ToString());
 
             // コンシューマ情報セット
-            ConsumerInfoEntity conInfo = new ConsumerInfoEntity();
+            ConsumerInfoViewModel conInfo = new ConsumerInfoViewModel();
             conInfo.StorageKey = param.ToString();
             conInfo.ConsumerKey = ck;
             conInfo.ConsumerSecret = cs;
 
-            object objConList = new List<ConsumerInfoEntity>();
+            object objConList = new List<ConsumerInfoViewModel>();
 
-            DataSerializer.TryDeserialize(USERFILE_PATH, ref objConList);
-            var conList = objConList as List<ConsumerInfoEntity>;
+            DataSerializerModel.TryDeserialize(USERFILE_PATH, ref objConList);
+            var conList = objConList as List<ConsumerInfoViewModel>;
 
             foreach (var item in conList)
             {
@@ -159,7 +159,7 @@ namespace ConsumerSignup.Entity
 
             conList.Add(conInfo);
 
-            DataSerializer.TrySerialize(USERFILE_PATH, conList);
+            DataSerializerModel.TrySerialize(USERFILE_PATH, conList);
 
             this.Close();
         }

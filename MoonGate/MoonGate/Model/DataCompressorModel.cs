@@ -6,12 +6,12 @@ using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 using System.IO;
 
-namespace MoonGate.Component
+namespace MoonGate.Model
 {
     /// <summary>
     /// 圧縮・解凍処理クラス
     /// </summary>
-    public class Compressor
+    public class DataCompressorModel
     {
         /// <summary>
         /// 
