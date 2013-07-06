@@ -2,14 +2,12 @@
 using mgcloud.CloudOperator;
 using mgcrypt;
 using mgcrypt.Rijndael;
-using MoonGate.Component;
-using MoonGate.Component.Message;
 using MoonGate.Component.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
+using System.IO;
+using System.Security;
 
 namespace MoonGate.Model
 {
@@ -26,183 +24,395 @@ namespace MoonGate.Model
         private const string USERFILE_PATH = "./user/consumer.xml";
 
         /// <summary>
-        /// 
+        /// パスワード
         /// </summary>
-        /// <param name="cloudId"></param>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        internal int Upload(object cloudId, InputPassMessage im, List<ListItemViewModel> list)
-        {
-            int iRes = 0;
-            char[] cKey = null;
-            char[] cSec = null;
-            byte[] encryptedData = null;
+        internal SecureString PassWord { get; set; }
 
-            LoadConsumerInfo(cloudId, out cKey, out cSec);
-            if (cKey == null || cKey.Length == 0)
-            {
-                return -101;
-            }
-            if (cSec == null || cSec.Length == 0)
-            {
-                return -101;
-            }
+        /// <summary>
+        /// パスファイル
+        /// </summary>
+        internal FileInfo PassFile { get; set; }
 
-            using (Encryptor encryptor = new RijndaelEncryptor())
-            {
-                using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
-                {
-                    try
-                    {
-                        // 認証情報のロード
-                        oprCld.LoadAuthInfo();
-
-                        foreach (var item in list)
-                        {
-                            // 暗号化
-                            encryptedData = null;
-                            switch (im.SelectedIndex)
-                            {
-                                case 0:
-                                    iRes = encryptor.Encrypt(item.FilePath, im.PassWord, out encryptedData);
-                                    break;
-                                case 1:
-                                    iRes = encryptor.Encrypt(item.FilePath, im.PassFile, out encryptedData);
-                                    break;
-                                case 2:
-                                    iRes = encryptor.Encrypt(item.FilePath, im.PassDrive, out encryptedData);
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            if (iRes < 0)
-                            {
-                                break;
-                            }
-
-                            // アップロード
-                            iRes = oprCld.UploadFile(item.FilePath, encryptedData);
-                            if (iRes < 0)
-                            {
-                                break;
-                            }
-
-                            // アップロード正常終了時はフラグオン
-                            item.IsTransceived = true;
-                        }
-
-                        // 認証情報のセーブ
-                        oprCld.SaveAuthInfo();
-                    }
-                    catch (Exception e)
-                    {
-                        string s = e.StackTrace;
-                    }
-                }
-            }
-
-            if (!SaveConsumerInfo(cloudId, cKey, cSec))
-            {
-                cKey = null;
-                cSec = null;
-
-                return -121;
-            }
-
-            cKey = null;
-            cSec = null;
-
-            return iRes;
-        }
+        /// <summary>
+        /// パスドライブ
+        /// </summary>
+        internal string PassDrive { get; set; }
 
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="cloudId"></param>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        internal int Download(object cloudId, InputPassMessage im, List<ListItemViewModel> list)
+        public DataTransceiverModel()
         {
-            int iRes = 0;
-            char[] cKey;
-            char[] cSec;
+            PassWord = null;
+            PassFile = null;
+            PassDrive = null;
+        }
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="cloudId"></param>
+        ///// <param name="list"></param>
+        ///// <returns></returns>
+        //internal int Upload(object cloudId, List<ListItemViewModel> list)
+        //{
+        //    int iRes = 0;
+        //    char[] cKey = null;
+        //    char[] cSec = null;
+        //    byte[] encryptedData = null;
+
+        //    LoadConsumerInfo(cloudId, out cKey, out cSec);
+        //    if (cKey == null || cKey.Length == 0)
+        //    {
+        //        return -101;
+        //    }
+        //    if (cSec == null || cSec.Length == 0)
+        //    {
+        //        return -101;
+        //    }
+
+        //    using (Encryptor encryptor = new RijndaelEncryptor())
+        //    {
+        //        using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+        //        {
+        //            try
+        //            {
+        //                // 認証情報のロード
+        //                oprCld.LoadAuthInfo();
+
+        //                foreach (var item in list)
+        //                {
+        //                    // 暗号化
+        //                    encryptedData = null;
+
+        //                    if (PassWord != null)
+        //                    {
+        //                        iRes = encryptor.Encrypt(item.FilePath, PassWord, out encryptedData);
+        //                    }
+        //                    else if (PassFile != null)
+        //                    {
+        //                        iRes = encryptor.Encrypt(item.FilePath, PassFile, out encryptedData);
+        //                    }
+        //                    else if (!string.IsNullOrEmpty(PassDrive))
+        //                    {
+        //                        iRes = encryptor.Encrypt(item.FilePath, PassDrive, out encryptedData);
+        //                    }
+        //                    else
+        //                    {
+        //                        break;
+        //                    }
+
+        //                    if (iRes < 0)
+        //                    {
+        //                        break;
+        //                    }
+
+        //                    // アップロード
+        //                    iRes = oprCld.UploadFile(item.FilePath, encryptedData);
+        //                    if (iRes < 0)
+        //                    {
+        //                        break;
+        //                    }
+
+        //                    // アップロード正常終了時はフラグオン
+        //                    item.IsTransceived = true;
+        //                }
+
+        //                // 認証情報のセーブ
+        //                oprCld.SaveAuthInfo();
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                string s = e.StackTrace;
+        //            }
+        //        }
+        //    }
+
+        //    if (!SaveConsumerInfo(cloudId, cKey, cSec))
+        //    {
+        //        cKey = null;
+        //        cSec = null;
+
+        //        return -121;
+        //    }
+
+        //    cKey = null;
+        //    cSec = null;
+
+        //    return iRes;
+        //}
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="encryptor"></param>
+        /// <param name="oprCld"></param>
+        /// <param name="item"></param>
+        internal int Upload(Encryptor encryptor, BaseCloudOperator oprCld, ListItemViewModel item)
+        {
+            int iRes = -1;
+            byte[] cryptionData = null;
+
+            if (PassWord != null)
+            {
+                iRes = encryptor.Encrypt(item.FilePath, PassWord, out cryptionData);
+            }
+            else if (PassFile != null)
+            {
+                iRes = encryptor.Encrypt(item.FilePath, PassFile, out cryptionData);
+            }
+            else if (!string.IsNullOrEmpty(PassDrive))
+            {
+                iRes = encryptor.Encrypt(item.FilePath, PassDrive, out cryptionData);
+            }
+            else
+            {
+                return iRes;
+            }
+
+            if (iRes < 0)
+            {
+                return iRes;
+            }
+
+            // アップロード
+            iRes = oprCld.UploadFile(item.FilePath, cryptionData);
+            if (iRes < 0)
+            {
+                return iRes;
+            }
+
+            return iRes;
+        }
+
+        //// <summary>
+         
+        //// </summary>
+        //// <param name="cloudId"></param>
+        //// <param name="listItem"></param>
+        //// <returns></returns>
+        ////internal int Upload(object cloudId, ListItemViewModel listItem)
+        ////{
+        ////    int iRes = 0;
+        ////    char[] cKey = null;
+        ////    char[] cSec = null;
+        ////    byte[] encryptedData = null;
+
+        ////    LoadConsumerInfo(cloudId, out cKey, out cSec);
+        ////    if (cKey == null || cKey.Length == 0)
+        ////    {
+        ////        return -101;
+        ////    }
+        ////    if (cSec == null || cSec.Length == 0)
+        ////    {
+        ////        return -101;
+        ////    }
+
+        ////    using (Encryptor encryptor = new RijndaelEncryptor())
+        ////    {
+        ////        using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+        ////        {
+        ////            try
+        ////            {
+        ////                 認証情報のロード
+        ////                oprCld.LoadAuthInfo();
+
+        ////                 暗号化
+        ////                encryptedData = null;
+
+        ////                if (PassWord != null)
+        ////                {
+        ////                    iRes = encryptor.Encrypt(listItem.FilePath, PassWord, out encryptedData);
+        ////                }
+        ////                else if (PassFile != null)
+        ////                {
+        ////                    iRes = encryptor.Encrypt(listItem.FilePath, PassFile, out encryptedData);
+        ////                }
+        ////                else if (!string.IsNullOrEmpty(PassDrive))
+        ////                {
+        ////                    iRes = encryptor.Encrypt(listItem.FilePath, PassDrive, out encryptedData);
+        ////                }
+        ////                else
+        ////                {
+        ////                    return -111;
+        ////                }
+
+        ////                if (iRes < 0)
+        ////                {
+        ////                    return iRes;
+        ////                }
+
+        ////                 アップロード
+        ////                iRes = oprCld.UploadFile(listItem.FilePath, encryptedData);
+        ////                if (iRes < 0)
+        ////                {
+        ////                    return iRes;
+        ////                }
+
+        ////                 アップロード正常終了時はフラグオン
+        ////                listItem.IsTransceived = true;
+
+        ////                 認証情報のセーブ
+        ////                oprCld.SaveAuthInfo();
+        ////            }
+        ////            catch (Exception e)
+        ////            {
+        ////                string s = e.StackTrace;
+        ////            }
+        ////        }
+        ////    }
+
+        ////    if (!SaveConsumerInfo(cloudId, cKey, cSec))
+        ////    {
+        ////        cKey = null;
+        ////        cSec = null;
+
+        ////        return -121;
+        ////    }
+
+        ////    cKey = null;
+        ////    cSec = null;
+
+        ////    return iRes;
+        ////}
+
+
+        //// <summary>
+         
+        //// </summary>
+        //// <param name="cloudId"></param>
+        //// <param name="list"></param>
+        //// <returns></returns>
+        ////internal int Download(object cloudId, List<ListItemViewModel> list)
+        ////{
+        ////    int iRes = 0;
+        ////    char[] cKey;
+        ////    char[] cSec;
+        ////    byte[] downloadData = null;
+
+        ////    LoadConsumerInfo(cloudId, out cKey, out cSec);
+        ////    if (cKey == null || cKey.Length == 0)
+        ////    {
+        ////        return -101;
+        ////    }
+        ////    if (cSec == null || cSec.Length == 0)
+        ////    {
+        ////        return -101;
+        ////    }
+            
+        ////    using (Decryptor decryptor = new RijndaelDecryptor())
+        ////    {
+        ////        using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
+        ////        {
+        ////            try
+        ////            {
+        ////                 認証情報のロード
+        ////                oprCld.LoadAuthInfo();
+
+        ////                foreach (var item in list)
+        ////                {
+        ////                     ダウンロード
+        ////                    downloadData = null;
+        ////                    iRes = oprCld.DownloadFile(item.FilePath, out downloadData);
+        ////                    if (iRes < 0)
+        ////                    {
+        ////                        break;
+        ////                    }
+
+                            
+        ////                    if (PassWord != null)
+        ////                    {
+        ////                        iRes = decryptor.Decrypt(item.FileName, PassWord, downloadData);
+        ////                    }
+        ////                    else if (PassFile != null)
+        ////                    {
+        ////                        iRes = decryptor.Decrypt(item.FileName, PassFile, downloadData);
+        ////                    }
+        ////                    else if (!string.IsNullOrEmpty(PassDrive))
+        ////                    {
+        ////                        iRes = decryptor.Decrypt(item.FileName, PassDrive, downloadData);
+        ////                    }
+        ////                    else
+        ////                    {
+        ////                        break;
+        ////                    }
+
+        ////                    if (iRes < 0)
+        ////                    {
+        ////                        break;
+        ////                    }
+
+        ////                    item.IsTransceived = true;
+        ////                }
+
+        ////                 認証情報のセーブ
+        ////                oprCld.SaveAuthInfo();
+        ////            }
+        ////            catch (Exception e)
+        ////            {
+        ////                string s = e.StackTrace;
+        ////            }
+        ////        }
+        ////    }
+
+        ////    if (!SaveConsumerInfo(cloudId, cKey, cSec))
+        ////    {
+        ////        cKey = null;
+        ////        cSec = null;
+
+        ////        return -121;
+        ////    }
+
+        ////    cKey = null;
+        ////    cSec = null;
+
+        ////    return iRes;
+        ////}
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="decryptor"></param>
+        /// <param name="oprCld"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        internal int Download(Decryptor decryptor, BaseCloudOperator oprCld, ListItemViewModel item)
+        {
+            // ダウンロード
+            int iRes = -1;
             byte[] downloadData = null;
 
-            LoadConsumerInfo(cloudId, out cKey, out cSec);
-            if (cKey == null || cKey.Length == 0)
+            iRes = oprCld.DownloadFile(item.FilePath, out downloadData);
+            if (iRes < 0)
             {
-                return -101;
-            }
-            if (cSec == null || cSec.Length == 0)
-            {
-                return -101;
-            }
-            
-            using (Decryptor decryptor = new RijndaelDecryptor())
-            {
-                using (BaseCloudOperator oprCld = new GoogleDriveOperator(cKey, cSec))
-                {
-                    try
-                    {
-                        // 認証情報のロード
-                        oprCld.LoadAuthInfo();
-
-                        foreach (var item in list)
-                        {
-                            // ダウンロード
-                            downloadData = null;
-                            iRes = oprCld.DownloadFile(item.FilePath, out downloadData);
-                            if (iRes < 0)
-                            {
-                                break;
-                            }
-
-                            // 復号
-                            switch (im.SelectedIndex)
-                            {
-                                case 0:
-                                    iRes = decryptor.Decrypt(item.FileName, im.PassWord, downloadData);
-                                    break;
-                                case 1:
-                                    iRes = decryptor.Decrypt(item.FileName, im.PassFile, downloadData);
-                                    break;
-                                case 2:
-                                    iRes = decryptor.Decrypt(item.FileName, im.PassDrive, downloadData);
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            if (iRes < 0)
-                            {
-                                break;
-                            }
-
-                            item.IsTransceived = true;
-                        }
-
-                        // 認証情報のセーブ
-                        oprCld.SaveAuthInfo();
-                    }
-                    catch (Exception e)
-                    {
-                        string s = e.StackTrace;
-                    }
-                }
+                return iRes;
             }
 
-            if (!SaveConsumerInfo(cloudId, cKey, cSec))
+            // 復号
+            if (PassWord != null)
             {
-                cKey = null;
-                cSec = null;
-
-                return -121;
+                iRes = decryptor.Decrypt(item.FileName, PassWord, downloadData);
+            }
+            else if (PassFile != null)
+            {
+                iRes = decryptor.Decrypt(item.FileName, PassFile, downloadData);
+            }
+            else if (!string.IsNullOrEmpty(PassDrive))
+            {
+                iRes = decryptor.Decrypt(item.FileName, PassDrive, downloadData);
+            }
+            else
+            {
+                return iRes;
             }
 
-            cKey = null;
-            cSec = null;
+            if (iRes < 0)
+            {
+                return iRes;
+            }
 
             return iRes;
         }
@@ -211,15 +421,15 @@ namespace MoonGate.Model
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="cloudId"></param>
         /// <returns></returns>
-        internal HybridDictionary GetCloudFileList(object param)
+        internal HybridDictionary GetCloudFileList(object cloudId)
         {
             char[] cKey;
             char[] cSec;
             HybridDictionary hDic = new HybridDictionary(true);
 
-            LoadConsumerInfo(param, out cKey, out cSec);
+            LoadConsumerInfo(cloudId, out cKey, out cSec);
             if (cKey == null || cKey.Length == 0)
             {
                 return null;
@@ -241,7 +451,9 @@ namespace MoonGate.Model
                 {
                     string s = e.StackTrace;
 
-                    if (!SaveConsumerInfo(param, cKey, cSec))
+                    oprCld.SaveAuthInfo();
+
+                    if (!SaveConsumerInfo(cloudId, cKey, cSec))
                     {
                         cKey = null;
                         cSec = null;
@@ -252,7 +464,7 @@ namespace MoonGate.Model
             }
 
 
-            if (!SaveConsumerInfo(param, cKey, cSec))
+            if (!SaveConsumerInfo(cloudId, cKey, cSec))
             {
                 cKey = null;
                 cSec = null;
@@ -265,10 +477,10 @@ namespace MoonGate.Model
         /// <summary>
         /// コンシューマ情報の読み込み
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="cloudId"></param>
         /// <param name="cKey"></param>
         /// <param name="cSec"></param>
-        private void LoadConsumerInfo(object param, out char[] cKey, out char[] cSec)
+        internal void LoadConsumerInfo(object cloudId, out char[] cKey, out char[] cSec)
         {
             cKey = null;
             cSec = null;
@@ -284,7 +496,7 @@ namespace MoonGate.Model
             ConsumerInfoViewModel conInfo = new ConsumerInfoViewModel();
             foreach (var item in listConsumerInfo)
             {
-                if (param.ToString() == item.StorageKey)
+                if (cloudId.ToString() == item.StorageKey)
                 {
                     conInfo = item;
                     listConsumerInfo.Remove(item);
@@ -292,11 +504,11 @@ namespace MoonGate.Model
                 }
             }
 
-            cKey = dcp.DecryptRsa(conInfo.ConsumerKey, param.ToString());
-            cSec = dcp.DecryptRsa(conInfo.ConsumerSecret, param.ToString());
+            cKey = dcp.DecryptRsa(conInfo.ConsumerKey, cloudId.ToString());
+            cSec = dcp.DecryptRsa(conInfo.ConsumerSecret, cloudId.ToString());
 
             // 秘密鍵の削除
-            dcp.DeleteKeys(param.ToString());
+            dcp.DeleteKeys(cloudId.ToString());
         }
 
 
@@ -304,14 +516,14 @@ namespace MoonGate.Model
         /// コンシューマ情報リスト保存
         /// </summary>
         /// <param name="conInfo"></param>
-        private bool SaveConsumerInfo(object param, char[] cKey, char[] cSec)
+        internal bool SaveConsumerInfo(object cloudId, char[] cKey, char[] cSec)
         {
             DataCipherModel dcp = new DataCipherModel();
 
             ConsumerInfoViewModel conInfo = new ConsumerInfoViewModel();
-            conInfo.StorageKey = param.ToString();
-            conInfo.ConsumerKey = dcp.EncryptRsa(cKey, param.ToString());
-            conInfo.ConsumerSecret = dcp.EncryptRsa(cSec, param.ToString());
+            conInfo.StorageKey = cloudId.ToString();
+            conInfo.ConsumerKey = dcp.EncryptRsa(cKey, cloudId.ToString());
+            conInfo.ConsumerSecret = dcp.EncryptRsa(cSec, cloudId.ToString());
 
             listConsumerInfo.Add(conInfo);
 

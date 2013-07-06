@@ -127,6 +127,18 @@
   <data name="glyphicons_232_cloud" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\pic\glyphicons\glyphicons_232_cloud.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="mesErrFailToEncrypt" xml:space="preserve">
+    <value>Failed to Encrypt!</value>
+  </data>
+  <data name="mesErrFailToLoadId" xml:space="preserve">
+    <value>Failed to Load Consumer Key!</value>
+  </data>
+  <data name="mesErrFailToLoadSec" xml:space="preserve">
+    <value>Failed to Load Consumer Secret!</value>
+  </data>
+  <data name="mesErrFailToUpload" xml:space="preserve">
+    <value>Failed to Upload!</value>
+  </data>
   <data name="mesErrInputMiss" xml:space="preserve">
     <value>Value Mismatching!</value>
   </data>
@@ -135,6 +147,9 @@
   </data>
   <data name="mesExp" xml:space="preserve">
     <value>Unexpected Error!</value>
+  </data>
+  <data name="PgId" xml:space="preserve">
+    <value>MoonGate-{982F430F-AD10-4449-A020-EFC5A5479DA5}</value>
   </data>
   <data name="titleErr" xml:space="preserve">
     <value>ERROR</value>

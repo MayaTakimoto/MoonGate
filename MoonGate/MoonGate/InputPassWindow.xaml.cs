@@ -2,7 +2,7 @@
 // <summary>鍵情報入力ダイアログ</summary>
 // <author>MayaTakimoto</author> 
 // <date>$Date: 2013-02-13 14:00:00  +9:00 $</date>
-// <copyright file="$Name: TargetListEntity.cs $" > 
+// <copyright file="$Name: InputPassWindow.xaml.cs $" > 
 //     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
 // </copyright>
 //-----------------------------------------------------------------------

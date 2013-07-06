@@ -2,6 +2,7 @@
 <Window x:Name="MgMain" x:Class="MoonGate.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:ViewModel="clr-namespace:MoonGate.Component.ViewModel"
     xmlns:Action="clr-namespace:MoonGate.Component.Action"
     xmlns:Component="clr-namespace:MoonGate.Component"
@@ -32,7 +33,21 @@
                 </LinearGradientBrush>
             </Menu.Background>
             <MenuItem x:Name="MenuMain" Header="File(_F)" Margin="0" FontFamily="Tahoma">
-                <MenuItem Name="MenuItemOpenFiles" Header="Add Files(_F)" HorizontalAlignment="Stretch" Command="{Binding Path=AddFilesCommand}" />
+                <MenuItem Name="MenuItemOpenFiles" Header="Add Files(_F)" HorizontalAlignment="Stretch">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:SelectFileAction 
+                                    Title="Select Files" 
+                                    CheckPathExists="True" 
+                                    Multiselect="True" 
+                                    FileName="" 
+                                    DefaultExt="*.*" 
+                                    Command="{Binding Path=AddFilesCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
                 <!-- 
                 <MenuItem Name="MenuItemOpenDir" Header="Add Folders(_D)" HorizontalAlignment="Stretch" Command="{Binding Path=AddFoldersCommand}" />
                 -->
@@ -41,14 +56,58 @@
                 <MenuItem Name="MenuItemExit" Header="Exit(_Q)" HorizontalAlignment="Stretch" Command="{Binding Path=ExitCommand}"/>
             </MenuItem>
             <MenuItem x:Name="MenuTrans" Header="Transmit(_T)" >
-                <MenuItem x:Name="MenuItemUpload" Header="Upload(_U)" HorizontalAlignment="Stretch" 
-                          Command="{Binding Path=UploadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
-                <MenuItem x:Name="MenuItemUploadAll" Header="Upload All(_I)" HorizontalAlignment="Stretch" 
-                          Command="{Binding Path=UploadAllCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
-                <MenuItem Name="MenuItemDownload" Header="Download(_D)" HorizontalAlignment="Stretch" 
-                          Command="{Binding Path=DownloadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
-                <MenuItem Name="MenuItemDownloadAll" Header="Download All(_S)" HorizontalAlignment="Stretch" 
-                          Command="{Binding Path=DownloadAllCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"/>
+                <MenuItem x:Name="MenuItemUpload" Header="Upload(_U)" HorizontalAlignment="Stretch">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:TransceiveAction 
+                                    CloudId="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"
+                                    FileList="{Binding ElementName=TargetList, Path=ItemsSource}"
+                                    TMode="Upload"
+                                    Command="{Binding Path=RemoveTransceivedItemCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem x:Name="MenuItemUploadAll" Header="Upload All(_I)" HorizontalAlignment="Stretch">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:TransceiveAction 
+                                    CloudId="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"
+                                    FileList="{Binding ElementName=TargetList, Path=ItemsSource}"
+                                    TMode="UploadAll"
+                                    Command="{Binding Path=RemoveTransceivedItemCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Name="MenuItemDownload" Header="Download(_D)" HorizontalAlignment="Stretch" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:TransceiveAction 
+                                    CloudId="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"
+                                    FileList="{Binding ElementName=TargetList, Path=ItemsSource}"
+                                    TMode="Download"
+                                    Command="{Binding Path=RemoveTransceivedItemCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Name="MenuItemDownloadAll" Header="Download All(_S)" HorizontalAlignment="Stretch">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:TransceiveAction 
+                                    CloudId="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"
+                                    FileList="{Binding ElementName=TargetList, Path=ItemsSource}"
+                                    TMode="DownloadAll"
+                                    Command="{Binding Path=RemoveTransceivedItemCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
             </MenuItem>
 
             <MenuItem x:Name="MenuSetting" Header="Setting(_S)" >
@@ -62,14 +121,33 @@
                 <Rectangle Width="5"/>
                 <Separator x:Name="sep_0" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
                 <Button x:Name="BtnFileOpen" Uid="BtnFileOpen" Height="20" Width="23" 
-                        VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Add Files to List" 
-                        Command="{Binding Path=AddFilesCommand}" >
+                        VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Add Files to List" >
                     <Image Source="pic/glyphicons/glyphicons_144_folder_open.png" />
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:SelectFileAction 
+                                    Title="Select Files" 
+                                    CheckPathExists="True" 
+                                    Multiselect="True" 
+                                    FileName="" 
+                                    DefaultExt="*.*" 
+                                    Command="{Binding Path=AddFilesCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </Button>
                 <!--
                 <Button x:Name="BtnFolderOpen" Uid="BtnFolderOpen" Height="20" Width="23" 
-                        VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Add Directory to List"
-                        Command="{Binding Path=AddFoldersCommand}" >
+                        VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Add Directory to List" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:SelectFolderAction  
+                                    Command="{Binding Path=AddFoldersCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <Image Source="pic/glyphicons/glyphicons_145_folder_plus.png" />
                 </Button>
                 -->
@@ -80,25 +158,39 @@
                 </Button>
                 <Button x:Name="BtnRemove" Uid="BtnRemove" Height="20" Width="23"
                         VerticalAlignment="Center" HorizontalAlignment="Left" 
-                        ToolTip="Remove from List" Command="{Binding Path=RemoveItemsCommand}" >
+                        ToolTip="Remove from List" Command="{Binding Path=RemoveSelectedItemsCommand}" >
                     <Image Source="pic/glyphicons/glyphicons_207_remove_2.png" />
                 </Button>
                 <Separator x:Name="sep_1" Height="18" Margin="0" VerticalAlignment="Top" Width="1"/>
-                <!--
-                <Button x:Name="BtnEncrypt" Uid="BtnEncrypt" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Start to Encrypt">
-                    <Image Source="pic/glyphicons/glyphicons_203_lock.png" />
-                </Button>
-                <Button x:Name="BtnDecrypt" Uid="BtnDecrypt" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Start to Decrypt">
-                    <Image Source="pic/glyphicons/glyphicons_204_unlock.png" />
-                </Button>
-                -->
-                <Button x:Name="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" 
-                        ToolTip="Upload" Command="{Binding Path=UploadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}">
+                <Button x:Name="BtnUpload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Upload" > 
                     <Image Source="pic/glyphicons/glyphicons_363_cloud_upload.png" />
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:TransceiveAction 
+                                    CloudId="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"
+                                    FileList="{Binding ElementName=TargetList, Path=ItemsSource}"
+                                    PrgBar="{Binding ElementName=ProgressBarMain}"
+                                    TMode="Upload"
+                                    Command="{Binding Path=RemoveTransceivedItemCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </Button>
-                <Button x:Name="BtnDownload" Uid="BtnDownload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" 
-                        ToolTip="Download" Command="{Binding Path=DownloadCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}">
+                <Button x:Name="BtnDownload" Uid="BtnDownload" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Download" >
                     <Image Source="pic/glyphicons/glyphicons_364_cloud_download.png" />
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:EventTrigger.Actions>
+                                <Action:TransceiveAction 
+                                    CloudId="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}"
+                                    FileList="{Binding ElementName=TargetList, Path=ItemsSource}"
+                                    PrgBar="{Binding ElementName=ProgressBarMain}"
+                                    TMode="Download"
+                                    Command="{Binding Path=RemoveTransceivedItemCommand}" />
+                            </i:EventTrigger.Actions>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </Button>
                 <!--
                 <ToggleButton x:Name="tbtnUnifying" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="into One Bundle" IsChecked="{Binding Path=IsBundle,Mode=OneWayToSource}" >
@@ -113,11 +205,6 @@
                         HorizontalAlignment="Left" ToolTip="Regist ConsumerInfo" Command="{Binding Path=CloudSetupCommand}">
                     <Image Source="pic/glyphicons/glyphicons_235_pen.png" />
                 </Button>
-                <!--
-                <Button x:Name="BtnAssociate" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="Associate" >
-                    <Image Source="pic/glyphicons/glyphicons_193_circle_ok.png" />
-                </Button>
-                -->
                 <Button x:Name="BtnSetting" Uid="BtnSetting" Height="20" VerticalAlignment="Center" Width="23" HorizontalAlignment="Left" ToolTip="App Setting" >
                     <Image Source="pic/glyphicons/glyphicons_136_cogwheel.png" />
                 </Button>
@@ -152,7 +239,7 @@
             <MenuItem Name="ConItemUpAll" Header="Upload All"
                       Command="{Binding Path=UploadAllCommand}" CommandParameter="{Binding ElementName=CmbCloudInfo, Path=SelectedValue}" />
             <Separator />
-            <MenuItem Name="ConItemRemove" Header="Remove from List" Command="{Binding Path=RemoveItemsCommand}"/>
+            <MenuItem Name="ConItemRemove" Header="Remove from List" Command="{Binding Path=RemoveSelectedItemsCommand}"/>
             <Separator />
             <MenuItem Name="ConItemShowPath" Header="Show FullPath"/>
         </ContextMenu>
@@ -180,16 +267,7 @@
             <Setter Property="CommandParameter" Value="{Binding Path=Items.CurrentItem}"/>
         </Style>
     </Window.Resources>
-
-    <!-- ActionとMessageを関連付ける -->
-    <Component:MessengerBehavior.ListAction>
-        <Component:ActionList>
-            <Action:SelectFileAction />
-            <Action:SelectFolderAction />
-            <Action:InputPassAction />
-        </Component:ActionList>
-    </Component:MessengerBehavior.ListAction>
-
+    
     <!-- 背景色設定 -->
     <Window.Background>
         <LinearGradientBrush EndPoint="688,0" MappingMode="Absolute">

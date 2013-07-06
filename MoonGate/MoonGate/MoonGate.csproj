@@ -80,21 +80,20 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mgcloud, Version=1.0.4931.37731, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="mgcloud, Version=1.0.4934.36927, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\mgcloud.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="mgcrypt, Version=1.0.4931.37728, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="mgcrypt, Version=1.0.4932.42821, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\mgcrypt.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -108,26 +107,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Component\ActionList.cs" />
-    <Compile Include="Component\MessengerBehavior.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Component\Action\InputPassAction.cs" />
+    <Compile Include="Component\Action\TransceiveAction.cs" />
     <Compile Include="Component\Action\SelectCloudFilesAction.cs" />
     <Compile Include="Component\Action\SelectFileAction.cs" />
     <Compile Include="Component\Action\SelectFolderAction.cs" />
-    <Compile Include="Component\BaseAction.cs" />
     <Compile Include="Component\ViewModel\ConsumerInfoViewModel.cs" />
     <Compile Include="Component\ViewModel\CloudInfoViewModel.cs" />
     <Compile Include="Component\ViewModel\FileInfoViewModel.cs" />
     <Compile Include="Component\ViewModel\FolderBrowserInfoViewModel.cs" />
     <Compile Include="Component\ViewModel\TreeNodeViewModel.cs" />
-    <Compile Include="Component\Message\InputPassMessage.cs" />
-    <Compile Include="Component\Message\MesBoxMessage.cs" />
-    <Compile Include="Component\Message\SelectCloudFilesMessage.cs" />
-    <Compile Include="Component\Message\SelectFileMessage.cs" />
-    <Compile Include="Component\BaseMessage.cs" />
-    <Compile Include="Component\Messenger.cs" />
     <Compile Include="Component\ViewModel\MainWindowInfoViewModel.cs" />
     <Compile Include="Model\DataCipherModel.cs" />
     <Compile Include="Model\DataSerializerModel.cs" />
@@ -152,7 +140,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Component\ViewModel\ListItemViewModel.cs" />
-    <Compile Include="Component\Message\SelectFolderMessage.cs" />
     <Compile Include="FolderBrowseWindow.xaml.cs">
       <DependentUpon>FolderBrowseWindow.xaml</DependentUpon>
     </Compile>

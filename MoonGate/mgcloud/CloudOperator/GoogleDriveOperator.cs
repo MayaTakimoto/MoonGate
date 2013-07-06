@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -113,10 +114,10 @@ namespace mgcloud.CloudOperator
 
                     listRequest.PageToken = fileList.NextPageToken;
                 }
-                catch
+                catch(Exception e)
                 {
                     listRequest.PageToken = null;
-                    return null;
+                    throw e;
                 }
             }
             while (!string.IsNullOrEmpty(listRequest.PageToken));
@@ -135,7 +136,7 @@ namespace mgcloud.CloudOperator
             // 変数初期化
             HybridDictionary DownloadFileList = new HybridDictionary(true); // ダウンロード対象ファイル一覧
             StringBuilder sbQuery = new StringBuilder(128);                 // 検索条件設定用変数
-
+            
             // 接続されていない場合は接続
             if (dServ == null)
             {
@@ -158,18 +159,34 @@ namespace mgcloud.CloudOperator
                 try
                 {
                     FileList fileList = listRequest.Fetch();
+                    
                     foreach (var file in fileList.Items)
                     {
-                        DownloadFileList.Add(file.OriginalFilename, file.DownloadUrl);
+                        if (DownloadFileList.Contains(file.OriginalFilename))
+                        {
+                            // 同名のファイルが有る場合、最新のものを取得する
+                            var d = fileList.Items
+                                .Where(param => param.DownloadUrl == DownloadFileList[file.OriginalFilename].ToString())
+                                .Select(param => param.CreatedDate);
+
+                            if (DateTime.Parse(d.ToArray()[0]).CompareTo(DateTime.Parse(file.CreatedDate)) <= 0)
+                            {
+                                DownloadFileList.Remove(file.OriginalFilename);
+                                DownloadFileList.Add(file.OriginalFilename, file.DownloadUrl);
+                            }
+                        }
+                        else
+                        {
+                            DownloadFileList.Add(file.OriginalFilename, file.DownloadUrl);
+                        }
                     }
 
                     listRequest.PageToken = fileList.NextPageToken;
                 }
                 catch (Exception e)
                 {
-                    e.Message.ToString();
                     listRequest.PageToken = null;
-                    //return null;
+                    throw e;
                 }
             }
             while (!string.IsNullOrEmpty(listRequest.PageToken));
@@ -202,18 +219,25 @@ namespace mgcloud.CloudOperator
                 dServ = InitConnection();
             }
 
-            // アップロードファイルのひな形を作る
-            var uploadFile = new Google.Apis.Drive.v2.Data.File();
-            uploadFile.Title = Path.ChangeExtension(Path.GetFileName(fileName), FILE_EXT);
-            uploadFile.Description = FILE_DESCRIPTION;
-            uploadFile.MimeType = MIME_BINARY;
+            try
+            {
+                // アップロードファイルのひな形を作る
+                var uploadFile = new Google.Apis.Drive.v2.Data.File();
+                uploadFile.Title = Path.ChangeExtension(Path.GetFileName(fileName), FILE_EXT);
+                uploadFile.Description = FILE_DESCRIPTION;
+                uploadFile.MimeType = MIME_BINARY;
 
-            MemoryStream ms = new MemoryStream(data);
+                MemoryStream ms = new MemoryStream(data);
 
-            FilesResource.InsertMediaUpload uploadRequest = dServ.Files.Insert(uploadFile, ms, MIME_BINARY);
-
-            uploadRequest.Upload();
-            var file = uploadRequest.ResponseBody;
+                FilesResource.InsertMediaUpload uploadRequest = dServ.Files.Insert(uploadFile, ms, MIME_BINARY);
+                
+                uploadRequest.Upload();
+                var file = uploadRequest.ResponseBody;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             return 0;
         }
@@ -250,10 +274,10 @@ namespace mgcloud.CloudOperator
                             msDl.Write(bytes, 0, iReadLength);
                         }
                     }
-                    catch
+                    catch(Exception e)
                     {
                         data = null;
-                        return -1;
+                        throw e;
                     }
 
                     data = msDl.ToArray();

@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <summary>メインウィンドウVMクラス</summary>
+// <summary>メインウィンドウViewModel</summary>
 // <author>MayaTakimoto</author> 
 // <date>$Date: 2013-02-13 14:00:00  +9:00 $</date>
 // <copyright file="$Name: TargetListEntity.cs $" > 
@@ -7,11 +7,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using mgcloud;
-using mgcloud.CloudOperator;
-using mgcrypt;
-using mgcrypt.Rijndael;
-using MoonGate.Component.Message;
 using MoonGate.Model;
 using System;
 using System.Collections;
@@ -29,7 +24,7 @@ using System.Windows.Media.Imaging;
 namespace MoonGate.Component.ViewModel
 {
     /// <summary>
-    /// MainWindowのVMクラス
+    /// MainWindowのViewModel
     /// </summary>
     public class MainWindowInfoViewModel : INotifyPropertyChanged
     {
@@ -37,17 +32,7 @@ namespace MoonGate.Component.ViewModel
         /// 
         /// </summary>
         private const string MASTERFILE_PATH = "./mst.xml";
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private const string USERFILE_PATH = "./user/consumer.xml";
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private List<ConsumerInfoViewModel> listConsumerInfo;
-
+  
         /// <summary>
         /// リストのデータソースプロパティ
         /// </summary>
@@ -63,10 +48,10 @@ namespace MoonGate.Component.ViewModel
         ///// </summary>
         //public bool IsBundle { get; set; }
 
-        /// <summary>
-        /// ローカルに暗号化ファイルを残すかプロパティ
-        /// </summary>
-        public bool IsLocal { get; set; }
+        ///// <summary>
+        ///// ローカルに暗号化ファイルを残すかプロパティ
+        ///// </summary>
+        //public bool IsLocal { get; set; }
 
         /// <summary>
         /// 処理進捗率プロパティ
@@ -91,27 +76,32 @@ namespace MoonGate.Component.ViewModel
         /// <summary>
         /// 項目削除コマンドプロパティ
         /// </summary>
-        public ICommand RemoveItemsCommand { get; private set; }
+        public ICommand RemoveSelectedItemsCommand { get; private set; }
 
         /// <summary>
-        /// 選択アップロードコマンドプロパティ
+        /// 
         /// </summary>
-        public ICommand UploadCommand { get; private set; }
+        public ICommand RemoveTransceivedItemCommand { get; private set; }
 
-        /// <summary>
-        /// 全アップロードコマンドプロパティ
-        /// </summary>
-        public ICommand UploadAllCommand { get; private set; }
+        ///// <summary>
+        ///// 選択アップロードコマンドプロパティ
+        ///// </summary>
+        //public ICommand UploadCommand { get; private set; }
 
-        /// <summary>
-        /// 選択ダウンロードコマンドプロパティ
-        /// </summary>
-        public ICommand DownloadCommand { get; private set; }
+        ///// <summary>
+        ///// 全アップロードコマンドプロパティ
+        ///// </summary>
+        //public ICommand UploadAllCommand { get; private set; }
 
-        /// <summary>
-        /// 全ダウンロードコマンドプロパティ
-        /// </summary>
-        public ICommand DownloadAllCommand { get; private set; }
+        ///// <summary>
+        ///// 選択ダウンロードコマンドプロパティ
+        ///// </summary>
+        //public ICommand DownloadCommand { get; private set; }
+
+        ///// <summary>
+        ///// 全ダウンロードコマンドプロパティ
+        ///// </summary>
+        //public ICommand DownloadAllCommand { get; private set; }
 
         /// <summary>
         /// 
@@ -146,6 +136,10 @@ namespace MoonGate.Component.ViewModel
             {
                 ListCloudInfo = list as List<CloudInfoViewModel>;
             }
+            else
+            {
+                ListCloudInfo = new List<CloudInfoViewModel>();
+            }
 
             SetCommands();
         }
@@ -157,66 +151,78 @@ namespace MoonGate.Component.ViewModel
         private void SetCommands()
         {
             AddFilesCommand = new RelayCommand(
-                param => this.AddFiles()
+                param => this.AddFile(param)
             );
 
             AddFoldersCommand = new RelayCommand(
-                param => this.AddFolders()
+                param => this.AddFolder(param)
             );
 
             AddCloudFilesCommand = new RelayCommand(
                 param => this.AddCloudFiles(param)
             );
 
-            RemoveItemsCommand = new RelayCommand(
+            RemoveSelectedItemsCommand = new RelayCommand(
                 param => this.RemoveSelectedItems(),
                 param =>
                 {
-                    return IsSelected();
-                }
-            );
-
-            UploadCommand = new RelayCommand(
-                param => this.UploadSelectedItems(param),
-                param =>
-                {
-                    return IsSelected();
-                }
-            );
-
-            UploadAllCommand = new RelayCommand(
-                param => this.UproadAllItems(param),
-                param =>
-                {
-                    if (ObsFileList.Count == 0)
+                    foreach (ListItemViewModel item in ObsFileList)
                     {
-                        return false;
+                        if (item.IsSelected)
+                        {
+                            return true;
+                        }
                     }
 
-                    return true;
+                    return false;
                 }
             );
 
-            DownloadCommand = new RelayCommand(
-                param => this.DownloadSelectedItems(param),
-                param =>
-                {
-                    return IsSelected();
-                }
+            RemoveTransceivedItemCommand = new RelayCommand(
+                param => this.RemoveTransceivedItems()
             );
 
-            DownloadAllCommand = new RelayCommand(
-                param => this.DownloadAll(param),
-                param =>
-                {
-                    if (ObsFileList.Count == 0)
-                    {
-                        return false;
-                    }
+            //UploadCommand = new RelayCommand(
+            //    param => this.UploadSelectedItems(param),
+            //    param =>
+            //    {
+            //        return IsSelected();
+            //    }
+            //);
 
-                    return true;
-                }
-            );
+            //UploadAllCommand = new RelayCommand(
+            //    param => this.UproadAllItems(param),
+            //    param =>
+            //    {
+            //        if (ObsFileList.Count == 0)
+            //        {
+            //            return false;
+            //        }
+
+            //        return true;
+            //    }
+            //);
+
+            //DownloadCommand = new RelayCommand(
+            //    param => this.DownloadSelectedItems(param),
+            //    param =>
+            //    {
+            //        return IsSelected();
+            //    }
+            //);
+
+            //DownloadAllCommand = new RelayCommand(
+            //    param => this.DownloadAll(param),
+            //    param =>
+            //    {
+            //        if (ObsFileList.Count == 0)
+            //        {
+            //            return false;
+            //        }
+
+            //        return true;
+            //    }
+            //);
 
             CloudSetupCommand = new RelayCommand(
                 param => this.CallCldSetup()
@@ -229,63 +235,28 @@ namespace MoonGate.Component.ViewModel
 
 
         /// <summary>
-        /// 選択項目の存在有無判定
-        /// </summary>
-        /// <returns></returns>
-        private bool IsSelected()
-        {
-            foreach (ListItemViewModel item in ObsFileList)
-            {
-                if (item.IsSelected)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-
-        /// <summary>
         /// ファイルを追加する
         /// </summary>
         /// <param name="files"></param>
         /// <param name="isDirectory"></param>
         /// <param name="isCloud"></param>
-        private void AddFiles()
+        private void AddFile(object param)
         {
-            ListItemViewModel listItem = null;
-            SelectFileMessage selectFileMessage = new SelectFileMessage(this);
+            ListItemViewModel listItem = new ListItemViewModel();
 
-            selectFileMessage.Title = "Select Files";
-            selectFileMessage.CheckPathExists = true;
-            selectFileMessage.Multiselect = true;
-            selectFileMessage.FileName = string.Empty;
-            selectFileMessage.DefaultExt = "*.*";
-            selectFileMessage.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            // 新規項目に情報をセットする
+            listItem.FileName = Path.GetFileName(param.ToString());
+            listItem.FilePath = param.ToString();
+            listItem.IsCloud = false;
+            listItem.IsDirectory = false;
+            listItem.IsTransceived = false;
+            listItem.IconPath = Imaging.CreateBitmapSourceFromHBitmap(
+                Properties.Resources.glyphicons_036_file.GetHbitmap(),
+                IntPtr.Zero,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
 
-            Messenger.Instance.Order<SelectFileMessage>(this, selectFileMessage);
-
-            if (selectFileMessage.Result == true)
-            {
-                foreach (string filePath in selectFileMessage.FileNames)
-                {
-                    listItem = new ListItemViewModel();
-
-                    // 新規項目に情報をセットする
-                    listItem.FileName = Path.GetFileName(filePath);
-                    listItem.FilePath = filePath;
-                    listItem.IsCloud = false;
-                    listItem.IsDirectory = false;
-                    listItem.IconPath = Imaging.CreateBitmapSourceFromHBitmap(
-                        Properties.Resources.glyphicons_036_file.GetHbitmap(),
-                        IntPtr.Zero,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
-
-                    ObsFileList.Add(listItem);
-                }
-            }
+            ObsFileList.Add(listItem);
         }
 
 
@@ -293,40 +264,30 @@ namespace MoonGate.Component.ViewModel
         /// フォルダを追加する
         /// </summary>
         /// <returns></returns>
-        private void AddFolders()
+        private void AddFolder(object param)
         {
-            ListItemViewModel listItem = null;
-            SelectFolderMessage selectFolderMessage = new SelectFolderMessage(this);
-
-            Messenger.Instance.Order<SelectFolderMessage>(this, selectFolderMessage);
-
-            if (selectFolderMessage.Result == true)
+            ListItemViewModel listItem = listItem = new ListItemViewModel();
+           
+            string dirName = Path.GetFileName(param.ToString());
+            if (string.IsNullOrEmpty(dirName))
             {
-                foreach (string folderPath in selectFolderMessage.FolderNames)
-                {
-                    listItem = new ListItemViewModel();
-
-                    string dirName = Path.GetFileName(folderPath);
-                    if (string.IsNullOrEmpty(dirName))
-                    {
-                        listItem.FileName = folderPath;
-                    }
-                    else
-                    {
-                        listItem.FileName = dirName;
-                    }
-                    listItem.FilePath = folderPath;
-                    listItem.IsCloud = false;
-                    listItem.IsDirectory = true;
-                    listItem.IconPath = Imaging.CreateBitmapSourceFromHBitmap(
-                        Properties.Resources.glyphicons_149_folder_new.GetHbitmap(),
-                        IntPtr.Zero,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
-
-                    ObsFileList.Add(listItem);
-                }
+                listItem.FileName = param.ToString();
             }
+            else
+            {
+                listItem.FileName = dirName;
+            }
+            listItem.FilePath = param.ToString();
+            listItem.IsCloud = false;
+            listItem.IsDirectory = true;
+            listItem.IsTransceived = false;
+            listItem.IconPath = Imaging.CreateBitmapSourceFromHBitmap(
+                Properties.Resources.glyphicons_149_folder_new.GetHbitmap(),
+                IntPtr.Zero,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+
+            ObsFileList.Add(listItem);
         }
 
 
@@ -362,174 +323,174 @@ namespace MoonGate.Component.ViewModel
         }
 
 
-        /// <summary>
-        /// 選択アップロード
-        /// </summary>
-        /// <param name="param"></param>
-        private void UploadSelectedItems(object param)
-        {
-            int iRes = -1;
-            List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
+        ///// <summary>
+        ///// 選択アップロード
+        ///// </summary>
+        ///// <param name="param"></param>
+        //private void UploadSelectedItems(object param)
+        //{
+        //    int iRes = -1;
+        //    List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
 
             
-            InputPassMessage inputPassMessage = new InputPassMessage(this);
-            Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
+        //    InputPassMessage inputPassMessage = new InputPassMessage(this);
+        //    Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
 
-            if (inputPassMessage.Result == true)
-            {
-                foreach (var item in ObsFileList)
-                {
-                    if (item.IsSelected && !item.IsCloud)
-                    {
-                        item.IsTransceived = false;
-                        listTargets.Add(item);
-                    }
-                }
+        //    if (inputPassMessage.Result == true)
+        //    {
+        //        foreach (var item in ObsFileList)
+        //        {
+        //            if (item.IsSelected && !item.IsCloud)
+        //            {
+        //                item.IsTransceived = false;
+        //                listTargets.Add(item);
+        //            }
+        //        }
 
-                DataTransceiverModel transceiver = new DataTransceiverModel();
-                iRes = transceiver.Upload(param, inputPassMessage, listTargets);
+        //        DataTransceiverModel transceiver = new DataTransceiverModel();
+        //        iRes = transceiver.Upload(param, inputPassMessage, listTargets);
 
-                if (iRes < 0)
-                {
+        //        if (iRes < 0)
+        //        {
 
-                }
+        //        }
 
-                inputPassMessage.PassWord.Dispose();
-                inputPassMessage.PassFile = null;
-                inputPassMessage.PassDrive = null;
-                inputPassMessage = null;
+        //        inputPassMessage.PassWord.Dispose();
+        //        inputPassMessage.PassFile = null;
+        //        inputPassMessage.PassDrive = null;
+        //        inputPassMessage = null;
 
-                // アップロードの完了したアイテムはリストから削除
-                RemoveTransceivedItems();
-            }
-        }
-
-
-        /// <summary>
-        /// 全アップロード
-        /// </summary>
-        /// <param name="param"></param>
-        private void UproadAllItems(object param)
-        {
-            int iRes = -1;
-            List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
+        //        // アップロードの完了したアイテムはリストから削除
+        //        RemoveTransceivedItems();
+        //    }
+        //}
 
 
-            InputPassMessage inputPassMessage = new InputPassMessage(this);
-            Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
-
-            if (inputPassMessage.Result == true)
-            {
-                foreach (var item in ObsFileList)
-                {
-                    if (!item.IsCloud)
-                    {
-                        item.IsTransceived = false;
-                        listTargets.Add(item);
-                    }
-                }
-
-                DataTransceiverModel transceiver = new DataTransceiverModel();
-                iRes = transceiver.Upload(param, inputPassMessage, listTargets);
-
-                if (iRes < 0)
-                {
-
-                }
-
-                inputPassMessage.PassWord.Dispose();
-                inputPassMessage.PassFile = null;
-                inputPassMessage.PassDrive = null;
-                inputPassMessage = null;
-
-                // アップロードの完了したアイテムはリストから削除
-                RemoveTransceivedItems();
-            }
-        }
+        ///// <summary>
+        ///// 全アップロード
+        ///// </summary>
+        ///// <param name="param"></param>
+        //private void UproadAllItems(object param)
+        //{
+        //    int iRes = -1;
+        //    List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
 
 
-        /// <summary>
-        /// ダウンロード
-        /// </summary>
-        /// <param name="param"></param>
-        private void DownloadSelectedItems(object param)
-        {
-            int iRes = -1;
-            List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
+        //    InputPassMessage inputPassMessage = new InputPassMessage(this);
+        //    Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
 
-            InputPassMessage inputPassMessage = new InputPassMessage(this);
-            Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
+        //    if (inputPassMessage.Result == true)
+        //    {
+        //        foreach (var item in ObsFileList)
+        //        {
+        //            if (!item.IsCloud)
+        //            {
+        //                item.IsTransceived = false;
+        //                listTargets.Add(item);
+        //            }
+        //        }
 
-            if (inputPassMessage.Result == true)
-            {
-                foreach (var item in ObsFileList)
-                {
-                    if (item.IsSelected && item.IsCloud)
-                    {
-                        item.IsTransceived = false;
-                        listTargets.Add(item);
-                    }
-                }
+        //        DataTransceiverModel transceiver = new DataTransceiverModel();
+        //        iRes = transceiver.Upload(param, inputPassMessage, listTargets);
 
-                DataTransceiverModel transceiver = new DataTransceiverModel();
-                iRes = transceiver.Download(param, inputPassMessage, listTargets);
+        //        if (iRes < 0)
+        //        {
 
-                if (iRes < 0)
-                {
+        //        }
 
-                }
+        //        inputPassMessage.PassWord.Dispose();
+        //        inputPassMessage.PassFile = null;
+        //        inputPassMessage.PassDrive = null;
+        //        inputPassMessage = null;
 
-                inputPassMessage.PassWord.Dispose();
-                inputPassMessage.PassFile = null;
-                inputPassMessage.PassDrive = null;
-                inputPassMessage = null;
-
-                // ダウンロードの完了したアイテムはリストから削除
-                RemoveTransceivedItems();
-            }
-        }
+        //        // アップロードの完了したアイテムはリストから削除
+        //        RemoveTransceivedItems();
+        //    }
+        //}
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="param"></param>
-        private void DownloadAll(object param)
-        {
-            int iRes = -1;
-            List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
+        ///// <summary>
+        ///// ダウンロード
+        ///// </summary>
+        ///// <param name="param"></param>
+        //private void DownloadSelectedItems(object param)
+        //{
+        //    int iRes = -1;
+        //    List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
 
-            InputPassMessage inputPassMessage = new InputPassMessage(this);
-            Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
+        //    InputPassMessage inputPassMessage = new InputPassMessage(this);
+        //    Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
 
-            if (inputPassMessage.Result == true)
-            {
-                foreach (var item in ObsFileList)
-                {
-                    if (item.IsCloud)
-                    {
-                        item.IsTransceived = false;
-                        listTargets.Add(item);
-                    }
-                }
+        //    if (inputPassMessage.Result == true)
+        //    {
+        //        foreach (var item in ObsFileList)
+        //        {
+        //            if (item.IsSelected && item.IsCloud)
+        //            {
+        //                item.IsTransceived = false;
+        //                listTargets.Add(item);
+        //            }
+        //        }
 
-                DataTransceiverModel transceiver = new DataTransceiverModel();
-                iRes = transceiver.Download(param, inputPassMessage, listTargets);
+        //        DataTransceiverModel transceiver = new DataTransceiverModel();
+        //        iRes = transceiver.Download(param, inputPassMessage, listTargets);
 
-                if (iRes < 0)
-                {
+        //        if (iRes < 0)
+        //        {
 
-                }
+        //        }
 
-                inputPassMessage.PassWord.Dispose();
-                inputPassMessage.PassFile = null;
-                inputPassMessage.PassDrive = null;
-                inputPassMessage = null;
+        //        inputPassMessage.PassWord.Dispose();
+        //        inputPassMessage.PassFile = null;
+        //        inputPassMessage.PassDrive = null;
+        //        inputPassMessage = null;
 
-                // ダウンロードの完了したアイテムはリストから削除
-                RemoveTransceivedItems();
-            }
-        }
+        //        // ダウンロードの完了したアイテムはリストから削除
+        //        RemoveTransceivedItems();
+        //    }
+        //}
+
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="param"></param>
+        //private void DownloadAll(object param)
+        //{
+        //    int iRes = -1;
+        //    List<ListItemViewModel> listTargets = new List<ListItemViewModel>();
+
+        //    InputPassMessage inputPassMessage = new InputPassMessage(this);
+        //    Messenger.Instance.Order<InputPassMessage>(this, inputPassMessage);
+
+        //    if (inputPassMessage.Result == true)
+        //    {
+        //        foreach (var item in ObsFileList)
+        //        {
+        //            if (item.IsCloud)
+        //            {
+        //                item.IsTransceived = false;
+        //                listTargets.Add(item);
+        //            }
+        //        }
+
+        //        DataTransceiverModel transceiver = new DataTransceiverModel();
+        //        iRes = transceiver.Download(param, inputPassMessage, listTargets);
+
+        //        if (iRes < 0)
+        //        {
+
+        //        }
+
+        //        inputPassMessage.PassWord.Dispose();
+        //        inputPassMessage.PassFile = null;
+        //        inputPassMessage.PassDrive = null;
+        //        inputPassMessage = null;
+
+        //        // ダウンロードの完了したアイテムはリストから削除
+        //        RemoveTransceivedItems();
+        //    }
+        //}
 
 
         /// <summary>
@@ -543,6 +504,11 @@ namespace MoonGate.Component.ViewModel
 
             DataTransceiverModel transceiver = new DataTransceiverModel();
             hDic = transceiver.GetCloudFileList(param);
+
+            if (hDic == null)
+            {
+                return;
+            }
 
             IDictionaryEnumerator hDicEnu = hDic.GetEnumerator();
             while (hDicEnu.MoveNext())
