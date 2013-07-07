@@ -154,11 +154,20 @@ namespace MoonGate.Properties {
         }
         
         /// <summary>
-        ///   MoonGate-{982F430F-AD10-4449-A020-EFC5A5479DA5} に類似しているローカライズされた文字列を検索します。
+        ///   Download Successfully Finished! に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string PgId {
+        internal static string mesInfoDownload {
             get {
-                return ResourceManager.GetString("PgId", resourceCulture);
+                return ResourceManager.GetString("mesInfoDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Upload Successfully Finished! に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string mesInfoUpload {
+            get {
+                return ResourceManager.GetString("mesInfoUpload", resourceCulture);
             }
         }
         
@@ -168,6 +177,15 @@ namespace MoonGate.Properties {
         internal static string titleErr {
             get {
                 return ResourceManager.GetString("titleErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Information に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string titleInfo {
+            get {
+                return ResourceManager.GetString("titleInfo", resourceCulture);
             }
         }
     }

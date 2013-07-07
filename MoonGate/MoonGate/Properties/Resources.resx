@@ -148,10 +148,16 @@
   <data name="mesExp" xml:space="preserve">
     <value>Unexpected Error!</value>
   </data>
-  <data name="PgId" xml:space="preserve">
-    <value>MoonGate-{982F430F-AD10-4449-A020-EFC5A5479DA5}</value>
-  </data>
   <data name="titleErr" xml:space="preserve">
     <value>ERROR</value>
+  </data>
+  <data name="mesInfoDownload" xml:space="preserve">
+    <value>Download Successfully Finished!</value>
+  </data>
+  <data name="mesInfoUpload" xml:space="preserve">
+    <value>Upload Successfully Finished!</value>
+  </data>
+  <data name="titleInfo" xml:space="preserve">
+    <value>Information</value>
   </data>
 </root>

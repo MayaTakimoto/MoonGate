@@ -164,7 +164,7 @@ namespace mgcloud.CloudOperator
                     {
                         if (DownloadFileList.Contains(file.OriginalFilename))
                         {
-                            // 同名のファイルが有る場合、最新のものを取得する
+                            // 同名のファイルが有る場合、最新のものを保持する
                             var d = fileList.Items
                                 .Where(param => param.DownloadUrl == DownloadFileList[file.OriginalFilename].ToString())
                                 .Select(param => param.CreatedDate);

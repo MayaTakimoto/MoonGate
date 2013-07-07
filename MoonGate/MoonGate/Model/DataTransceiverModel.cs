@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Security;
+using System.Windows;
 
 namespace MoonGate.Model
 {
@@ -449,8 +450,6 @@ namespace MoonGate.Model
                 }
                 catch (Exception e)
                 {
-                    string s = e.StackTrace;
-
                     oprCld.SaveAuthInfo();
 
                     if (!SaveConsumerInfo(cloudId, cKey, cSec))
