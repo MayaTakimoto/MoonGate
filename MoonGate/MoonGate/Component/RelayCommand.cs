@@ -1,4 +1,13 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <summary>RelayCommandクラス</summary>
+// <author>MayaTakimoto</author> 
+// <date>$Date: 2013-04-06 ‏‎23:09:37  +9:00 $</date>
+// <copyright file="$Name: RelayCommand.cs $" > 
+//     Copyright(c) 2013 MayaTakimoto All Rights Reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Windows.Input;
 
 namespace MoonGate.Component
