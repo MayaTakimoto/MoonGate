@@ -69,14 +69,14 @@ namespace mgcloud
 
 
         /// <summary>
-        /// 
+        /// クラウド上のディレクトリ一覧を取得
         /// </summary>
         /// <returns></returns>
         public abstract HybridDictionary GetDirList();
 
 
         /// <summary>
-        /// 
+        /// クラウド上の任意のディレクトリ内のファイル一覧を取得
         /// </summary>
         /// <returns></returns>
         public abstract HybridDictionary GetFileList(string dirId = null);
